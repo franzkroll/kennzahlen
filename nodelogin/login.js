@@ -3,6 +3,8 @@ var express = require('express');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
+var fs = require('fs');
+var http = require('http');
 
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -67,11 +69,12 @@ app.post('/auth', function(request, response) {
 
 app.get('/home', function(request, response) {
 	if (request.session.loggedin) {
-		response.send('Welcome back, ' + request.session.username + '!');
+		//response.send('Welcome back, ' + request.session.username + '!');
+		response.sendFile(__dirname + '/chart.html');
 	} else {
 		response.send('Please login to view this page!');
 	}
-	response.end();
+	//response.end();
 });
 
 app.listen(3000);
