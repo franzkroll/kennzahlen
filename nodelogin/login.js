@@ -56,23 +56,22 @@ app.get('/about', function(request, response) {
     response.render('pages/about');
 });
 
+app.get('/example', function(request, response) {
+    response.render('pages/graph');
+});
+
+app.get('/submit', function(request, response) {
+    response.render('pages/submit');
+});
+
 app.get('/home', function(request, response) {
 	if (request.session.loggedin) {
 		response.setHeader('Content-Type', 'text/html');
-		/*connectionLogin.query("SELECT * FROM accounts",(err, result)=>{
-			if (err) {
-				console.log(err); 
-				response.json({"error":true});
-			} else { 
-				console.log(result); 
-				response.json(result);
-			}
-		});*/
 		response.render('pages/index');
 	} else {
 		response.send('Please login to view this page!');
 	}
-	//response.end();
+	response.end();
 });
 
 app.listen(3000);
