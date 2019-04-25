@@ -52,6 +52,16 @@ app.post('/auth', function(request, response) {
 	}
 });
 
+app.get('/home', function(request, response) {
+	if (request.session.loggedin) {
+		response.setHeader('Content-Type', 'text/html');
+		response.render('pages/index');
+	} else {
+		response.send('Please login to view this page!');
+	}
+	response.end();
+});
+
 app.get('/about', function(request, response) {
     response.render('pages/about');
 });
@@ -62,16 +72,6 @@ app.get('/example', function(request, response) {
 
 app.get('/submit', function(request, response) {
     response.render('pages/submit');
-});
-
-app.get('/home', function(request, response) {
-	if (request.session.loggedin) {
-		response.setHeader('Content-Type', 'text/html');
-		response.render('pages/index');
-	} else {
-		response.send('Please login to view this page!');
-	}
-	response.end();
 });
 
 app.listen(3000);
