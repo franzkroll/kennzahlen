@@ -20,6 +20,7 @@ app.use(session({
     resave            : true,
     saveUninitialized : true
 }));
+
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
@@ -70,7 +71,8 @@ app.post('/auth', function(request, response) {
 app.get('/home', function(request, response) {
 	if (request.session.loggedin) {
 		//response.send('Welcome back, ' + request.session.username + '!');
-		response.sendFile(__dirname + '/chart.html');
+		response.setHeader('Content-Type', 'text/html');
+		response.sendFile(path.join(__dirname+'/chart.html'));
 	} else {
 		response.send('Please login to view this page!');
 	}
