@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<% include ../partials/head %>
-		<style>
-			.button {
-				width: 100%;
-				padding: 15px;
-				background-color: #535b63;
-				margin-bottom: 15px;
-				border: 0;
-				box-sizing: border-box;
-				cursor: pointer;
-				font-weight: bold;
-				color: #ffffff;
-			}
-		</style>
-	</head>
-	<body class="container">
-		<header>
-			<% include ../partials/header %>
-		</header>
 
+<head>
+	<% include ../partials/head %>
+	<style>
+		.button {
+			width: 30%;
+			padding: 15px;
+			background-color: #535b63;
+			margin-bottom: 15px;
+			border: 0;
+			box-sizing: border-box;
+			cursor: pointer;
+			font-weight: bold;
+			color: #ffffff;
+		}
+	</style>
+</head>
+
+<body class="container">
+	<header>
+		<% include ../partials/header %>
+	</header>
+	<div style="text-align:center;">
 		<main>
 			<a href="/example"><button class="button">Visualisierungen</button></a>
 			<a href="/submit"><button class="button">Datenformular</button></a>
 		</main>
+	</div>
 
-		<footer>
-			<% include ../partials/footer %>
-		</footer>
-		
-	</body>
+	<footer>
+		<% include ../partials/footer %>
+	</footer>
+</body>
+
 </html>
