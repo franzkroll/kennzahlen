@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
 app.get('/', function(request, response) {
-	response.sendFile(path.join(__dirname + '/login.html'));
+	response.render('pages/login');
 });
 
 app.post('/auth', function(request, response) {

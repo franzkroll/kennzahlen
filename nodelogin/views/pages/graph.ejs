@@ -4,21 +4,14 @@
     <% include ../partials/head %>
     <meta charset="utf-8" />
     <title>Chart.js demo</title>
-    <!-- import plugin script -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
 </head>
 <body class="container">
     <header>
         <% include ../partials/header %>
     </header>
-    <!-- line chart canvas element -->
     <canvas id="buyers" width="600" height="400"></canvas>
-    <!-- pie chart canvas element -->
-    <canvas id="countries" width="600" height="400"></canvas>
-    <!-- bar chart canvas element -->
-    <canvas id="income" width="600" height="400"></canvas>
     <script>
-    // line chart data
         var buyerData = {
             labels : ["January","February","March","April","May","June"],
             datasets : [
@@ -31,10 +24,8 @@
                 }   
             ]
         }
-    	// get line chart canvas
-	var buyers = document.getElementById('buyers').getContext('2d');
-	// draw line chart
-	new Chart(buyers).Line(buyerData);
+        var buyers = document.getElementById('buyers').getContext('2d');
+	    new Chart(buyers).Line(buyerData);
     </script>
 </body>
 </html>

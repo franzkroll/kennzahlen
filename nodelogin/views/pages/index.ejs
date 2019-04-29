@@ -1,25 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<% include ../partials/head %>
-</head>
-<body class="container">
+	<head>
+		<% include ../partials/head %>
+		<style>
+			.button {
+				width: 100%;
+				padding: 15px;
+				background-color: #535b63;
+				margin-bottom: 15px;
+				border: 0;
+				box-sizing: border-box;
+				cursor: pointer;
+				font-weight: bold;
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body class="container">
+		<header>
+			<% include ../partials/header %>
+		</header>
 
-	<header>
-		<% include ../partials/header %>
-	</header>
+		<main>
+			<a href="/example"><button class="button">Visualisierungen</button></a>
+			<a href="/submit"><button class="button">Datenformular</button></a>
+		</main>
 
-	<main>
-		<div class="noten">
-			<h1>Hier Auswahlmenü? (Eintragen/Darstellen)</h1>
-	        </div>
-        <a href="/example"><button>Visualisierungen</button></a>
-        <a href="/submit"><button>Daten eintragen</button></a>
-	</main>
-
-	<footer>
-		<% include ../partials/footer %>
-	</footer>
-	
-</body>
+		<footer>
+			<% include ../partials/footer %>
+		</footer>
+		
+	</body>
 </html>
