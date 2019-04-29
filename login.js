@@ -12,8 +12,6 @@ var connectionLogin = mysql.createConnection({
 	database: 'nodelogin'
 });
 
-//TODO create data connectionLogin
-
 var app = express();
 
 app.set('view engine', 'ejs');

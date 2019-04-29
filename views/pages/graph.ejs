@@ -9,6 +9,7 @@
     <style>
         .dropdown {
             width: 30%;
+            margin-bottom: 15px;
             -webkit-appearance: none;
             -moz-appearance: window;
             border: none;
@@ -34,6 +35,8 @@
 
     <script>
         var selectAction = document.getElementById("graph");
+        var currentChart;
+        var chart = document.getElementById('chart').getContext('2d');
 
         selectAction.onchange = function (e) {
             if (!e) {
@@ -41,17 +44,15 @@
             }
 
             var svalue = this.options[this.selectedIndex].value;
-            var chart = document.getElementById('chart').getContext('2d');
-            var currentChart = new Chart(chart).Bar(barData);
+            if (currentChart) {
+                currentChart.destroy();
+            }
 
             if (svalue === "line") {
-                currentChart.destroy();
                 currentChart = new Chart(chart).Line(buyerData);
             } else if (svalue === "pie") {
-                currentChart.destroy();
                 currentChart = new Chart(chart).Pie(pieData, pieOptions);
             } else if (svalue === "bar") {
-                currentChart.destroy();
                 currentChart = new Chart(chart).Bar(barData);
             }
         }
