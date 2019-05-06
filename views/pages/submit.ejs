@@ -13,6 +13,8 @@
         }
 
         .login-form h1 {
+            margin-bottom: 15px;
+
             text-align: center;
             color: #4d4d4d;
             font-size: 24px;
@@ -39,9 +41,19 @@
             font-weight: bold;
             color: #ffffff;
         }
+
+        .dropdown {
+            width: 15%;
+            margin-bottom: 10px;
+            margin: 10px;
+            -webkit-appearance: none;
+            -moz-appearance: window;
+            border: none;
+            background-image: url("https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png");
+            background-repeat: no-repeat;
+            background-position: right center;
+        }
     </style>
-    <% include ../partials/header %>
-    </header>
 
     <main>
         <div class="note">
@@ -49,12 +61,30 @@
 </head>
 
 <body class="container">
+    <header>
+        <% include ../partials/header %>
+    </header>
+
     <main>
-        <form action="auth" method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="submit" value="Kennzahl eintragen">
-        </form>
+        <div style="text-align:center;margin-bottom: 15px;margin-right: 10px">
+            <select id="graph" class="dropdown">
+                <option value="bar">Kennzahl 1.1</option>
+            </select>
+            <select id="graph" class="dropdown">
+                <option value="bar">Zeitraum</option>
+            </select>
+        </div>
+
+        <div class="login-form">
+            <form action="auth" method="POST">
+                <input type="text" name="username" placeholder="Eigenschaft 1" required>
+                <input type="text" name="username" placeholder="Eigenschaft 2" required>
+                <input type="text" name="username" placeholder="Eigenschaft 3" required>
+                <input type="text" name="username" placeholder="Eigenschaft 4" required>
+                <input type="password" name="password" placeholder="Eigenschaft 5" required>
+                <input type="text" name="username" placeholder="Eigenschaft 6" required>
+                <input type="submit" value="Eintragen">
+            </form>
         </div>
     </main>
 
