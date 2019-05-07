@@ -71,8 +71,7 @@ app.post('/auth', function (request, response) {
 			response.end();
 		});
 	} else {
-		response.send('Please enter Username and Password!');
-		response.end();
+		response.render('pages/simple/loginReq');
 	}
 });
 
@@ -84,50 +83,85 @@ app.get('/home', function (request, response) {
 			user: userLocal
 		});
 	} else {
-		response.send('Please login to view this page!');
+		response.render('pages/simple/loginReq');
 	}
-	response.end();
 });
 
 // Display simple About Page
 app.get('/about', function (request, response) {
-	response.render('pages/about', {
-		user: userLocal
-	});
+	if (request.session.loggedin) {
+		response.render('pages/about', {
+			user: userLocal
+		});
+	} else {
+		response.render('pages/simple/loginReq');
+	}
 });
 
 // Display visualization of data
 // TODO: better name for example
 app.get('/example', function (request, response) {
-	response.render('pages/graph', {
-		user: userLocal
-	});
+	if (request.session.loggedin) {
+		response.render('pages/graph', {
+			user: userLocal
+		});
+	} else {
+		response.render('pages/simple/loginReq');
+	}
 });
 
 // Display menu for entering data
 app.get('/submit', function (request, response) {
-	response.render('pages/submit', {
-		user: userLocal
-	});
+	if (request.session.loggedin) {
+		response.render('pages/submit', {
+			user: userLocal
+		});
+	} else {
+		response.render('pages/simple/loginReq');
+	}
 });
 
-// Display menu for creating new Kennzahlen
+// Display menu for creating new key figures
 app.get('/create', function (request, response) {
-	response.render('pages/create', {
-		user: userLocal
-	});
+	if (request.session.loggedin) {
+		response.render('pages/create', {
+			user: userLocal
+		});
+	} else {
+		response.render('pages/simple/loginReq');
+	}
 });
 
-// Display basic managign informations for a superuser or admin
+// Display basic managing information for a superuser or admin
+// TODO: check for admin
 app.get('/stats', function (request, response) {
-	response.render('pages/stats', {
-		user: userLocal
-	});
+	if (request.session.loggedin) {
+		response.render('pages/stats', {
+			user: userLocal
+		});
+	} else {
+		response.render('pages/simple/loginReq');
+	}
 });
+
+// Logout user and delete the session object
+app.get('/logout', function (request, response, next) {
+	if (request.session) {
+		request.session.destroy(function (err) {
+			if (err) {
+				return next(err);
+			} else {
+				return response.redirect('/');
+			}
+		});
+	}
+});
+
 
 // Return error message if requested page doesn't exist
 app.get('*', function (request, response) {
-	response.status(404).send("Seite konnte nicht gefunden werden.");
+	response.render('pages/simple/error');
+	//	response.status(404).send("Seite konnte nicht gefunden werden.");
 });
 
 // Start server on port that was previously defined
