@@ -33,7 +33,9 @@ module.exports = function (app) { // Render Homepage and display selection menus
                     userLocal.name = username;
                     // TODO: add role to mysql database, query database for role
                     userLocal.role = "Test";
-                    response.render('pages/index');
+                    response.render('pages/index', {
+                        user: userLocal
+                    });
                 } else {
                     response.send('Incorrect Username and/or Password!');
                 }
@@ -44,6 +46,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
+    // Render index selection page
     app.get('/home', function (request, response) {
         if (request.session.loggedin) {
             response.setHeader('Content-Type', 'text/html');
