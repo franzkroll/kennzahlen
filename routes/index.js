@@ -6,14 +6,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
         role: null
     };
 
-    // Create SQL-Connection for accessing user data
-    var connectionLogin = mysql.createConnection({
-        host: 'localhost',
-        user: 'dbaccess',
-        password: 'test',
-        database: 'nodelogin'
-    });
-
     // Render login page when user first accesses the application
     app.get('/', function (request, response) {
         response.render('pages/login');
@@ -23,6 +15,15 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.post('/auth', function (request, response) {
         var username = request.body.username;
         var password = request.body.password;
+
+        // Create SQL-Connection for accessing user data
+        var connectionLogin = mysql.createConnection({
+            host: 'localhost',
+            user: 'dbaccess',
+            password: 'test',
+            database: 'nodelogin'
+        });
+
         if (username && password) {
             connectionLogin.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
                 if (results.length > 0) {
@@ -39,7 +40,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 response.end();
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 
@@ -50,7 +51,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 
@@ -61,7 +62,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 
@@ -73,7 +74,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 
@@ -84,7 +85,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 
@@ -95,7 +96,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 
@@ -107,7 +108,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginReq');
+            response.render('pages/simple/loginError');
         }
     });
 

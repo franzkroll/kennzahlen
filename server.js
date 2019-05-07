@@ -3,6 +3,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const serverStatus = require('express-server-status');
 const helmet = require('helmet');
+const path = require('path');
 
 const port = 4000;
 
@@ -16,8 +17,10 @@ app.set('view engine', 'ejs');
 
 app.use(helmet());
 
-app.use('/public', express.static(process.cwd() + '/public'));
+// Path for linking stylesheet
+app.use(express.static(path.resolve('./public')));
 
+// session login credentials
 app.use(session({
 	secret: 'secret',
 	resave: true,
