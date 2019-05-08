@@ -134,7 +134,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
     // Handle creation of new users
     app.post('/admin', function (request, response) {
-        // TODO: put data into database
         if (request) {
             console.log('New user request: \n' + request.body);
             const sql = "INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)";
