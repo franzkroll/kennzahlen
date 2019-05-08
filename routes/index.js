@@ -1,12 +1,6 @@
 module.exports = function (app) { // Render Homepage and display selection menus and header
     const mysql = require('mysql');
 
-    // Save local user name and role for other functions of website
-    let userLocal = {
-        name: null,
-        role: null
-    };
-
     // Render login page when user first accesses the application
     app.get('/', function (request, response) {
         response.render('pages/login');
@@ -30,24 +24,21 @@ module.exports = function (app) { // Render Homepage and display selection menus
         if (username && password) {
             connectionLogin.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
                 if (results.length > 0) {
-                    user = username;
                     request.session.loggedin = true;
                     request.session.username = username;
-                    userLocal.name = username;
                     // TODO: add role to mysql database, query database for role
-                    userLocal.role = "Test";
                     response.render('pages/index', {
-                        user: userLocal
+                        user: request.session.username
                     });
-                    console.log("User '" + username + "' logged in .");
+                    console.log("User '" + request.session.username + "' logged in .");
                 } else {
-                    console.log("Failed login by '" + username + "' .");
-                    response.render('pages/error/loginFailed');
+                    console.log("Failed login by '" + request.session.username + "' .");
+                    response.render('pages/errors/loginFailed');
                 }
                 response.end();
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
@@ -56,10 +47,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
         if (request.session.loggedin) {
             response.setHeader('Content-Type', 'text/html');
             response.render('pages/index', {
-                user: userLocal
+                user: request.session.username
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
@@ -67,10 +58,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/about', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/about', {
-                user: userLocal
+                user: request.session.username
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
@@ -78,10 +69,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/graph', {
-                user: userLocal
+                user: request.session.username
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
@@ -89,10 +80,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/submit', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/submit', {
-                user: userLocal
+                user: request.session.username
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
@@ -100,10 +91,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/create', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/create', {
-                user: userLocal
+                user: request.session.username
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
@@ -112,16 +103,17 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/stats', {
-                user: userLocal
+                user: request.session.username
             });
         } else {
-            response.render('pages/error/loginError');
+            response.render('pages/errors/loginError');
         }
     });
 
     // Logout user and delete the session object
     app.get('/logout', function (request, response, next) {
         if (request.session) {
+            console.log("User '" + request.session.username + "' logged out .");
             request.session.destroy(function (err) {
                 if (err) {
                     return next(err);

@@ -1,3 +1,5 @@
+@import '/public/css/reset.css';
+
 /* Footer */
 
 html {
@@ -32,7 +34,6 @@ body {
     width: 30%;
     margin-bottom: 15px;
     -webkit-appearance: none;
-    -moz-appearance: window;
     border: none;
     background-image: url("https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png");
     background-repeat: no-repeat;
