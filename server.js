@@ -27,6 +27,7 @@ app.use(express.static(path.resolve('./public')));
 app.use(session({
 	secret: 'secret',
 	resave: true,
+	role: 'role',
 	saveUninitialized: true
 }));
 

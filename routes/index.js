@@ -1,5 +1,14 @@
 module.exports = function (app) { // Render Homepage and display selection menus and header
+    //TODO: globally check for sql injection
+
     const mysql = require('mysql');
+
+    const connectionLogin = mysql.createConnection({
+        host: 'localhost',
+        user: 'dbaccess',
+        password: 'Pdgy#MW$Jud6F$_B',
+        database: 'nodelogin'
+    });
 
     // Render login page when user first accesses the application
     app.get('/', function (request, response) {
@@ -14,19 +23,13 @@ module.exports = function (app) { // Render Homepage and display selection menus
         const password = request.body.password;
 
         // Create SQL-Connection for accessing user data
-        var connectionLogin = mysql.createConnection({
-            host: 'localhost',
-            user: 'dbaccess',
-            password: 'test',
-            database: 'nodelogin'
-        });
 
         if (username && password) {
+            // TODO: hash password before query
             connectionLogin.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
                 if (results.length > 0) {
                     request.session.loggedin = true;
                     request.session.username = username;
-                    // TODO: add role to mysql database, query database for role
                     response.render('pages/index', {
                         user: request.session.username
                     });
@@ -109,6 +112,41 @@ module.exports = function (app) { // Render Homepage and display selection menus
             response.render('pages/errors/loginError');
         }
     });
+
+    app.get('/admin', function (request, response) {
+        if (request.session.loggedin) {
+            connectionLogin.query('SELECT * FROM accounts WHERE username = ?', [request.session.username], function (error, rows) {
+                const role = rows[0].role;
+                if (role === 'admin') {
+                    response.render('pages/admin/admin', {
+                        user: request.session.username
+                    });
+                } else {
+                    console.log('User ' + request.session.username + ' tried to access admin functionalities');
+                    response.render('pages/errors/loginError');
+                }
+            });
+        } else {
+            response.render('pages/errors/loginError');
+        }
+    })
+
+    // Admin functionality, needs to be moved and merged with createUser
+    app.post('/admin', function (request, response) {
+        // TODO: put data into database
+        if (request) {
+            console.log('New user request: \n' + request.body);
+            const sql = "INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)";
+            // TODO: hash password here
+            connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err, result) {
+                if (err) throw err;
+                console.log("user successfully created");
+            });
+        }
+        response.render('pages/admin/admin', {
+            user: request.session.username
+        });
+    })
 
     // Logout user and delete the session object
     app.get('/logout', function (request, response, next) {
