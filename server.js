@@ -5,28 +5,32 @@ const serverStatus = require('express-server-status');
 const helmet = require('helmet');
 const path = require('path');
 
-const port = 4000;
+// start server on Port 4000 if no other port is specified
+const port = process.env.PORT || 4000;
 
+// link routes 
 var routes = require('./routes/index.js');
 
 // Application uses express for rendering and displaying pages
 var app = express();
 
-// Set ejs as view engine
+// Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');
 
+// Security function
 app.use(helmet());
 
 // Path for linking stylesheet
 app.use(express.static(path.resolve('./public')));
 
-// session login credentials
+// Session login credentials
 app.use(session({
 	secret: 'secret',
 	resave: true,
 	saveUninitialized: true
 }));
 
+// Handles post Request for Login
 app.use(bodyParser.urlencoded({
 	extended: true
 }));

@@ -178,6 +178,7 @@ svg {
     position: absolute;
     top: 50%;
     left: 50%;
+    font-family: Tahoma, Geneva, sans-serif;
     margin-top: -100px;
     margin-left: 50px;
     color: #535b63;
@@ -185,6 +186,7 @@ svg {
 }
 
 .message-box h1 {
+    font-family: Tahoma, Geneva, sans-serif;
     font-size: 60px;
     line-height: 46px;
     margin-bottom: 40px;
@@ -199,6 +201,7 @@ svg {
     padding: 8px 25px;
     border-radius: 4px;
     color: #FFF;
+    font-family: Tahoma, Geneva, sans-serif;
     font-weight: bold;
     font-size: 14px;
     transition: all 0.3s linear;

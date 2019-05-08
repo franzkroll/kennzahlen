@@ -1,7 +1,8 @@
 module.exports = function (app) { // Render Homepage and display selection menus and header
     const mysql = require('mysql');
 
-    var userLocal = {
+    // Save local user name and role for other functions of website
+    let userLocal = {
         name: null,
         role: null
     };
@@ -11,10 +12,12 @@ module.exports = function (app) { // Render Homepage and display selection menus
         response.render('pages/login');
     });
 
-    // TODO: comments, sql injection
+    /** Queries database with login data,
+     * returns homepage if login data is correct, returns error message otherwise
+     */
     app.post('/auth', function (request, response) {
-        var username = request.body.username;
-        var password = request.body.password;
+        const username = request.body.username;
+        const password = request.body.password;
 
         // Create SQL-Connection for accessing user data
         var connectionLogin = mysql.createConnection({
@@ -36,13 +39,15 @@ module.exports = function (app) { // Render Homepage and display selection menus
                     response.render('pages/index', {
                         user: userLocal
                     });
+                    console.log("User '" + username + "' logged in .");
                 } else {
-                    response.send('Incorrect Username and/or Password!');
+                    console.log("Failed login by '" + username + "' .");
+                    response.render('pages/error/loginFailed');
                 }
                 response.end();
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
@@ -54,7 +59,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
@@ -65,19 +70,18 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
     // Display visualization of data
-    // TODO: better name for example
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/graph', {
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
@@ -88,7 +92,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
@@ -99,7 +103,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
@@ -111,7 +115,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 user: userLocal
             });
         } else {
-            response.render('pages/simple/loginError');
+            response.render('pages/error/loginError');
         }
     });
 
@@ -130,6 +134,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
     // Return error message if requested page doesn't exist
     app.get('*', function (request, response) {
-        response.render('pages/simple/error');
+        response.render('pages/errors/error404');
     });
 }
