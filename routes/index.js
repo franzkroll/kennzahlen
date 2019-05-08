@@ -33,7 +33,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                     response.render('pages/index', {
                         user: request.session.username
                     });
-                    console.log("User '" + request.session.username + "' logged in .");
+                    console.log("User '" + request.session.username + "' logged in.");
                 } else {
                     console.log("Failed login by '" + request.session.username + "' .");
                     response.render('pages/errors/loginFailed');
@@ -113,6 +113,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
+    // Admin functionality, needs to be moved and merged with createUser
     app.get('/admin', function (request, response) {
         if (request.session.loggedin) {
             connectionLogin.query('SELECT * FROM accounts WHERE username = ?', [request.session.username], function (error, rows) {
@@ -122,7 +123,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                         user: request.session.username
                     });
                 } else {
-                    console.log('User ' + request.session.username + ' tried to access admin functionalities');
+                    console.log('User ' + request.session.username + ' tried to access admin functionalities. Denying access.');
                     response.render('pages/errors/loginError');
                 }
             });
@@ -131,7 +132,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     })
 
-    // Admin functionality, needs to be moved and merged with createUser
+    // Handle creation of new users
     app.post('/admin', function (request, response) {
         // TODO: put data into database
         if (request) {
@@ -140,7 +141,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
             // TODO: hash password here
             connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err, result) {
                 if (err) throw err;
-                console.log("user successfully created");
+                console.log("User successfully created and inserted into database.");
             });
         }
         response.render('pages/admin/admin', {
@@ -151,7 +152,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
     // Logout user and delete the session object
     app.get('/logout', function (request, response, next) {
         if (request.session) {
-            console.log("User '" + request.session.username + "' logged out .");
+            console.log("User '" + request.session.username + "' logged out.");
             request.session.destroy(function (err) {
                 if (err) {
                     return next(err);

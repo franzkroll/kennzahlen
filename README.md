@@ -19,6 +19,8 @@ node server.js
 
 Die Anwendung ist nun über [localhost:4000](http://localhost:4000/) erreichbar. (Beim Starten über NodeJS lässt sich ebenso ein anderer Port spezifizieren.)
 
+Ein log über alle Ereignisse wird in debug.log erstellt.
+
 
 ## Aufbau der Datenbanken
 
