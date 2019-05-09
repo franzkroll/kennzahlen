@@ -91,9 +91,20 @@ module.exports = function (app) { // Render Homepage and display selection menus
     });
 
     // Display menu for creating new key figures
-    app.get('/create', function (request, response) {
+    app.get('/createTheme', function (request, response) {
         if (request.session.loggedin) {
-            response.render('pages/create', {
+            response.render('pages/createTheme', {
+                user: request.session.username
+            });
+        } else {
+            response.render('pages/errors/loginError');
+        }
+    });
+
+    // Display menu for adding a measure to an existing theme
+    app.get('/addMeasure', function (request, response) {
+        if (request.session.loggedin) {
+            response.render('pages/addMeasure', {
                 user: request.session.username
             });
         } else {
@@ -102,7 +113,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
     });
 
     // Display basic managing information for a superuser or admin
-    // TODO: check for admin
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
             response.render('pages/stats', {

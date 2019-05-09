@@ -14,8 +14,10 @@ const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 const log_stdout = process.stdout;
 
 console.log = function (d) { //
-	log_file.write(util.format(d) + '\n');
-	log_stdout.write(util.format(d) + '\n');
+	const time = new Date();
+	const dateString = (time.toDateString() + " / " + time.toTimeString()).split('(')
+	log_file.write(dateString[0] + ': ' + util.format(d) + '\n');
+	log_stdout.write(dateString[0] + ': ' + util.format(d) + '\n');
 };
 
 // start server on Port 4000 if no other port is specified
@@ -63,7 +65,7 @@ const server = app.listen(port, function () {
 
 // Logs Current Connections
 setInterval(() => server.getConnections(
-	(err, connections) => console.log(`- ${connections} connections currently open`)
+	(err, connections) => console.log(`${connections} connections currently open`)
 ), 10000);
 
 process.on('SIGTERM', shutDown);

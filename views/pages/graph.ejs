@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- TODO: Kennzahl selection, Tabellen-->
+<!-- TODO: Tabellen-->
 
 <head>
     <% include ../partials/head %>
@@ -15,7 +15,11 @@
     <header>
         <% include ../partials/header %>
     </header>
+
     <div style="text-align:center;">
+        <select id="measure" class="dropdownS">
+            <option value="bar">Kennzahl</option>
+        </select>
         <select id="graph" class="dropdown">
             <option value="bar">Bar-Chart</option>
             <option value="line">Line-Chart</option>
