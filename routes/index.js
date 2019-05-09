@@ -112,6 +112,26 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
+    // Displays admin index page
+    app.get('/admin', function (request, response) {
+        if (request.session.loggedin) {
+            let role;
+            getInformationFromLoginDB(request, function (result, err) {
+                role = (result[0].role);
+                console.log(role);
+                if (role === 'admin') {
+                    response.render('pages/admin/admin', {
+                        user: request.session.username
+                    });
+                } else {
+                    response.render('pages/errors/adminError');
+                }
+            });
+        } else {
+            response.render('pages/errors/loginError');
+        }
+    })
+
     // Display basic managing information for a superuser or admin
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
@@ -123,18 +143,19 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
-    // Admin functionality, needs to be moved and merged with createUser
-    app.get('/admin', function (request, response) {
+    // Display user creation page, TODO: only for admins
+    app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
-            connectionLogin.query('SELECT * FROM accounts WHERE username = ?', [request.session.username], function (error, rows) {
-                const role = rows[0].role;
+            let role;
+            getInformationFromLoginDB(request, function (result, err) {
+                role = (result[0].role);
+                console.log(role);
                 if (role === 'admin') {
-                    response.render('pages/admin/admin', {
+                    response.render('pages/admin/createUser', {
                         user: request.session.username
                     });
                 } else {
-                    console.log('User ' + request.session.username + ' tried to access admin functionalities. Denying access.');
-                    response.render('pages/errors/loginError');
+                    response.render('pages/errors/adminError');
                 }
             });
         } else {
@@ -143,10 +164,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
     })
 
     // Handle creation of new users
-    app.post('/admin', function (request, response) {
+    app.post('/createUser', function (request, response) {
         if (request) {
             console.log('New user request: \n' + request.body);
-            const sql = "INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)";
+            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
             // TODO: hash password here
             connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err, result) {
                 if (err) throw err;
@@ -176,4 +197,20 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('*', function (request, response) {
         response.render('pages/errors/error404');
     });
+
+    //** Stuff for querying databases */
+    var getInformationFromLoginDB = function (request, callback) {
+        var result = [];
+
+        console.log(request.session.username);
+        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', [request.session.username], function (err, res, fields) {
+            if (err) return callback(err);
+            if (res.length) {
+                for (var i = 0; i < res.length; i++) {
+                    result.push(res[i]);
+                }
+            }
+            callback(result);
+        });
+    }
 }

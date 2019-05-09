@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- TODO: split views  in different files -->
+
+<head>
+    <% include ../../partials/head %>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+
+<body class="container">
+
+    <header>
+        <% include ../../partials/header %>
+    </header>
+
+    <main>
+        <span style="display:block; height: 25px;"></span>
+
+        <div class="login-formS">
+            <form action="createUser" method="POST">
+                <input type="text" name="username" placeholder="Benutzername" required>
+                <input type="text" name="password" placeholder="Passwort" required>
+                <input type="text" name="mail" placeholder="E-Mail" required>
+                <input type="text" name="role" placeholder="Rolle" required>
+                <span style="display:block; height: 15px;"></span>
+                <input type="submit" value="Benutzer anlegen">
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <% include ../../partials/footer %>
+    </footer>
+
+</body>
+
+</html>

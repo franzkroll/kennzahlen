@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- TODO: split views  in different files -->
-
 <head>
     <% include ../../partials/head %>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -15,23 +13,16 @@
     </header>
 
     <main>
-        <span style="display:block; height: 25px;"></span>
+        <span style="display:block; height: 10px;"></span>
 
-        <div class="login-formS">
-            <form action="admin" method="POST">
-                <input type="text" name="username" placeholder="Benutzername" required>
-                <input type="text" name="password" placeholder="Passwort" required>
-                <input type="text" name="mail" placeholder="E-Mail" required>
-                <input type="text" name="role" placeholder="Rolle" required>
-                <input type="submit" value="Benutzer anlegen">
-            </form>
-        </div>
         <div style="text-align:center;">
-            <main>
-                <div>
-                    <a href="/stats"><button style="width:300px" class="button">Serverstatistiken</button></a>
-                </div>
-            </main>
+            <div>
+                <a href="/stats"><button style="width:300px" class="button">Serverstatistiken</button></a>
+            </div>
+            <span style="display:block; height: 10px;"></span>
+            <div>
+                <a href="/createUser"><button style="width:300px" class="button">Neuen Benutzer erstellen</button></a>
+            </div>
         </div>
     </main>
 
