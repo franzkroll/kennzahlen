@@ -1,13 +1,13 @@
-var selectAction = document.getElementById("graph");
-var currentChart;
-var chart = document.getElementById('chart').getContext('2d');
+let selectAction = document.getElementById("graph");
+let currentChart;
+let chart = document.getElementById('chart').getContext('2d');
 
 selectAction.onchange = function (e) {
     if (!e) {
-        var e = window.event;
+        let e = window.event;
     }
 
-    var svalue = this.options[this.selectedIndex].value;
+    let svalue = this.options[this.selectedIndex].value;
     if (currentChart) {
         currentChart.destroy();
     }
@@ -21,7 +21,7 @@ selectAction.onchange = function (e) {
     }
 }
 
-var buyerData = {
+let buyerData = {
     labels: ["Januar", "Februar", "März", "April", "Mai", "Juni"],
     datasets: [{
         fillColor: "rgba(172,194,132,0.4)",
@@ -32,7 +32,7 @@ var buyerData = {
     }]
 }
 
-var pieData = [{
+let pieData = [{
         value: 20,
         color: "#878BB6"
     },
@@ -50,12 +50,12 @@ var pieData = [{
     }
 ];
 
-var pieOptions = {
+let pieOptions = {
     segmentShowStroke: false,
     animateScale: true
 }
 
-var barData = {
+let barData = {
     labels: ["January", "February", "March", "April", "May", "June"],
     datasets: [{
             fillColor: "#48A497",

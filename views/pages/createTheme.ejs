@@ -12,26 +12,27 @@
     <header>
         <% include ../partials/header %>
     </header>
-    <!-- TODO: dynmaically create input fields-->
     <main>
         <div class="" style="text-align:center;margin-bottom: 10px;margin-right: 10px;margin-top:10px">
             Bitte legen Sie die jeweiligen Kennzahlen des Themas sowie einen Namen für das Thema fest.
         </div>
         <span style="display:block; height: 15px;"></span>
+
+        <script src="/scripts/fieldCreator.js"></script>
+
         <div class="login-formS">
             <form action="create" method="POST">
                 <input type="text" name="var1" placeholder="Name des Themas" required>
-                <span style="display:block; height: 15px;"></span>
-                <input type="text" name="var1" placeholder="Eigenschaft 1" required>
-                <input type="text" name="var2" placeholder="Eigenschaft 2" required>
-                <input type="text" name="var3" placeholder="Eigenschaft 3" required>
-                <input type="text" name="var4" placeholder="Eigenschaft 4" required>
-                <input type="text" name="var5" placeholder="Eigenschaft 5" required>
-                <input type="text" name="var6" placeholder="Eigenschaft 6" required>
-                <span style="display:block; height: 15px;"></span>
-                <input type="submit" value="Thema erstellen">
+                <span style="display:block; height: 10px;"></span>
+                <div id="container">
+                    <input type="text" name="var1" placeholder="Eigenschaft 1" required>
+                </div>
+                <span style="display:block; height: 10px;"></span>
+                <div>
+                    <input type="submit" value="Thema erstellen">
+                    <input class="button" style="width:300px" type="button" value="Eigenschaft hinzufügen" id="add" />
+                </div>
             </form>
-
         </div>
     </main>
 

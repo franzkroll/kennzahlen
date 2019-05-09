@@ -15,7 +15,24 @@
     </header>
 
     <main>
-
+        <table>
+            <thead>
+                <tr>
+                    <th>Benutzername</th>
+                    <th>Rolle</th>
+                    <th>E-Mail</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- todo load in database data -->
+                <% print.forEach(function (result) { %>
+                <tr>
+                    <td><%= result.id %></td>
+                    <td><%= result.username %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
     </main>
 
     <footer>

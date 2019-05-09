@@ -149,7 +149,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
             let role;
             getInformationFromLoginDB(request, function (result, err) {
                 role = (result[0].role);
-                console.log(role);
                 if (role === 'admin') {
                     response.render('pages/admin/createUser', {
                         user: request.session.username
@@ -171,10 +170,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
             let role;
             getInformationFromLoginDB(request, function (result, err) {
                 role = (result[0].role);
-                console.log(role);
                 if (role === 'admin') {
                     response.render('pages/admin/showUsers', {
-                        user: request.session.username
+                        user: request.session.username,
+                        result: result
                     });
                 } else {
                     response.render('pages/errors/adminError');
