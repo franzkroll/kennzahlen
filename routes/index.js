@@ -118,13 +118,13 @@ module.exports = function (app) { // Render Homepage and display selection menus
             let role;
             getInformationFromLoginDB(request, function (result, err) {
                 role = (result[0].role);
-                console.log(role);
                 if (role === 'admin') {
                     response.render('pages/admin/admin', {
                         user: request.session.username
                     });
                 } else {
                     response.render('pages/errors/adminError');
+                    console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
                 }
             });
         } else {
@@ -156,6 +156,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                     });
                 } else {
                     response.render('pages/errors/adminError');
+                    console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
                 }
             });
         } else {
