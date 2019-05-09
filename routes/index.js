@@ -164,6 +164,28 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     })
 
+
+    // Display user creation page, TODO: only for admins
+    app.get('/showUsers', function (request, response) {
+        if (request.session.loggedin) {
+            let role;
+            getInformationFromLoginDB(request, function (result, err) {
+                role = (result[0].role);
+                console.log(role);
+                if (role === 'admin') {
+                    response.render('pages/admin/showUsers', {
+                        user: request.session.username
+                    });
+                } else {
+                    response.render('pages/errors/adminError');
+                    console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
+                }
+            });
+        } else {
+            response.render('pages/errors/loginError');
+        }
+    })
+
     // Handle creation of new users
     app.post('/createUser', function (request, response) {
         if (request) {
@@ -199,7 +221,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
         response.render('pages/errors/error404');
     });
 
-    //** Stuff for querying databases */
+    /** Code for querying database, TODO: maybe better? */
     var getInformationFromLoginDB = function (request, callback) {
         var result = [];
 
