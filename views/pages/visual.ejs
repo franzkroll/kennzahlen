@@ -9,6 +9,7 @@
     <title>Chart.js demo</title>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+
 </head>
 
 <body class="container">
@@ -39,10 +40,42 @@
     <span style="display:block; height: 10px;"></span>
 
     <div style="text-align:center">
-        <button class="button"> </button>
+        <!-- TODO: create table-->
+        <button onClick="showTable()" class="button">Als Tabelle anzeigen</button>
     </div>
 
-    <script src="/scripts/graph.js"></script>
+
+    <div id="table">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Januar 2019</th>
+                    <th>Februar 2019</th>
+                    <th>März 2019</th>
+                    <th>April 2019</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-column="1">Kennzahl 1</td>
+                    <td data-column="2">2</td>
+                    <td data-column="3">3</td>
+                    <td data-column="4">6</td>
+                    <td data-column="5">1</td>
+                </tr>
+                <tr>
+                    <td data-column="1">Kennzahl 2</td>
+                    <td data-column="2">5</td>
+                    <td data-column="3">3</td>
+                    <td data-column="4">1</td>
+                    <td data-column="5">8</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/scripts/visualHelper.js"></script>
 
     <footer>
         <% include ../partials/footer %>
