@@ -90,6 +90,14 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
+    app.post('/submit', function (request, response) {
+        //TODO: get data and store in db, give user response that values were inserted
+    });
+
+    app.post('/createTheme', function (request, response) {
+        //TODO: get data and store in db, give user response that theme was created
+    });
+
     // Display menu for creating new key figures
     app.get('/createTheme', function (request, response) {
         if (request.session.loggedin) {
@@ -116,11 +124,12 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/admin', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getInformationFromLoginDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result, err) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     response.render('pages/admin/admin', {
-                        user: request.session.username
+                        user: request.session.username,
+                        text: ""
                     });
                 } else {
                     response.render('pages/errors/adminError');
@@ -147,7 +156,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getInformationFromLoginDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result, err) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     response.render('pages/admin/createUser', {
@@ -168,12 +177,23 @@ module.exports = function (app) { // Render Homepage and display selection menus
     app.get('/showUsers', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getInformationFromLoginDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result, err) {
                 role = (result[0].role);
+                console.log(role);
                 if (role === 'admin') {
-                    response.render('pages/admin/showUsers', {
-                        user: request.session.username,
-                        result: result
+                    getAllUsersFromDB(request, function (result, err) {
+                        role = (result[0].role);
+                        let sendString = "";
+
+                        // Convert json object to string for sending via ejs
+                        for (i = 0; i < result.length; i++) {
+                            sendString += result[i].id + ":" + result[i].username + ":" + result[i].role + ":" + result[i].email + ":";
+                        }
+
+                        response.render('pages/admin/showUsers', {
+                            user: request.session.username,
+                            result: sendString
+                        });
                     });
                 } else {
                     response.render('pages/errors/adminError');
@@ -196,8 +216,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 console.log("User successfully created and inserted into database.");
             });
         }
+        const responseText = "Benutzer erfolgreich erstellt!";
         response.render('pages/admin/admin', {
-            user: request.session.username
+            user: request.session.username,
+            text: responseText
         });
     })
 
@@ -221,11 +243,25 @@ module.exports = function (app) { // Render Homepage and display selection menus
     });
 
     /** Code for querying database, TODO: maybe better? */
-    var getInformationFromLoginDB = function (request, callback) {
+    var getCurrentLoginFromDB = function (request, callback) {
         var result = [];
 
-        console.log(request.session.username);
         connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', [request.session.username], function (err, res, fields) {
+            if (err) return callback(err);
+            if (res.length) {
+                for (var i = 0; i < res.length; i++) {
+                    result.push(res[i]);
+                }
+            }
+            callback(result);
+        });
+    }
+
+    /** Code for querying database, TODO: maybe better? */
+    var getAllUsersFromDB = function (request, callback) {
+        var result = [];
+
+        connectionLogin.query('SELECT * FROM accounts', function (err, res, fields) {
             if (err) return callback(err);
             if (res.length) {
                 for (var i = 0; i < res.length; i++) {
