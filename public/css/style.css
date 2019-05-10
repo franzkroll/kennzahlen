@@ -30,9 +30,13 @@ body {
     padding-top: 48px;
 }
 
+/* TODO: make footer move with page */
 .footer {
+    box-sizing: border-box;
     position: absolute;
     bottom: 0;
+    margin-right: 15px;
+    text-align: center;
     margin-bottom: 30px;
     height: 40px;
     background-color: #4169E1;
@@ -287,7 +291,8 @@ svg {
 
 /* User table */
 table {
-    width: 750px;
+    width: 90%;
+    text-align:center;
     border-collapse: collapse;
     margin: 50px auto;
 }
@@ -316,7 +321,7 @@ Max width before this PARTICULAR table gets nasty
 This query will take effect for any screen smaller than 760px
 and also iPads specifically.
 */
-@media only screen and (max-width: 760px),
+@media only screen and (max-width: 200px),
 (min-device-width: 768px) and (max-device-width: 1024px) {
 
     table {

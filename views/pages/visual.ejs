@@ -9,7 +9,6 @@
     <title>Chart.js demo</title>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-
 </head>
 
 <body class="container">
@@ -23,10 +22,17 @@
     </div>
     <span style="display:block; height: 10px;"></span>
     <div style="text-align:center;">
-        <select id="measure" class="dropdownS">
-            <option value="bar">Kennzahl</option>
+        <!-- TODO: load data here, display possible entries by tables -->
+         <select id="theme" class="dropdownS">
+            <option value="val1">Thema 1.1</option>
+            <option value="val2">Thema 1.2</option>
         </select>
-        <select id="graph" class="dropdown">
+        <select id="measure" class="dropdownS">
+            <option value="val1">Kennzahl 1.1.1</option>
+            <option value="val2">Kennzahl 1.1.2</option>
+        </select>
+        <!-- TODO: maybe more options -->
+        <select id="graph" class="dropdownS">
             <option value="bar">Balkendiagramm</option>
             <option value="line">Liniendiagramm</option>
             <option value="pie">Kuchendiagramm</option>
@@ -41,11 +47,11 @@
 
     <div style="text-align:center">
         <!-- TODO: create table-->
-        <button onClick="showTable()" class="button">Als Tabelle anzeigen</button>
+        <button onClick="showTable()" class="button">Tabelle ein-/ausblenden</button>
     </div>
 
-
     <div id="table">
+        <!-- maybe show whole theme here? one measure doesn't make sense -->
         <table>
             <thead>
                 <tr>
