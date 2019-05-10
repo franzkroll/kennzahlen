@@ -19,7 +19,6 @@
 /* Footer */
 
 html {
-    position: relative;
     min-height: 100%;
 }
 
@@ -317,7 +316,7 @@ Max width before this PARTICULAR table gets nasty
 This query will take effect for any screen smaller than 760px
 and also iPads specifically.
 */
-@media only screen and (max-width: 760px),
+@media only screen and (max-width: 200px),
 (min-device-width: 768px) and (max-device-width: 1024px) {
 
     table {

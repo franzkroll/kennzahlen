@@ -71,7 +71,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
     // Display visualization of data
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
-            response.render('pages/graph', {
+            response.render('pages/visual', {
                 user: request.session.username
             });
         } else {
@@ -203,7 +203,12 @@ module.exports = function (app) { // Render Homepage and display selection menus
         } else {
             response.render('pages/errors/loginError');
         }
-    })
+    });
+
+    app.post('/deleteUser', function (request, response) {
+        //TODO: delete user from database
+        console.log('Delete User called');
+    });
 
     // Handle creation of new users
     app.post('/createUser', function (request, response) {
@@ -221,7 +226,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
             user: request.session.username,
             text: responseText
         });
-    })
+    });
 
     // Logout user and delete the session object
     app.get('/logout', function (request, response, next) {
