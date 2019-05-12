@@ -16,6 +16,11 @@
     color: #ffffff;
 }
 
+.misc-text {
+    font-family: Tahoma, Geneva, sans-serif;
+    text-align: center;
+}
+
 /* Footer */
 
 html {
@@ -312,6 +317,7 @@ th {
 td,
 th {
     padding: 10px;
+    width: 20%;
     border: 1px solid #ccc;
     text-align: left;
     font-size: 14px;

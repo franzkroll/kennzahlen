@@ -45,6 +45,39 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
+    // Handle creation of new users
+    app.post('/createUser', function (request, response) {
+        if (request) {
+            console.log('New user request: \n' + request.body);
+            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
+            // TODO: hash password here
+            connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err, result) {
+                if (err) throw err;
+                console.log("User successfully created and inserted into database.");
+            });
+        }
+        const responseText = "Benutzer erfolgreich erstellt!";
+        response.render('pages/admin/admin', {
+            user: request.session.username,
+            text: responseText
+        });
+    });
+
+    app.post('/deleteUser', function (request, response) {
+        //TODO: delete user from database
+        const id = request.body.userDelete;
+        console.log(id);
+        console.log('Delete User called');
+        var x = 7;
+        deleteUserFromDB(x, function (result, err) {
+            console.log(err);
+            response.render('pages/admin/admin', {
+                user: request.session.username,
+                text: "Benutzer erfolgreich gelöscht"
+            });
+        });
+    });
+
     // Render index selection page
     app.get('/home', function (request, response) {
         if (request.session.loggedin) {
@@ -144,8 +177,17 @@ module.exports = function (app) { // Render Homepage and display selection menus
     // Display basic managing information for a superuser or admin
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
-            response.render('pages/stats', {
-                user: request.session.username
+            let role;
+            getCurrentLoginFromDB(request, function (result, err) {
+                role = (result[0].role);
+                if (role === 'admin') {
+                    response.render('pages/stats', {
+                        user: request.session.username
+                    });
+                } else {
+                    response.render('pages/errors/adminError');
+                    console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
+                }
             });
         } else {
             response.render('pages/errors/loginError');
@@ -203,39 +245,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
         } else {
             response.render('pages/errors/loginError');
         }
-    });
-
-    app.post('/deleteUser', function (request, response) {
-        //TODO: delete user from database
-        const id = request.body.userDelete;
-        console.log(id);
-        console.log('Delete User called');
-        var x = 7;
-        deleteUserFromDB(x, function (result, err) {
-            console.log(err);
-            response.render('pages/admin/admin', {
-                user: request.session.username,
-                text: "Benutzer erfolgreich gelöscht"
-            });
-        });
-    });
-
-    // Handle creation of new users
-    app.post('/createUser', function (request, response) {
-        if (request) {
-            console.log('New user request: \n' + request.body);
-            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
-            // TODO: hash password here
-            connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err, result) {
-                if (err) throw err;
-                console.log("User successfully created and inserted into database.");
-            });
-        }
-        const responseText = "Benutzer erfolgreich erstellt!";
-        response.render('pages/admin/admin', {
-            user: request.session.username,
-            text: responseText
-        });
     });
 
     // Logout user and delete the session object
