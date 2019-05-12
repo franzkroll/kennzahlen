@@ -1,7 +1,6 @@
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const serverStatus = require('express-server-status');
 const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
@@ -29,6 +28,7 @@ var routes = require('./routes/index.js');
 // Application uses express for rendering and displaying pages
 var app = express();
 
+
 // Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');
 
@@ -53,7 +53,6 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 // Display simple server status
-app.use('/stats', serverStatus(app));
 
 routes(app);
 

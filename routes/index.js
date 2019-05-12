@@ -3,6 +3,14 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
     const mysql = require('mysql');
 
+    // TODO: move to server?
+    const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
+    const statusMonitor = require('express-status-monitor')();
+
+    app.use(statusMonitor);
+
+    app.get('/status', ensureLoggedIn, statusMonitor.pageRoute)
+
     const connectionLogin = mysql.createConnection({
         host: 'localhost',
         user: 'dbaccess',
