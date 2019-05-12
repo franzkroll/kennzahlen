@@ -19,6 +19,7 @@
 /* Footer */
 
 html {
+    overflow-y: scroll;
     min-height: 100%;
 }
 
@@ -32,18 +33,17 @@ body {
 
 /* TODO: make footer move with page */
 .footer {
-    box-sizing: border-box;
-    position: absolute;
+    position: fixed;
+    left: 0;
     bottom: 0;
-    margin-right: 15px;
+    width: 100%;
     text-align: center;
-    margin-bottom: 30px;
-    height: 40px;
+    height: 30px;
     background-color: #4169E1;
 }
 
 .footer p {
-    line-height: 40px;
+    line-height: 30px;
     color: white;
 }
 
@@ -99,8 +99,8 @@ body {
 /* Header */
 
 ul {
+    width: 100%;
     list-style-type: none;
-    margin: 15;
     padding: 0;
     overflow: hidden;
     font-weight: bold;
@@ -291,8 +291,9 @@ svg {
 
 /* User table */
 table {
-    width: 90%;
-    text-align:center;
+    width: 80%;
+    box-sizing: border-box;
+    text-align: center;
     border-collapse: collapse;
     margin: 50px auto;
 }
@@ -325,7 +326,7 @@ and also iPads specifically.
 (min-device-width: 768px) and (max-device-width: 1024px) {
 
     table {
-        width: 100%;
+        width: 80%;
     }
 
     /* Force table to not be like tables anymore */
