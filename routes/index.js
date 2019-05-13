@@ -53,29 +53,26 @@ module.exports = function (app) { // Render Homepage and display selection menus
         }
     });
 
-    // Handle creation of new users
+    // Handle creation of new users, TODO: move callback down
     app.post('/createUser', function (request, response) {
-        if (request) {
-            console.log('New user request: \n' + request.body);
-            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
-            // TODO: hash password here
-            connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err, result) {
-                if (err) throw err;
-                console.log("User successfully created and inserted into database.");
+        let responseText;
+        insertUserIntoDB(request, function (result, err) {
+            if (err) {
+                console.log(err)
+                responseText = "Fehler bei der Erstellung des Benutzers!";
+            } else {
+                responseText = "Benutzer erfolgreich erstellt!";
+            };
+            response.render('pages/admin/admin', {
+                user: request.session.username,
+                text: responseText
             });
-        }
-        const responseText = "Benutzer erfolgreich erstellt!";
-        response.render('pages/admin/admin', {
-            user: request.session.username,
-            text: responseText
         });
     });
 
     app.post('/deleteUser', function (request, response) {
         //TODO: delete user from database
         const id = request.body.id;
-        console.log(id);
-        console.log('Delete User called');
         deleteUserFromDB(id, function (result, err) {
             console.log(err);
             response.render('pages/admin/admin', {
@@ -83,6 +80,14 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 text: "Benutzer erfolgreich gelöscht"
             });
         });
+    });
+
+    app.post('/submit', function (request, response) {
+        //TODO: get data and store in db, give user response that values were inserted
+    });
+
+    app.post('/createTheme', function (request, response) {
+        //TODO: get data and store in db, give user response that theme was created
     });
 
     // Render index selection page
@@ -128,14 +133,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
         } else {
             response.render('pages/errors/loginError');
         }
-    });
-
-    app.post('/submit', function (request, response) {
-        //TODO: get data and store in db, give user response that values were inserted
-    });
-
-    app.post('/createTheme', function (request, response) {
-        //TODO: get data and store in db, give user response that theme was created
     });
 
     // Display menu for creating new key figures
@@ -230,7 +227,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                 role = (result[0].role);
                 console.log(role);
                 if (role === 'admin') {
-                    getAllUsersFromDB(request, function (result, err) {
+                    getAllUsersFromDB(function (result, err) {
                         role = (result[0].role);
                         let sendString = "";
 
@@ -274,13 +271,13 @@ module.exports = function (app) { // Render Homepage and display selection menus
     });
 
     /** Code for querying database, TODO: maybe better? */
-    var getCurrentLoginFromDB = function (request, callback) {
-        var result = [];
+    const getCurrentLoginFromDB = function (request, callback) {
+        let result = [];
 
-        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', [request.session.username], function (err, res, fields) {
+        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', [request.session.username], function (err, res) {
             if (err) return callback(err);
             if (res.length) {
-                for (var i = 0; i < res.length; i++) {
+                for (let i = 0; i < res.length; i++) {
                     result.push(res[i]);
                 }
             }
@@ -289,10 +286,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
     }
 
     /** Code for querying database, TODO: maybe better? */
-    var getAllUsersFromDB = function (request, callback) {
-        var result = [];
+    const getAllUsersFromDB = function (callback) {
+        let result = [];
 
-        connectionLogin.query('SELECT * FROM accounts', function (err, res, fields) {
+        connectionLogin.query('SELECT * FROM accounts', function (err, res) {
             if (err) return callback(err);
             if (res.length) {
                 for (var i = 0; i < res.length; i++) {
@@ -303,12 +300,22 @@ module.exports = function (app) { // Render Homepage and display selection menus
         });
     }
 
-    var deleteUserFromDB = function (id, callback) {
-        var result = [];
-        console.log(id);
-        connectionLogin.query('DELETE FROM accounts where id=?', [id], function (err, res, fields) {
+    // Deletes user with passed i from the accounts database
+    const insertUserIntoDB = function (request, callback) {
+        console.log("callback called");
+        const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
+        // TODO: hash password here, check for good password
+        connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err) {
             if (err) return callback(err);
-            callback(result);
+            callback();
+        });
+    }
+
+    // Deletes user with passed i from the accounts database
+    const deleteUserFromDB = function (id, callback) {
+        connectionLogin.query('DELETE FROM accounts where id=?', [id], function (err) {
+            if (err) return callback(err);
+            callback();
         });
     }
 }
