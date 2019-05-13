@@ -42,6 +42,8 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 
 TODO: Beispiel für Kennzahlentabelle einfügen
 
+Die Tabellen für die Kennzahlen werden jeweils unter dem Namen des Themas abgespeichert. Das heißt alle Kennzahlen müssen einem Thema zugeordnet sein. Es ist möglich, dass Themen mit nur einer Kennzahl existieren. Die erste Spalte speichert dabei den Erfassungszeitraum. 
+
 | First Header  | Second Header |
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |

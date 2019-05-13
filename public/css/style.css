@@ -42,12 +42,13 @@ body {
     bottom: 0;
     width: 100%;
     text-align: center;
-    height: 25px;
+    height: 20px;
     background-color: #4169E1;
 }
 
 .footer p {
-    line-height: 25px;
+    line-height: 20px;
+    font-size: 14px;
     color: white;
 }
 
@@ -295,7 +296,7 @@ svg {
 
 /* User table */
 table {
-    width: 80%;
+    width: 100%;
     box-sizing: border-box;
     text-align: center;
     border-collapse: collapse;
@@ -316,7 +317,6 @@ th {
 td,
 th {
     padding: 10px;
-    width: 20%;
     border: 1px solid #ccc;
     text-align: left;
     font-size: 14px;
