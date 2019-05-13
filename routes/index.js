@@ -71,7 +71,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
     });
 
     app.post('/deleteUser', function (request, response) {
-        //TODO: delete user from database
         const id = request.body.id;
         deleteUserFromDB(id, function (result, err) {
             console.log(err);
@@ -220,7 +219,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
 
     // Display user creation page, TODO: only for admins
-    app.get('/showUsers', function (request, response) {
+    app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
             getCurrentLoginFromDB(request, function (result, err) {
@@ -236,7 +235,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
                             sendString += result[i].id + ":" + result[i].username + ":" + result[i].role + ":" + result[i].email + ":";
                         }
 
-                        response.render('pages/admin/showUsers', {
+                        response.render('pages/admin/showUser', {
                             user: request.session.username,
                             result: sendString
                         });

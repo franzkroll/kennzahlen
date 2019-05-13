@@ -36,7 +36,6 @@ body {
     padding-top: 48px;
 }
 
-/* TODO: make footer move with page */
 .footer {
     position: fixed;
     left: 0;
