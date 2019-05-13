@@ -33,6 +33,8 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 
 Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden.
 
+#### Beispiel
+
 | id | username | passwort | email         | role  |
 | -- | -------- | -------- | ------------- | ----- |
 | 1  | admin    | admin    | test@test.com | admin |
@@ -45,7 +47,7 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Zeilen speichern jeweils die Eigenschaften der Kennzahlen. Die Spalten stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Monat und Kennzahl-Eigenschaft. 
 Erstellt ein Benutzer neue Kennzahlen werden dynamisch neue Tabellen angelegt.
 
-Beispiel
+#### Beispiel
 
 |                  | Januar 2019   | Februar 2019  | März 2019     | April 2019 |
 | ---------------- | ------------- | ------------- | ------------- | ---------- |
