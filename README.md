@@ -40,18 +40,21 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 
 ### Kennzahlendatenbank
 
-TODO: Beispiel für Kennzahlentabelle einfügen
+Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Zeilen speichern jeweils die Eigenschaften der Kennzahlen. Die Spalten stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Monat und Kennzahl-Eigenschaft. 
+Erstellt ein Benutzer neue Kennzahlen werden dynamisch neue Tabellen angelegt.
 
-Die Tabellen für die Kennzahlen werden jeweils unter dem Namen des Themas abgespeichert. Das heißt alle Kennzahlen müssen einem Thema zugeordnet sein. Es ist möglich, dass Themen mit nur einer Kennzahl existieren. Die erste Spalte speichert dabei den Erfassungszeitraum. 
+Beispiel
 
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+|               | Januar 2019   | Februar 2019  | März 2019     | April 2019 |
+| ------------- | ------------- | ------------- | ------------- | ---------- |
+| Eigenschaft 1.1  | 0  | 4 | 5 | 4 | 7
+| Eigenschaft 1.2  | 3  | 1 | 2 | 8 | 5
 
 ## Benutzung des Web-Interfaces
 
-Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen.
+Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte Visualisieren und Daten zu bestehenden Kennzahlen eintragen.
+
+Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer.
 
 ## Kontakt
 
@@ -64,4 +67,4 @@ Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php)
 
 ## Disclaimer 
 
-TODO: Legal-Disclaimer einfügen
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
