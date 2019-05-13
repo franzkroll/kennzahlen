@@ -29,7 +29,6 @@ var routes = require('./routes/index.js');
 // Application uses express for rendering and displaying pages
 var app = express();
 
-
 // Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');
 
@@ -70,6 +69,7 @@ setInterval(() => server.getConnections(
 	(err, connections) => console.log(`${connections} connections currently open`)
 ), 10000);
 
+// Activate shutDown function when SIGTERM or SIGINT is received (process is cancelled)
 process.on('SIGTERM', shutDown);
 process.on('SIGINT', shutDown);
 

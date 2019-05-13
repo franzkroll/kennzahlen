@@ -1,4 +1,4 @@
-module.exports = function (app) { // Render Homepage and display selection menus and header
+module.exports = function (app) {
     //TODO: globally check for sql injection
 
     const mysql = require('mysql');

@@ -42,12 +42,12 @@ body {
     bottom: 0;
     width: 100%;
     text-align: center;
-    height: 30px;
+    height: 25px;
     background-color: #4169E1;
 }
 
 .footer p {
-    line-height: 30px;
+    line-height: 25px;
     color: white;
 }
 
