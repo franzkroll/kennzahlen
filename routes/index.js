@@ -73,11 +73,10 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
     app.post('/deleteUser', function (request, response) {
         //TODO: delete user from database
-        const id = request.body.userDelete;
+        const id = request.body.id;
         console.log(id);
         console.log('Delete User called');
-        var x = 7;
-        deleteUserFromDB(x, function (result, err) {
+        deleteUserFromDB(id, function (result, err) {
             console.log(err);
             response.render('pages/admin/admin', {
                 user: request.session.username,
