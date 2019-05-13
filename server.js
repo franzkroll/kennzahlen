@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
+const compression = require('compression');
 const util = require('util');
 
 // Overwrite default console log and write into debug.log instead..
@@ -34,6 +35,9 @@ app.set('view engine', 'ejs');
 
 // Security function
 app.use(helmet());
+
+// Reduces data, increases website reaction speed
+app.use(compression());
 
 // Path for linking stylesheet
 app.use(express.static(path.resolve('./public')));

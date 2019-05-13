@@ -70,23 +70,25 @@ module.exports = function (app) { // Render Homepage and display selection menus
         });
     });
 
+    // Post action for deleting a user, if user exists he is deleted from the database
     app.post('/deleteUser', function (request, response) {
         const id = request.body.id;
         deleteUserFromDB(id, function (err) {
             console.log(err);
             response.render('pages/admin/admin', {
                 user: request.session.username,
-                text: "Benutzer erfolgreich gelöscht"
+                text: "Benutzer erfolgreich gelöscht."
             });
         });
     });
 
+    // 
     app.post('/submit', function (request, response) {
-        //TODO: get data and store in db, give user response that values were inserted
+        //TODO: get data and store in existing table in db, give user response that values were inserted
     });
 
     app.post('/createTheme', function (request, response) {
-        //TODO: get data and store in db, give user response that theme was created
+        //TODO: get data and create new table in db, give user response that theme was created
     });
 
     // Render index selection page
@@ -97,8 +99,9 @@ module.exports = function (app) { // Render Homepage and display selection menus
             const myPlaintextPassword = 'admin';
 
             bcrypt.hash(myPlaintextPassword, saltRounds, function (err, hash) {
-                bcrypt.compare('admi', hash, function (err, res) {
+                bcrypt.compare(myPlaintextPassword, hash, function (err, res) {
                     console.log(res);
+                    console.log(hash);
                 });
             });
         }
