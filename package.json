@@ -20,6 +20,8 @@
     "express-status-monitor": "1.2.5",
     "helmet": "3.18.0",
     "mysql": "^2.17.1",
+    "password-sheriff": "1.1.0",
+    "password-validator": "4.1.1",
     "pug": "^2.0.3"
   },
   "devDependencies": {}

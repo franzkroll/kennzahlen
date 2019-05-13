@@ -6,6 +6,7 @@ module.exports = function (app) {
     // TODO: move to server?
     const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
     const statusMonitor = require('express-status-monitor')();
+    const passwordValidator = require('password-validator');
 
     app.use(statusMonitor);
 
@@ -57,9 +58,12 @@ module.exports = function (app) {
     app.post('/createUser', function (request, response) {
         let responseText;
         insertUserIntoDB(request, function (err) {
-            if (err) {
-                console.log(err)
-                responseText = "Fehler bei der Erstellung des Benutzers!";
+            if (err === "pw") {
+                console.log(err);
+                responseText = "Fehler bei der Erstellung des Benutzers! Passwort zu unsicher.";
+            } else if (err) {
+                console.log(err);
+                responseText = "Fehler bei der Erstellung des Benutzers! Benutzer bereits vorhanden.";
             } else {
                 responseText = "Benutzer erfolgreich erstellt!";
             };
@@ -94,7 +98,7 @@ module.exports = function (app) {
     // Render index selection page
     app.get('/test', function (request, response) {
         if (request.session.loggedin) {
-            const bcrypt = require('bcrypt');
+            /*const bcrypt = require('bcrypt');
             const saltRounds = 10;
             const myPlaintextPassword = 'admin';
 
@@ -103,10 +107,36 @@ module.exports = function (app) {
                     console.log(res);
                     console.log(hash);
                 });
-            });
+            });*/
         }
         response.end();
     });
+
+    function pwCheck(password) {
+        const schema = new passwordValidator();
+
+        schema
+            .is().min(8) // Minimum length 8
+            .is().max(100) // Maximum length 100
+            .has().uppercase() // Must have uppercase letters
+            .has().lowercase() // Must have lowercase letters
+            .has().digits() // Must have digits
+            .has().not().spaces() // Should not have spaces
+            .is().not().oneOf(['Passw0rt', 'Passwort123', '1234', 'passwort']); // Blacklist these values
+
+        // Validate against a password string
+        const goodPassword = schema.validate(password, {
+            list: true
+        });
+
+        if (goodPassword.length === 0) {
+            console.log("Paswort safe");
+            return true;
+        } else {
+            console.log("Password unsafe: " + goodPassword);
+            return false;
+        }
+    }
 
     // Render index selection page
     app.get('/home', function (request, response) {
@@ -317,15 +347,22 @@ module.exports = function (app) {
         });
     }
 
+
     // Deletes user with passed i from the accounts database
     const insertUserIntoDB = function (request, callback) {
-        console.log("callback called");
-        const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
-        // TODO: hash password here, check for good password
-        connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err) {
-            if (err) return callback(err);
-            callback();
-        });
+        if (pwCheck(request.body.password)) {
+            console.log("password check passed");
+            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
+            // TODO: hash password here, check for good password
+            connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err) {
+                if (err) return callback(err);
+                callback();
+            });
+        } else {
+            err = "pw";
+            console.log("password check failed");
+            return callback(err);
+        }
     }
 
     // Deletes user with passed i from the accounts database

@@ -1,4 +1,3 @@
-// TODO: move to different file
 var sel = document.getElementById('userDelete');
 const table = document.getElementById("userTable");
 const arRes = result.split(':');
