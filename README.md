@@ -8,7 +8,9 @@ Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, b
 
 ## Installation einer eigenen Instanz des Servers
 
-Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt.
+Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt. 
+
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in /routes/index.js, im Feld 'connectionLogin' anpassen. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden.
 
 ```sh
 git clone https://github.com/franzkroll/kennzahlen.git
@@ -20,7 +22,7 @@ Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in 
 
 Die Anwendung ist nun über [localhost:4000](http://localhost:4000/) erreichbar. (Beim Starten über NodeJS lässt sich ebenso ein anderer Port spezifizieren.)
 
-Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben.
+Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben. 
 
 
 ## Aufbau der Datenbanken
@@ -45,10 +47,10 @@ Erstellt ein Benutzer neue Kennzahlen werden dynamisch neue Tabellen angelegt.
 
 Beispiel
 
-|               | Januar 2019   | Februar 2019  | März 2019     | April 2019 |
-| ------------- | ------------- | ------------- | ------------- | ---------- |
-| Eigenschaft 1.1  | 0  | 4 | 5 | 4 | 7
-| Eigenschaft 1.2  | 3  | 1 | 2 | 8 | 5
+|                  | Januar 2019   | Februar 2019  | März 2019     | April 2019 |
+| ---------------- | ------------- | ------------- | ------------- | ---------- |
+| Eigenschaft 1.1  | 0             | 4             | 5             | 4          |
+| Eigenschaft 1.2  | 3             | 1             | 2             | 8          |
 
 ## Benutzung des Web-Interfaces
 
@@ -62,6 +64,8 @@ https://www.leitstelle-lausitz.de/ |
 franz.kroll@b-tu.de
 
 ## Lizenz
+
+TODO: Überprüfen ob richtige Lizenzen
 
 Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php), Inhalt lizenziert unter CC BY NC SA 4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/).
 
