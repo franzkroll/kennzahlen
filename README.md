@@ -31,9 +31,9 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 
 Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden.
 
-| id | username | passwort | email | role |
-| ------------- | ------------- | ----------- | ---------| ------------|
-| 1  | admin  | admin | test@test.com | admin
+| id | username | passwort | email         | role  |
+| -- | -------- | -------- | ------------- | ----- |
+| 1  | admin    | admin    | test@test.com | admin |
 
 
 Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche. IDs werden automatisch fortlaufend vergeben und müssen nicht bei der Erstellung festgelegt werden.

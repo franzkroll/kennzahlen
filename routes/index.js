@@ -56,7 +56,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
     // Handle creation of new users, TODO: move callback down
     app.post('/createUser', function (request, response) {
         let responseText;
-        insertUserIntoDB(request, function (result, err) {
+        insertUserIntoDB(request, function (err) {
             if (err) {
                 console.log(err)
                 responseText = "Fehler bei der Erstellung des Benutzers!";
@@ -72,7 +72,7 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
     app.post('/deleteUser', function (request, response) {
         const id = request.body.id;
-        deleteUserFromDB(id, function (result, err) {
+        deleteUserFromDB(id, function (err) {
             console.log(err);
             response.render('pages/admin/admin', {
                 user: request.session.username,
@@ -87,6 +87,22 @@ module.exports = function (app) { // Render Homepage and display selection menus
 
     app.post('/createTheme', function (request, response) {
         //TODO: get data and store in db, give user response that theme was created
+    });
+
+    // Render index selection page
+    app.get('/test', function (request, response) {
+        if (request.session.loggedin) {
+            const bcrypt = require('bcrypt');
+            const saltRounds = 10;
+            const myPlaintextPassword = 'admin';
+
+            bcrypt.hash(myPlaintextPassword, saltRounds, function (err, hash) {
+                bcrypt.compare('admi', hash, function (err, res) {
+                    console.log(res);
+                });
+            });
+        }
+        response.end();
     });
 
     // Render index selection page
@@ -224,7 +240,6 @@ module.exports = function (app) { // Render Homepage and display selection menus
             let role;
             getCurrentLoginFromDB(request, function (result, err) {
                 role = (result[0].role);
-                console.log(role);
                 if (role === 'admin') {
                     getAllUsersFromDB(function (result, err) {
                         role = (result[0].role);
