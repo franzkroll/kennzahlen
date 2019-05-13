@@ -7,7 +7,8 @@ window.addEventListener("load", function () {
         var text = document.createElement("input");
         text.setAttribute("type", "text");
         text.setAttribute("name", "var" + i);
-        text.setAttribute("placeholder", "Eigenschaft " + i);
+        text.setAttribute("placeholder", "Kennzahl " + i);
+        text.setAttribute("title", "Geben Sie hier eine Beschreibung für die Kennzahl des Themas ein.");
 
         i++;
 

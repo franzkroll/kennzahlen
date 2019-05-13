@@ -21,13 +21,16 @@
 
         <div class="login-formS">
             <form action="createTheme" method="POST">
-                <input type="text" name="var1" placeholder="Name des Themas" required>
+                <input type="text" name="var1" placeholder="Name des Themas"
+                    title="Legen Sie hier einen Namen für das Thema fest, ein Thema enthält mehrere Kennzahlen"
+                    required>
                 <span style="display:block; height: 5px;"></span>
-                <input type="text" name="role" placeholder="Rechte festlegen"
+                <input type="text" name="role" placeholder="Rollen"
                     title="Legen Sie hier die Rollen fest, die das Thema bearbeiten dürfen." required>
                 <span style="display:block; height: 5px;"></span>
                 <div id="container">
-                    <input type="text" name="var1" placeholder="Eigenschaft 1" required>
+                    <input type="text" name="var1" placeholder="Kennzahl 1"
+                        title="Geben Sie hier eine Beschreibung für die Kennzahl des Themas ein." required>
                 </div>
                 <input class="button" style="width:300px" type="button" value="Eigenschaft hinzufügen" id="add" />
                 <span style="display:block; height: 15px;"></span>
