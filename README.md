@@ -26,14 +26,6 @@ Ein log über alle Ereignisse wird in debug.log erstellt.
 
 ### Benutzerdatenbank
 
-+----+----------+----------+----------------------+-------+
-| id | username | password | email                | role  |
-+----+----------+----------+----------------------+-------+
-|  1 | test     | test     | test@test.com        | user  |
-+----+----------+----------+----------------------+-------+
-
-Every user has an id, username, password, email and a role. Current roles are user and admin. The E-Mail has to be a working and correct e-mail address.
-
 ### Kennzahlendatenbank
 
 ## Benutzung des Web-Interfaces
