@@ -122,18 +122,18 @@ module.exports = function (app) {
             .has().lowercase() // Must have lowercase letters
             .has().digits() // Must have digits
             .has().not().spaces() // Should not have spaces
-            .is().not().oneOf(['Passw0rt', 'Passwort123', '1234', 'passwort']); // Blacklist these values
+            .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
 
         // Validate against a password string
-        const goodPassword = schema.validate(password, {
+        const checkedPw = schema.validate(password, {
             list: true
         });
 
-        if (goodPassword.length === 0) {
+        if (checkedPw.length === 0) {
             console.log("Paswort safe");
             return true;
         } else {
-            console.log("Password unsafe: " + goodPassword);
+            console.log("Password unsafe: " + checkedPw);
             return false;
         }
     }
@@ -184,10 +184,18 @@ module.exports = function (app) {
     });
 
     // Display menu for creating new key figures
-    app.get('/createTheme', function (request, response) {
+    app.get('/createMeasure', function (request, response) {
         if (request.session.loggedin) {
-            response.render('pages/createTheme', {
-                user: request.session.username
+            let role;
+            getCurrentLoginFromDB(request, function (result, err) {
+                role = (result[0].role);
+                if (!(role === 'submit')) {
+                    response.render('pages/createMeasure', {
+                        user: request.session.username
+                    });
+                } else {
+                    response.render('pages/errors/adminError')
+                }
             });
         } else {
             response.render('pages/errors/loginError');
@@ -195,10 +203,18 @@ module.exports = function (app) {
     });
 
     // Display menu for adding a measure to an existing theme
-    app.get('/addMeasure', function (request, response) {
+    app.get('/addAttribute', function (request, response) {
         if (request.session.loggedin) {
-            response.render('pages/addMeasure', {
-                user: request.session.username
+            let role;
+            getCurrentLoginFromDB(request, function (result, err) {
+                role = (result[0].role);
+                if (!(role === 'submit')) {
+                    response.render('pages/addAttribute', {
+                        user: request.session.username
+                    });
+                } else {
+                    response.render('pages/errors/adminError')
+                }
             });
         } else {
             response.render('pages/errors/loginError');

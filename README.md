@@ -22,12 +22,12 @@ Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in 
 
 Die Anwendung ist nun über [localhost:4000](http://localhost:4000/) erreichbar. (Beim Starten über NodeJS lässt sich ebenso ein anderer Port spezifizieren.)
 
-Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben. 
+Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben.
 
 
 ## Aufbau der Datenbanken
 
-Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Datenbanken aufgeteilt. Die Datenbank 'accounts' enthält alle registrierten Nutzer des Systems. Die Kennzahlendatenbank enthält im System erfassten Kennzahlendaten. Möchte man das System lokal verwenden muss ein Benutzer von Hand in der Benutzerdatenbank erstellt werden.
+Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Datenbanken aufgeteilt. Die Datenbank 'accounts' enthält alle registrierten Nutzer des Systems. Die Kennzahlendatenbank enthält die im System erfassten Kennzahlendaten. Möchte man das System lokal verwenden, muss ein erster Benutzer von Hand in der Benutzerdatenbank erstellt werden. Dieser sollte die Rolle 'admin' haben um weitere Benutzer anlegen zu können.
 
 ### Benutzerdatenbank
 
@@ -40,11 +40,11 @@ Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit
 | 1  | admin    | admin    | test@test.com | admin |
 
 
-Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche. IDs werden automatisch fortlaufend vergeben und müssen nicht bei der Erstellung festgelegt werden.
+Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche, 'user' und allen weiteren Rollen fehlt der Zugriff auf die Verwaltungsbereiche. Ein Benutzer mit der Rolle 'submit' darf nur Daten eintragen und keine neuen Kennzahlen anlegen. Weitere Rollen können ebenso verwendet werden um den Zugriff auf die verschiedenen Kennzahlen festzulegen. Diese müssen dann bei der Erstellung der Kennzahl spezifiziert werden. IDs werden automatisch fortlaufend vergeben und müssen nicht bei der Erstellung festgelegt werden.
 
 ### Kennzahlendatenbank
 
-Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Zeilen speichern jeweils die Eigenschaften der Kennzahlen. Die Spalten stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Monat und Kennzahl-Eigenschaft. 
+Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Zeilen speichern jeweils die Eigenschaften der Kennzahlen. Die Spalten stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Monat und die Kennzahl-Eigenschaft. 
 Erstellt ein Benutzer neue Kennzahlen werden dynamisch neue Tabellen angelegt.
 
 #### Beispiel

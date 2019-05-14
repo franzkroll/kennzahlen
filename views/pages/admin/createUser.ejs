@@ -16,11 +16,19 @@
 
         <div class="login-formS">
             <form action="createUser" method="POST">
-                <input type="text" name="username" placeholder="Benutzername" required>
-                <input type="text" name="password" placeholder="Passwort" required>
-                <input type="email" name="mail" placeholder="E-Mail" required>
-                <input type="text" name="role" placeholder="Rolle" required>
-                <span style="display:block; height: 15px;"></span>
+                <input type="text" name="username" placeholder="Benutzername"
+                    title="Geben Sie hier den Benutzernamen ein, Benutzernamen dürfen nur einmal im System vorkommen."
+                    required>
+                <input type="text" name="password" placeholder="Passwort"
+                    title="Geben Sie hier das Passwort für den Benutzer ein, es muss mindestens 8 Zeichen lang sein, einen Großbuchstaben und eine Zahl enthalten."
+                    required>
+                <input type="email" name="mail" placeholder="E-Mail"
+                    title="Legen Sie hier eine gültige E-Mail Adresse fest, Adressen dürfen nicht doppelt vorkommen."
+                    required>
+                <input type="text" name="role" placeholder="Rolle"
+                    title="Legen Sie hier eine Rolle für den Benutzer fest, gültige Rollen sind 'admin' und 'user'" .
+                    required>
+                <span style=" display:block; height: 15px;"></span>
                 <input type="submit" value="Benutzer anlegen">
             </form>
         </div>
