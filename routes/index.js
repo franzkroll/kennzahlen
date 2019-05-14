@@ -112,6 +112,15 @@ module.exports = function (app) {
         response.end();
     });
 
+    app.get('/help', function (request, response) {
+        console.log("Help page called.")
+        if (request.session.loggedin) {
+            response.render('pages/help', {
+                user: request.session.username
+            });
+        }
+    });
+
     // Render index selection page
     app.get('/home', function (request, response) {
         if (request.session.loggedin) {
