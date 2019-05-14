@@ -1,17 +1,26 @@
-let selectAction = document.getElementById("graph");
+/** TODO: just an example for now, needs to be reworked to use sql data and display 
+ *  also display correct visualization options for the currently loaded in data
+ */
 let currentChart;
+// Get elements from document to be place graphs into them
+let selectAction = document.getElementById("graph");
 let chart = document.getElementById('chart').getContext('2d');
 
+// Listens for changes in select element
 selectAction.onchange = function (e) {
     if (!e) {
         let e = window.event;
     }
 
+    // Get selected index from select element
     let svalue = this.options[this.selectedIndex].value;
+
+    // Destroy the current chart to prevent overlapping
     if (currentChart) {
         currentChart.destroy();
     }
 
+    // Display new graph depending on which model the user selected
     if (svalue === "line") {
         currentChart = new Chart(chart).Line(buyerData);
     } else if (svalue === "pie") {
@@ -21,6 +30,7 @@ selectAction.onchange = function (e) {
     }
 }
 
+// Data for displaying current example on web page
 let buyerData = {
     labels: ["Januar", "Februar", "März", "April", "Mai", "Juni"],
     datasets: [{
@@ -68,13 +78,4 @@ let barData = {
             data: [364, 504, 605, 400, 345, 320]
         }
     ]
-}
-
-function showTable() {
-    var x = document.getElementById("table");
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-    }
 }

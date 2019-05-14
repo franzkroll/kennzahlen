@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- Page for entering a new measure and all the information it needs to be created. -->
+
 <head>
     <% include ../partials/head %>
 </head>
@@ -17,24 +19,30 @@
         </div>
         <span style="display:block; height: 10px;"></span>
 
+        <!-- Adds new text fields for attributes to the canvas. -->
         <script src="/scripts/fieldCreator.js"></script>
+
 
         <div class="login-formS">
             <form action="createTheme" method="POST">
+                <!-- Theme for the measure, can be added as text. TODO: maybe add dropdown menu with existing themes. -->
                 <input type="text" name="var1" placeholder="Zuordnung zu Thema"
                     title="Geben Sie hier ein Thema ein, zu dem diese Kennzahl zugeordnet ist." required>
 
                 <span style="display:block; height: 5px;"></span>
 
+                <!-- Fields for entering roles. TODO: maybe change to dropdown menu? but how to add new roles then? -->
                 <input type="text" name="role" placeholder="Rollen"
-                    title="Legen Sie hier die Rollen fest, die das Thema bearbeiten dürfen." required>
+                    title="Legen Sie hier die Rollen fest, die das Thema bearbeiten dürfen. (user, submit)." required>
 
                 <span style="display:block; height: 5px;"></span>
 
+                <!-- Field for setting name of the measure. -->
                 <input type="text" name="var1" placeholder="Name der Kennzahl"
                     title="Legen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften."
                     required>
 
+                <!-- Dropdown menu for selecting input-cycle for the measure data. -->
                 <div class="misc-text" style="margin-bottom: 10px">
                     Erfassungzyklus:
                     <select style="text-align:left; width:50%;" id="cycle" class="dropdownS">
@@ -47,6 +55,7 @@
 
                 <span style="display:block; height: 5px;"></span>
 
+                <!-- If need new attribute fields are added here. -->
                 <div id="container">
                     <input type="text" name="var1" placeholder="Eigenschaft 1"
                         title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
@@ -56,6 +65,7 @@
 
                 <span style="display:block; height: 15px;"></span>
 
+                <!-- Submits data to server. -->
                 <input type="submit" value="Thema erstellen">
             </form>
         </div>

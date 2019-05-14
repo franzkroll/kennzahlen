@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- Page for adding an attribute to an existing measure. -->
+
 <head>
     <% include ../partials/head %>
 </head>
@@ -17,6 +19,7 @@
             Buttons eine neue Kennzahl zu diesem Thema hinzufügen.
         </div>
 
+        <!-- User can select an existing measure here. -->
         <div style="text-align:center;margin-bottom: 15px;margin-right: 10px">
             <select id="graph" class="dropdownS">
                 <option value="bar">Kennzahl 1.1</option>
@@ -24,6 +27,7 @@
             </select>
         </div>
 
+        <!-- And enter a new attribute and send it back to the server. -->
         <div class="login-formS">
             <form action="submit" method="POST">
                 <input type="text" name="var1" placeholder="Eigenschaft"
