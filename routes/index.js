@@ -98,7 +98,7 @@ module.exports = function (app) {
     // Render index selection page
     app.get('/test', function (request, response) {
         if (request.session.loggedin) {
-            /*const bcrypt = require('bcrypt');
+            const bcrypt = require('bcrypt');
             const saltRounds = 10;
             const myPlaintextPassword = 'admin';
 
@@ -107,36 +107,10 @@ module.exports = function (app) {
                     console.log(res);
                     console.log(hash);
                 });
-            });*/
+            });
         }
         response.end();
     });
-
-    function pwCheck(password) {
-        const schema = new passwordValidator();
-
-        schema
-            .is().min(8) // Minimum length 8
-            .is().max(100) // Maximum length 100
-            .has().uppercase() // Must have uppercase letters
-            .has().lowercase() // Must have lowercase letters
-            .has().digits() // Must have digits
-            .has().not().spaces() // Should not have spaces
-            .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
-
-        // Validate against a password string
-        const checkedPw = schema.validate(password, {
-            list: true
-        });
-
-        if (checkedPw.length === 0) {
-            console.log("Paswort safe");
-            return true;
-        } else {
-            console.log("Password unsafe: " + checkedPw);
-            return false;
-        }
-    }
 
     // Render index selection page
     app.get('/home', function (request, response) {
@@ -387,5 +361,31 @@ module.exports = function (app) {
             if (err) return callback(err);
             callback();
         });
+    }
+
+    // Check if entered password is a safe password, used when a new user is created
+    function pwCheck(password) {
+        const schema = new passwordValidator();
+
+        schema
+            .is().min(8) // Minimum length 8
+            .is().max(100) // Maximum length 100
+            .has().uppercase() // Must have uppercase letters
+            .has().lowercase() // Must have lowercase letters
+            .has().digits() // Must have digits
+            .has().not().spaces() // Should not have spaces
+            .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
+
+        const checkedPw = schema.validate(password, {
+            list: true
+        });
+
+        if (checkedPw.length === 0) {
+            console.log("Paswort safe");
+            return true;
+        } else {
+            console.log("Password unsafe: " + checkedPw);
+            return false;
+        }
     }
 }

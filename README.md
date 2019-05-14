@@ -10,7 +10,7 @@ Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, b
 
 Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt. 
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in /routes/index.js, im Feld 'connectionLogin' anpassen. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden.
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in /routes/index.js, im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden.
 
 ```sh
 git clone https://github.com/franzkroll/kennzahlen.git

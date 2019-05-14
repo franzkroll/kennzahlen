@@ -21,9 +21,8 @@
 
         <div class="login-formS">
             <form action="createTheme" method="POST">
-                <input type="text" name="var1" placeholder="Name des Themas"
-                    title="Legen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften."
-                    required>
+                <input type="text" name="var1" placeholder="Zuordnung zu Thema"
+                    title="Geben Sie hier ein Thema ein, zu dem diese Kennzahl zugeordnet ist." required>
 
                 <span style="display:block; height: 5px;"></span>
 
@@ -32,9 +31,25 @@
 
                 <span style="display:block; height: 5px;"></span>
 
+                <input type="text" name="var1" placeholder="Name der Kennzahl"
+                    title="Legen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften."
+                    required>
+
+                <div class="misc-text" style="margin-bottom: 10px">
+                    Erfassungzyklus:
+                    <select style="text-align:left; width:50%;" id="cycle" class="dropdownS">
+                        <option value="val1">monatlich</option>
+                        <option value="val2">quartalsweise</option>
+                        <option value="val3">jährlich</option>
+                    </select>
+                </div>
+
+
+                <span style="display:block; height: 5px;"></span>
+
                 <div id="container">
                     <input type="text" name="var1" placeholder="Eigenschaft 1"
-                        title="Geben Sie hier eine Beschreibung für die Kennzahl des Themas ein." required>
+                        title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
                 </div>
 
                 <input class="button" style="width:300px" type="button" value="Eigenschaft hinzufügen" id="add" />
