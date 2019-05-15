@@ -113,12 +113,24 @@ module.exports = function (app) {
     });
 
     app.get('/help', function (request, response) {
-        console.log("Help page called.")
         if (request.session.loggedin) {
-            response.render('pages/help', {
-                user: request.session.username
+            let role;
+            getCurrentLoginFromDB(request, function (result, err) {
+                role = (result[0].role);
+                if (role === 'admin') {
+                    response.render('pages/admin/adminHelp', {
+                        user: request.session.username
+                    });
+                } else {
+                    response.render('pages/help', {
+                        user: request.session.username
+                    });
+                }
             });
+        } else {
+            response.render('pages/errors/loginError');
         }
+
     });
 
     // Render index selection page

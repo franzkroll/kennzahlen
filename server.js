@@ -13,6 +13,7 @@ const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 });
 const log_stdout = process.stdout;
 
+
 // Get current time and date, add them to every printed debug
 console.log = function (d) {
 	const time = new Date();
@@ -42,11 +43,18 @@ app.use(compression());
 // Path for linking stylesheet
 app.use(express.static(path.resolve('./public')));
 
+// Logout user after 30 minutes
+const logoutMinutes = 30;
+
 // Session login credentials
 app.use(session({
+	cookie: {
+		maxAge: 60000 * logoutMinutes // Automatic logout after 30 minutes of inactivity
+	},
+	rolling: true,
+	resave: false,
 	secret: 'secret',
-	resave: true,
-	saveUninitialized: true
+	saveUninitialized: false // Don't save sessions that aren' logged in.
 }));
 
 // Handles post Request for Login

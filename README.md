@@ -44,15 +44,17 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 
 ### Kennzahlendatenbank
 
-Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Zeilen speichern jeweils die Eigenschaften der Kennzahlen. Die Spalten stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Monat und die Kennzahl-Eigenschaft. 
-Erstellt ein Benutzer neue Kennzahlen werden dynamisch neue Tabellen angelegt.
+Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Spalten speichern jeweils die Eigenschaften der Kennzahlen. Die Zeilen stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Zeitabschnitt und Kennzahl-Eigenschaft. 
+Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt. Die Zuordnung der Kennzahlen zu Themen wird in einer separaten Tabelle gespeichert.
 
 #### Beispiel
 
-|                  | Januar 2019   | Februar 2019  | März 2019     | April 2019 |
-| ---------------- | ------------- | ------------- | ------------- | ---------- |
-| Eigenschaft 1.1  | 0             | 4             | 5             | 4          |
-| Eigenschaft 1.2  | 3             | 1             | 2             | 8          |
+|                  | Eigenschaft 1.1.1 | Eigenschaft 1.1.2 | Eigenschaft 1.1.3 | 
+| ---------------- | ----------------- | ----------------- | ----------------- | 
+| Januar 2019      | 0                 | 4                 | 5                 | 
+| Februar 2019     | 3                 | 1                 | 2                 | 
+| März 2019        | 0                 | 4                 | 5                 | 
+| April 2019       | 3                 | 1                 | 2                 |  
 
 ## Benutzung des Web-Interfaces
 
