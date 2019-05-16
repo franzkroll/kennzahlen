@@ -15,7 +15,7 @@ for (i = 0; i < measureArray.length - 1; i++) {
     selM.appendChild(opt);
 }
 
-let dataTest = [];
+let dataGraph = [];
 let measureAttr = [];
 
 selM.onclick = function () {
@@ -45,7 +45,6 @@ selM.onclick = function () {
                         opt.value = years[k];
                         selYear.appendChild(opt);
                     }
-
                 }
 
                 let row = table.insertRow(j + 1);
@@ -60,11 +59,10 @@ selM.onclick = function () {
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];
 
-
                         var columnCount = measure.length - 2;
 
+                        // Save data for graphs
                         let dataBuilder = [];
-
                         for (k = j + 1; k < columns.length; k += columnCount) {
                             let cell = row.insertCell(-1);
                             cell.innerHTML = columns[k].split(':')[1].match(/\d+/)[0];
@@ -72,8 +70,7 @@ selM.onclick = function () {
                                 dataBuilder.push(columns[k].split(':')[1].match(/\d+/)[0]);
                             }
                         }
-
-                        dataTest.push(dataBuilder);
+                        dataGraph.push(dataBuilder);
                     }
                 }
             }
@@ -84,6 +81,8 @@ selM.onclick = function () {
 /* Graph stuff here */
 let currentChart;
 
+
+
 selGraph.onchange = function (e) {
     let svalue = this.options[this.selectedIndex].value;
 
@@ -91,23 +90,28 @@ selGraph.onchange = function (e) {
         currentChart.destroy();
     }
 
+    for (i = 0; i < dataGraph.length; i++) {
+        console.log(dataGraph[i]);
+    }
+
+
     if (svalue === "bar") {
         currentChart = new Chart(document.getElementById("chart"), {
             type: 'bar',
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
                 datasets: [{
-                    data: dataTest[0],
+                    data: dataGraph[0],
                     label: measureAttr[0],
                     backgroundColor: "#3e95cd",
                     fill: false
                 }, {
-                    data: dataTest[1],
+                    data: dataGraph[1],
                     label: measureAttr[1],
                     backgroundColor: "#8e5ea2",
                     fill: false
                 }, {
-                    data: dataTest[2],
+                    data: dataGraph[2],
                     label: measureAttr[2],
                     backgroundColor: "#3cba9f",
                     fill: false
@@ -125,17 +129,17 @@ selGraph.onchange = function (e) {
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
                 datasets: [{
-                    data: dataTest[0],
+                    data: dataGraph[0],
                     label: measureAttr[0],
                     borderColor: "#3e95cd",
                     fill: false
                 }, {
-                    data: dataTest[1],
+                    data: dataGraph[1],
                     label: measureAttr[1],
                     borderColor: "#8e5ea2",
                     fill: false
                 }, {
-                    data: dataTest[2],
+                    data: dataGraph[2],
                     label: measureAttr[2],
                     borderColor: "#3cba9f",
                     fill: false

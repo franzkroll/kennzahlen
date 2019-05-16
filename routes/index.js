@@ -249,6 +249,7 @@ module.exports = function (app) {
 
     // Display menu for entering data
     app.get('/submit', function (request, response) {
+        // TODO: load data from disk and send to page
         if (request.session.loggedin) {
             response.render('pages/submit', {
                 user: request.session.username
