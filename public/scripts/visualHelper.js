@@ -1,91 +1,82 @@
-/** TODO: just an example for now, needs to be reworked to use sql data and display 
- *  also display correct visualization options for the currently loaded in data
- */
-let currentChart;
-// Get elements from document to be place graphs into them
-let selectAction = document.getElementById("graph");
-let chart = document.getElementById('chart').getContext('2d');
+const measureArray = measureListData.split(';');
 
-// Listens for changes in select element
-selectAction.onchange = function (e) {
-    if (!e) {
-        let e = window.event;
-    }
+var selM = document.getElementById('measure');
+var selAttr = document.getElementById('attr');
 
-    // Get selected index from select element
-    let svalue = this.options[this.selectedIndex].value;
-
-    // Destroy the current chart to prevent overlapping
-    if (currentChart) {
-        currentChart.destroy();
-    }
-
-    // Display new graph depending on which model the user selected
-    if (svalue === "line") {
-        currentChart = new Chart(chart).Line(buyerData);
-    } else if (svalue === "pie") {
-        currentChart = new Chart(chart).Pie(pieData, pieOptions);
-    } else if (svalue === "bar") {
-        currentChart = new Chart(chart).Bar(barData);
-    }
-}
-
-// Data for displaying current example on web page
-let buyerData = {
-    labels: ["Januar", "Februar", "März", "April", "Mai", "Juni"],
-    datasets: [{
-        fillColor: "rgba(172,194,132,0.4)",
-        strokeColor: "#ACC26D",
-        pointColor: "#fff",
-        pointStrokeColor: "#9DB86D",
-        data: [203, 156, 99, 251, 305, 247]
-    }]
-}
-
-let pieData = [{
-        value: 20,
-        color: "#878BB6"
-    },
-    {
-        value: 40,
-        color: "#4ACAB4"
-    },
-    {
-        value: 10,
-        color: "#FF8153"
-    },
-    {
-        value: 30,
-        color: "#FFEA88"
-    }
-];
-
-let pieOptions = {
-    segmentShowStroke: false,
-    animateScale: true
-}
-
-let barData = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [{
-            fillColor: "#48A497",
-            strokeColor: "#48A4D1",
-            data: [456, 479, 324, 569, 702, 600]
-        },
-        {
-            fillColor: "rgba(73,188,170,0.4)",
-            strokeColor: "rgba(72,174,209,0.4)",
-            data: [364, 504, 605, 400, 345, 320]
+for (i = 0; i < measureArray.length; i++) {
+    const measure = measureArray[i].split(',').filter(Boolean);
+    for (j = 0; j < measure.length; j++) {
+        if (j === 0) {
+            let opt = document.createElement('option');
+            opt.appendChild(document.createTextNode(measure[0]));
+            opt.value = measure[0];
+            selM.appendChild(opt);
         }
-    ]
+    }
 }
+
+selM.onchange = function () {
+    var index = this.selectedIndex;
+    var inputText = this.children[index].innerHTML.trim();
+    let filled = false;
+    for (i = 0; i < measureArray.length; i++) {
+        const measure = measureArray[i].split(',').filter(Boolean);
+        if (!filled) {
+            for (j = 0; j < measure.length - 2; j++) {
+                if (measure[j] === inputText) {
+                    selAttr.innerHTML = "";
+                    filled = true;
+                }
+                let opt = document.createElement('option');
+                opt.appendChild(document.createTextNode(measure[j + 1]));
+                opt.value = measure[j + 1];
+                selAttr.appendChild(opt);
+            }
+        }
+    }
+}
+
 
 // Displays or removes table
 function showTable() {
     var x = document.getElementById("table");
     if (x.style.display === "none") {
         x.style.display = "block";
+        showTable();
     } else {
         x.style.display = "none";
+    }
+}
+
+String.prototype.replaceAll = function (search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+//TODO: add measure selection, split received data into tables and save them individually
+// TODO: pass data to chart.js
+function showTable() {
+    const data = measureData.slice(2, measureData.length - 2).split(':');
+
+    const measure = measureData.slice(2, measureData.length - 2).split('},{');
+    const table = document.getElementById("dataTable");
+    let rowCount = 1;
+
+    const columnCount = measure[0].split(':').length - 1;
+
+    for (j = 0; j < columnCount; j++) {
+        let row = table.insertRow(rowCount);
+        let name = data.slice(0, columnCount)[j].split(',')[1];
+        rowCount++;
+
+        if (name != undefined) {
+            let cell = row.insertCell(0);
+            cell.innerHTML = name.slice(1, name.length - 1).replaceAll('_', ' ');
+
+            for (i = j; i < data.length; i += columnCount) {
+                let cell = row.insertCell(-1);
+                cell.innerHTML = data[i].split(',')[0].replace('}', '');
+            }
+        }
     }
 }

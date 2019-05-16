@@ -7,6 +7,7 @@ module.exports = function (app) {
     const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
     const statusMonitor = require('express-status-monitor')();
     const passwordValidator = require('password-validator');
+    const fs = require('fs');
 
     app.use(statusMonitor);
 
@@ -17,6 +18,13 @@ module.exports = function (app) {
         user: 'dbaccess',
         password: 'Pdgy#MW$Jud6F$_B',
         database: 'nodelogin'
+    });
+
+    const connectionData = mysql.createConnection({
+        host: 'localhost',
+        user: 'dbaccessData',
+        password: 'N&HQkzW]WF2bBA*k',
+        database: 'measures'
     });
 
     // Render login page when user first accesses the application
@@ -86,6 +94,44 @@ module.exports = function (app) {
         });
     });
 
+    function txtToArray() {
+        const path = 'tables.txt'
+    }
+
+    app.post('/visual', function (request, response) {
+        // TODO: get table name from measure List, query database with it
+
+        let measureList = [];
+        let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+        let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
+        let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
+
+        measureList.push(measure1);
+        measureList.push(measure2);
+        measureList.push(measure3);
+
+        let tableName;
+
+        for (i = 0; i < measureList.length; i++) {
+            if (measureList[i][0] == request.body.measure) {
+                tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+            }
+        }
+
+        getMeasureFromDB(tableName, function (result, err) {
+            if (err) {
+                console.log(err);
+            }
+            const measureData = JSON.stringify(result);
+
+            response.render('pages/visual', {
+                user: request.session.username,
+                measureData: measureData,
+                measureListData: measureList
+            });
+        });
+    });
+
     // 
     app.post('/submit', function (request, response) {
         //TODO: get data and store in existing table in db, give user response that values were inserted
@@ -93,11 +139,41 @@ module.exports = function (app) {
 
     app.post('/createTheme', function (request, response) {
         //TODO: get data and create new table in db, give user response that theme was created
+        //create table Anzahl_der_Anforderungen_des_VNEF (id smallint unsigned not null auto_increment, Gesamtanzahl_aller_Anforderungen_des_VNEF INTEGER, constraint pk_1
+
     });
+
+    function arrayToTxt(array) {
+
+        var file = fs.createWriteStream('tables.txt');
+        file.on('error', function (err) {
+            /* error handling */
+        });
+        array.forEach(function (v) {
+            file.write(v.join(', ') + '\n');
+        });
+        file.end();
+
+        console.log('Wrote to file');
+    }
 
     // Render index selection page
     app.get('/test', function (request, response) {
-        if (request.session.loggedin) {
+        let measureList = [];
+        let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+        let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
+        let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
+
+        measureList.push(measure1);
+
+        arrayToTxt(measureList);
+
+        measureList.push(measure2);
+        measureList.push(measure3);
+
+        arrayToTxt(measureList);
+
+        /*if (request.session.loggedin) {
             const bcrypt = require('bcrypt');
             const saltRounds = 10;
             const myPlaintextPassword = 'admin';
@@ -108,7 +184,7 @@ module.exports = function (app) {
                     console.log(hash);
                 });
             });
-        }
+        }*/
         response.end();
     });
 
@@ -159,8 +235,20 @@ module.exports = function (app) {
     // Display visualization of data
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
+            // TODO: load measure list from txt and parse
+            let measureList = [];
+            let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+            let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
+            let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
+
+            measureList.push(measure1);
+            measureList.push(measure2);
+            measureList.push(measure3);
+
             response.render('pages/visual', {
-                user: request.session.username
+                user: request.session.username,
+                measureData: "",
+                measureListData: measureList
             });
         } else {
             response.render('pages/errors/loginError');
@@ -332,7 +420,7 @@ module.exports = function (app) {
     const getCurrentLoginFromDB = function (request, callback) {
         let result = [];
 
-        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', [request.session.username], function (err, res) {
+        connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
             if (err) return callback(err);
             if (res.length) {
                 for (let i = 0; i < res.length; i++) {
@@ -348,6 +436,22 @@ module.exports = function (app) {
         let result = [];
 
         connectionLogin.query('SELECT * FROM accounts', function (err, res) {
+            if (err) return callback(err);
+            if (res.length) {
+                for (var i = 0; i < res.length; i++) {
+                    result.push(res[i]);
+                }
+            }
+            callback(result);
+        });
+    }
+
+    const getMeasureFromDB = function (tableName, callback) {
+        let result = [];
+
+        const query = 'SELECT * FROM ' + tableName;
+
+        connectionData.query(query, function (err, res) {
             if (err) return callback(err);
             if (res.length) {
                 for (var i = 0; i < res.length; i++) {
@@ -378,7 +482,7 @@ module.exports = function (app) {
 
     // Deletes user with passed i from the accounts database
     const deleteUserFromDB = function (id, callback) {
-        connectionLogin.query('DELETE FROM accounts where id=?', [id], function (err) {
+        connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
             if (err) return callback(err);
             callback();
         });
