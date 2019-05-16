@@ -94,40 +94,29 @@ module.exports = function (app) {
         });
     });
 
-    function txtToArray() {
-        const path = 'tables.txt'
-    }
+
 
     app.post('/visual', function (request, response) {
-        // TODO: get table name from measure List, query database with it
+        loadTables(function (measureList) {
+            let tableName;
 
-        let measureList = [];
-        let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
-        let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
-        let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
-
-        measureList.push(measure1);
-        measureList.push(measure2);
-        measureList.push(measure3);
-
-        let tableName;
-
-        for (i = 0; i < measureList.length; i++) {
-            if (measureList[i][0] == request.body.measure) {
-                tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+            for (i = 0; i < measureList.length; i++) {
+                if (measureList[i][0] == request.body.measure) {
+                    tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+                }
             }
-        }
 
-        getMeasureFromDB(tableName, function (result, err) {
-            if (err) {
-                console.log(err);
-            }
-            const measureData = JSON.stringify(result);
+            getMeasureFromDB(tableName, function (result, err) {
+                if (err) {
+                    console.log(err);
+                }
+                const measureData = JSON.stringify(result);
 
-            response.render('pages/visual', {
-                user: request.session.username,
-                measureData: measureData,
-                measureListData: measureList
+                response.render('pages/visual', {
+                    user: request.session.username,
+                    measureData: measureData,
+                    measureListData: measureList
+                });
             });
         });
     });
@@ -135,16 +124,17 @@ module.exports = function (app) {
     // 
     app.post('/submit', function (request, response) {
         //TODO: get data and store in existing table in db, give user response that values were inserted
+        // check with txt file if table exists
     });
 
     app.post('/createTheme', function (request, response) {
-        //TODO: get data and create new table in db, give user response that theme was created
-        //create table Anzahl_der_Anforderungen_des_VNEF (id smallint unsigned not null auto_increment, Gesamtanzahl_aller_Anforderungen_des_VNEF INTEGER, constraint pk_1
-
+        // TODO: load tableData with txtToArray, let user enter values
+        // create new entry in txt file
+        // add new table to database
     });
 
+    // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
     function arrayToTxt(array) {
-
         var file = fs.createWriteStream('tables.txt');
         file.on('error', function (err) {
             /* error handling */
@@ -157,19 +147,18 @@ module.exports = function (app) {
         console.log('Wrote to file');
     }
 
-    // Render index selection page
+    // Used for testing, writes table data into table.txt, needs to be put into createMeasure
     app.get('/test', function (request, response) {
         let measureList = [];
         let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+        let measure4 = ['Test', 'Test;'];
         let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
         let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
 
         measureList.push(measure1);
-
-        arrayToTxt(measureList);
-
         measureList.push(measure2);
         measureList.push(measure3);
+        measureList.push(measure4);
 
         arrayToTxt(measureList);
 
@@ -235,20 +224,12 @@ module.exports = function (app) {
     // Display visualization of data
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
-            // TODO: load measure list from txt and parse
-            let measureList = [];
-            let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
-            let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
-            let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
-
-            measureList.push(measure1);
-            measureList.push(measure2);
-            measureList.push(measure3);
-
-            response.render('pages/visual', {
-                user: request.session.username,
-                measureData: "",
-                measureListData: measureList
+            loadTables(function (measureList) {
+                response.render('pages/visual', {
+                    user: request.session.username,
+                    measureData: "",
+                    measureListData: measureList
+                });
             });
         } else {
             response.render('pages/errors/loginError');
@@ -429,6 +410,17 @@ module.exports = function (app) {
             }
             callback(result);
         });
+    }
+
+    const loadTables = function (callback) {
+        const path = 'tables.txt'
+        var array = [];
+        var text = fs.readFileSync("./tables.txt").toString('utf-8');
+        var textByLine = text.split("\n")
+        for (i = 0; i < textByLine.length; i++) {
+            array.push(textByLine[i].split(','));
+        }
+        callback(array);
     }
 
     /** Code for querying database, TODO: maybe better? */
