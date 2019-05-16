@@ -101,22 +101,31 @@ module.exports = function (app) {
             let tableName;
 
             for (i = 0; i < measureList.length; i++) {
-                if (measureList[i][0] == request.body.measure) {
+                if (measureList[i][0] === request.body.measure) {
                     tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                 }
             }
+            tableName += "_" + request.body.year;
 
             getMeasureFromDB(tableName, function (result, err) {
                 if (err) {
                     console.log(err);
-                }
-                const measureData = JSON.stringify(result);
+                    response.render('pages/visual', {
+                        user: request.session.username,
+                        measureData: "",
+                        text: "Datensatz nicht vorhanden!",
+                        measureListData: measureList
+                    });
+                } else {
+                    const measureData = JSON.stringify(result);
 
-                response.render('pages/visual', {
-                    user: request.session.username,
-                    measureData: measureData,
-                    measureListData: measureList
-                });
+                    response.render('pages/visual', {
+                        user: request.session.username,
+                        measureData: measureData,
+                        text: "Daten erfolgreich geladen!",
+                        measureListData: measureList
+                    });
+                }
             });
         });
     });
@@ -157,8 +166,8 @@ module.exports = function (app) {
 
         measureList.push(measure1);
         measureList.push(measure2);
-        measureList.push(measure3);
-        measureList.push(measure4);
+        /*measureList.push(measure3);
+        measureList.push(measure4);*/
 
         arrayToTxt(measureList);
 
@@ -228,6 +237,7 @@ module.exports = function (app) {
                 response.render('pages/visual', {
                     user: request.session.username,
                     measureData: "",
+                    text: "",
                     measureListData: measureList
                 });
             });
@@ -443,14 +453,14 @@ module.exports = function (app) {
 
         const query = 'SELECT * FROM ' + tableName;
 
-        connectionData.query(query, function (err, res) {
-            if (err) return callback(err);
+        connectionData.query(query, function (res, error) {
+            if (error) return callback(error, null);
             if (res.length) {
                 for (var i = 0; i < res.length; i++) {
                     result.push(res[i]);
                 }
             }
-            callback(result);
+            callback(null, res);
         });
     }
 
