@@ -105,7 +105,9 @@ module.exports = function (app) {
                     tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                 }
             }
-            tableName += "_" + request.body.year;
+            tableName += "_" + request.body.year.trim();
+
+            console.log(tableName);
 
             getMeasureFromDB(tableName, function (result, err) {
                 if (err) {
@@ -132,6 +134,7 @@ module.exports = function (app) {
 
     // 
     app.post('/submit', function (request, response) {
+        //load tables and send to user
         //TODO: get data and store in existing table in db, give user response that values were inserted
         // check with txt file if table exists
     });
@@ -158,10 +161,14 @@ module.exports = function (app) {
 
     // Used for testing, writes table data into table.txt, needs to be put into createMeasure
     app.get('/test', function (request, response) {
+        //TODO: move to creation
         let measureList = [];
-        let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+        let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+        let measure2 = ['Test', '2018:2019:2020', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
 
         measureList.push(measure1);
+        measureList.push(measure2);
+
 
         arrayToTxt(measureList);
 

@@ -4,22 +4,16 @@ const table = document.getElementById("dataTable");
 var selGraph = document.getElementById('graph');
 var selM = document.getElementById('measure');
 
-for (i = 0; i < measureArray.length; i++) {
-    const measure = measureArray[i].split(',').filter(Boolean);
-    for (j = 0; j < measure.length; j++) {
-        if (j === 0) {
-            let opt = document.createElement('option');
-            opt.appendChild(document.createTextNode(measure[0]));
-            opt.value = measure[0];
-            selM.appendChild(opt);
-        }
-    }
-}
+var selYear = document.getElementById('year');
 
-String.prototype.replaceAll = function (search, replacement) {
-    var target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
+// Format measure array and add to select
+for (i = 0; i < measureArray.length - 1; i++) {
+    const measure = measureArray[i].split(',').filter(Boolean);
+    let opt = document.createElement('option');
+    opt.appendChild(document.createTextNode(measure[0]));
+    opt.value = measure[0];
+    selM.appendChild(opt);
+}
 
 let dataTest = [];
 let measureAttr = [];
@@ -40,22 +34,34 @@ selM.onclick = function () {
                     for (var i = table.rows.length - 1; i > 0; i--) {
                         table.deleteRow(i);
                     }
+                    years = measure[j + 1].split(':');
+
+                    selYear.innerHTML = "";
+
+                    for (k = 0; k < years.length; k++) {
+                        console.log(years[k])
+                        let opt = document.createElement('option');
+                        opt.appendChild(document.createTextNode(years[k]));
+                        opt.value = years[k];
+                        selYear.appendChild(opt);
+                    }
+
                 }
 
                 let row = table.insertRow(j + 1);
 
-                if (j < measure.length - 2) {
+                if (j < measure.length - 3) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(measure[j + 1]));
                     opt.value = measure[j + 1];
-                    measureAttr.push(measure[j + 1]);
+                    measureAttr.push(measure[j + 2]);
 
                     if (data) {
                         let cell = row.insertCell(-1);
-                        cell.innerHTML = measure[j + 1];
+                        cell.innerHTML = measure[j + 2];
 
 
-                        var columnCount = measure.length - 1;
+                        var columnCount = measure.length - 2;
 
                         let dataBuilder = [];
 
@@ -75,7 +81,7 @@ selM.onclick = function () {
     }
 }
 
-
+/* Graph stuff here */
 let currentChart;
 
 selGraph.onchange = function (e) {
