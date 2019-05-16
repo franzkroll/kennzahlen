@@ -160,14 +160,8 @@ module.exports = function (app) {
     app.get('/test', function (request, response) {
         let measureList = [];
         let measure1 = ['Anzahl der Anrufe', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
-        let measure4 = ['Test', 'Test;'];
-        let measure2 = ['Test', 'TestA', 'TestB', 'TestC;'];
-        let measure3 = ['Test2', 'Test2A', 'Test2B', 'Test2C;'];
 
         measureList.push(measure1);
-        measureList.push(measure2);
-        /*measureList.push(measure3);
-        measureList.push(measure4);*/
 
         arrayToTxt(measureList);
 
