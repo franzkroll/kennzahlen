@@ -39,7 +39,6 @@ selM.onclick = function () {
                     selYear.innerHTML = "";
 
                     for (k = 0; k < years.length; k++) {
-                        console.log(years[k])
                         let opt = document.createElement('option');
                         opt.appendChild(document.createTextNode(years[k]));
                         opt.value = years[k];

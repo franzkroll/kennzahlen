@@ -1,13 +1,12 @@
 module.exports = function (app) {
-    //TODO: globally check for sql injection
-
+    // Imports ...
     const mysql = require('mysql');
-
-    // TODO: move to server?
     const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
     const statusMonitor = require('express-status-monitor')();
     const passwordValidator = require('password-validator');
     const fs = require('fs');
+    const bcrypt = require('bcrypt');
+    const saltRounds = 10;
 
     app.use(statusMonitor);
 
@@ -43,6 +42,14 @@ module.exports = function (app) {
 
         if (username && password) {
             // TODO: hash password before query
+            bcrypt.hash(password, saltRounds, function (err, hash) {
+                if (!err) {
+                    console.log(hash);
+                } else {
+                    console.log(err);
+                }
+            });
+
             connectionLogin.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
                 if (results.length > 0) {
                     request.session.loggedin = true;
@@ -62,7 +69,6 @@ module.exports = function (app) {
         }
     });
 
-    // Handle creation of new users, TODO: move callback down
     app.post('/createUser', function (request, response) {
         let responseText;
         insertUserIntoDB(request, function (err) {
@@ -93,8 +99,6 @@ module.exports = function (app) {
             });
         });
     });
-
-
 
     app.post('/visual', function (request, response) {
         loadTables(function (measureList) {
@@ -132,11 +136,10 @@ module.exports = function (app) {
         });
     });
 
-    // 
     app.post('/submit', function (request, response) {
-        //load tables and send to user
         //TODO: get data and store in existing table in db, give user response that values were inserted
         // check with txt file if table exists
+
     });
 
     app.post('/createTheme', function (request, response) {
@@ -164,29 +167,20 @@ module.exports = function (app) {
         //TODO: move to creation
         let measureList = [];
         let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
-        let measure2 = ['Test', '2018:2019:2020', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
+        let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer', 'Einsatzdauer_des_V-NEF_ab_Alarmierung;']
+        let measure3 = ['Annahmezeit', '2017:2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'Zielerreichungsgrad 95% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 90% der Notrufe in <= 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1.1;']
 
         measureList.push(measure1);
         measureList.push(measure2);
+        measureList.push(measure3);
 
 
         arrayToTxt(measureList);
 
-        /*if (request.session.loggedin) {
-            const bcrypt = require('bcrypt');
-            const saltRounds = 10;
-            const myPlaintextPassword = 'admin';
-
-            bcrypt.hash(myPlaintextPassword, saltRounds, function (err, hash) {
-                bcrypt.compare(myPlaintextPassword, hash, function (err, res) {
-                    console.log(res);
-                    console.log(hash);
-                });
-            });
-        }*/
         response.end();
     });
 
+    // Loads simple help page
     app.get('/help', function (request, response) {
         if (request.session.loggedin) {
             let role;
@@ -251,8 +245,11 @@ module.exports = function (app) {
     app.get('/submit', function (request, response) {
         // TODO: load data from disk and send to page
         if (request.session.loggedin) {
-            response.render('pages/submit', {
-                user: request.session.username
+            loadTables(function (measureList) {
+                response.render('pages/submit', {
+                    user: request.session.username,
+                    measureListData: measureList
+                });
             });
         } else {
             response.render('pages/errors/loginError');
@@ -425,10 +422,9 @@ module.exports = function (app) {
     }
 
     const loadTables = function (callback) {
-        const path = 'tables.txt'
-        var array = [];
-        var text = fs.readFileSync("./tables.txt").toString('utf-8');
-        var textByLine = text.split("\n")
+        let array = [];
+        const text = fs.readFileSync("./tables.txt").toString('utf-8');
+        const textByLine = text.split("\n")
         for (i = 0; i < textByLine.length; i++) {
             array.push(textByLine[i].split(','));
         }
@@ -466,55 +462,64 @@ module.exports = function (app) {
         });
     }
 
-
     // Deletes user with passed i from the accounts database
     const insertUserIntoDB = function (request, callback) {
         if (pwCheck(request.body.password)) {
-            console.log("password check passed");
-            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
             // TODO: hash password here, check for good password
+            bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
+                if (!err) {
+                    console.log(hash);
+                } else {
+                    console.log(err);
+                }
+            });
+
+            console.log("password check passed");
+            // TODO: check for sql injection
+            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
             connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err) {
                 if (err) return callback(err);
                 callback();
             });
+
         } else {
             err = "pw";
             console.log("password check failed");
             return callback(err);
         }
     }
+}
 
-    // Deletes user with passed i from the accounts database
-    const deleteUserFromDB = function (id, callback) {
-        connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
-            if (err) return callback(err);
-            callback();
-        });
-    }
+// Deletes user with passed i from the accounts database
+const deleteUserFromDB = function (id, callback) {
+    connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
+        if (err) return callback(err);
+        callback();
+    });
+}
 
-    // Check if entered password is a safe password, used when a new user is created
-    function pwCheck(password) {
-        const schema = new passwordValidator();
+// Check if entered password is a safe password, used when a new user is created
+function pwCheck(password) {
+    const schema = new passwordValidator();
 
-        schema
-            .is().min(8) // Minimum length 8
-            .is().max(100) // Maximum length 100
-            .has().uppercase() // Must have uppercase letters
-            .has().lowercase() // Must have lowercase letters
-            .has().digits() // Must have digits
-            .has().not().spaces() // Should not have spaces
-            .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
+    schema
+        .is().min(8) // Minimum length 8
+        .is().max(100) // Maximum length 100
+        .has().uppercase() // Must have uppercase letters
+        .has().lowercase() // Must have lowercase letters
+        .has().digits() // Must have digits
+        .has().not().spaces() // Should not have spaces
+        .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
 
-        const checkedPw = schema.validate(password, {
-            list: true
-        });
+    const checkedPw = schema.validate(password, {
+        list: true
+    });
 
-        if (checkedPw.length === 0) {
-            console.log("Paswort safe");
-            return true;
-        } else {
-            console.log("Password unsafe: " + checkedPw);
-            return false;
-        }
+    if (checkedPw.length === 0) {
+        console.log("Paswort safe");
+        return true;
+    } else {
+        console.log("Password unsafe: " + checkedPw);
+        return false;
     }
 }
