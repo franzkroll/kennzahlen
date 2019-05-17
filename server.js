@@ -23,7 +23,7 @@ console.log = function (d) {
 };
 
 // start server on Port 4000 if no other port is specified
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5000;
 
 // link routes 
 var routes = require('./routes/index.js');

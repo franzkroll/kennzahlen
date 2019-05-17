@@ -121,6 +121,7 @@ module.exports = function (app) {
                     response.render('pages/visual', {
                         user: request.session.username,
                         measureData: "",
+                        loadedTable: "",
                         text: "Datensatz nicht vorhanden!",
                         measureListData: measureList
                     });
@@ -129,7 +130,8 @@ module.exports = function (app) {
 
                     response.render('pages/visual', {
                         user: request.session.username,
-                        measureData: measureData,
+                        measureData: JSON.stringify(measureData),
+                        loadedTable: tableName,
                         text: "Daten erfolgreich geladen!",
                         measureListData: measureList
                     });
@@ -246,6 +248,7 @@ module.exports = function (app) {
                 response.render('pages/visual', {
                     user: request.session.username,
                     measureData: "",
+                    loadedTable: "",
                     text: "",
                     measureListData: measureList
                 });
@@ -257,7 +260,6 @@ module.exports = function (app) {
 
     // Display menu for entering data
     app.get('/submit', function (request, response) {
-        // TODO: load data from disk and send to page
         if (request.session.loggedin) {
             loadTables(function (measureList) {
                 response.render('pages/submit', {
