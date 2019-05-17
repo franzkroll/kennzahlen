@@ -44,7 +44,7 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 
 ### Kennzahlendatenbank
 
-Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Spalten speichern jeweils die Eigenschaften der Kennzahlen. Die Zeilen stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Zeitabschnitt und Kennzahl-Eigenschaft. 
+Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Spalten speichern jeweils die Eigenschaften der Kennzahlen. Die Zeilen stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Zeitabschnitt und Kennzahl-Eigenschaft. Pro Jahr und Kennzahl wird eine neue Tabelle erstellt. Möchten für ein neues Jahr neue Kennzahlendaten eingetragen werden muss eine neue Tabelle erstellet werde.
 Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt. Die Zuordnung der Kennzahlen zu Themen wird in einer separaten Tabelle gespeichert.
 
 #### Beispiel
