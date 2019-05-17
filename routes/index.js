@@ -41,31 +41,29 @@ module.exports = function (app) {
         const password = request.body.password;
 
         if (username && password) {
-            // TODO: hash password before query
-            bcrypt.hash(password, saltRounds, function (err, hash) {
-                if (!err) {
-                    console.log(hash);
-                } else {
-                    console.log(err);
-                }
-            });
-
-            connectionLogin.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
+            // Query database for username
+            connectionLogin.query('SELECT * FROM accounts WHERE username = ?', [username], function (error, results, fields) {
                 if (results.length > 0) {
-                    request.session.loggedin = true;
-                    request.session.username = username;
-                    response.render('pages/index', {
-                        user: request.session.username
+                    // Hash and compare with stored hash
+                    bcrypt.compare(password, results[0].password, function (err, res) {
+                        // Log in user if correct
+                        if (res === true) {
+                            request.session.loggedin = true;
+                            request.session.username = username;
+                            response.render('pages/index', {
+                                user: request.session.username
+                            });
+                            console.log("User '" + request.session.username + "' logged in.");
+                        } else {
+                            response.render('pages/errors/loginFailed');
+                        }
                     });
-                    console.log("User '" + request.session.username + "' logged in.");
                 } else {
-                    console.log("Failed login by '" + request.session.username + "' .");
                     response.render('pages/errors/loginFailed');
                 }
-                response.end();
             });
         } else {
-            response.render('pages/errors/loginError');
+            response.render('pages/errors/loginFailed');
         }
     });
 
@@ -497,17 +495,18 @@ module.exports = function (app) {
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
                     console.log(hash);
+
+                    // TODO: check for sql injections, but unlikely here, admin section
+                    const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
+                    connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
+                        if (err) return callback(err);
+                        callback();
+                    });
                 } else {
                     console.log(err);
                 }
             });
 
-            // TODO: check for sql injections, but unlikely here, admin section
-            const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
-            connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err) {
-                if (err) return callback(err);
-                callback();
-            });
 
         } else {
             err = "pw";

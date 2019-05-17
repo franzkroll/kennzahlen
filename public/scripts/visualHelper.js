@@ -1,6 +1,8 @@
 const measureArray = measureListData.split(';');
 const table = document.getElementById("dataTable");
 
+let currentChart;
+
 const tName = loadedTableName;
 
 var selGraph = document.getElementById('graph');
@@ -48,7 +50,11 @@ selM.onclick = function () {
                 // If measure is found clear table and prepare select for new data
                 if (measure[j] === inputText) {
                     filled = true;
-                    dataLoaded = true;
+
+                    // Clear chart if changed to an item without data
+                    if (currentChart) {
+                        currentChart.destroy();
+                    }
 
                     //Clear rows of the table except the first row
                     for (var i = table.rows.length - 1; i > 0; i--) {
@@ -115,10 +121,6 @@ selM.onclick = function () {
 }
 
 /* Graph stuff here */
-let currentChart;
-
-
-
 selGraph.onchange = function (e) {
     let svalue = this.options[this.selectedIndex].value;
 
@@ -129,7 +131,6 @@ selGraph.onchange = function (e) {
     for (i = 0; i < dataGraph.length; i++) {
         console.log(dataGraph[i]);
     }
-
 
     if (svalue === "bar") {
         currentChart = new Chart(document.getElementById("chart"), {
