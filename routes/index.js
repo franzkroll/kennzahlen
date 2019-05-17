@@ -12,6 +12,7 @@ module.exports = function (app) {
 
     app.get('/status', ensureLoggedIn, statusMonitor.pageRoute)
 
+    // Create SQL-Connection for accessing user data
     const connectionLogin = mysql.createConnection({
         host: 'localhost',
         user: 'dbaccess',
@@ -19,6 +20,7 @@ module.exports = function (app) {
         database: 'nodelogin'
     });
 
+    // Create SQL-Connection for accessing measure data
     const connectionData = mysql.createConnection({
         host: 'localhost',
         user: 'dbaccessData',
@@ -37,8 +39,6 @@ module.exports = function (app) {
     app.post('/auth', function (request, response) {
         const username = request.body.username;
         const password = request.body.password;
-
-        // Create SQL-Connection for accessing user data
 
         if (username && password) {
             // TODO: hash password before query
@@ -69,6 +69,7 @@ module.exports = function (app) {
         }
     });
 
+    // Post action for creating a user, renders admin index after creating and storing user in the database, displays error if that failed
     app.post('/createUser', function (request, response) {
         let responseText;
         insertUserIntoDB(request, function (err) {
@@ -100,6 +101,7 @@ module.exports = function (app) {
         });
     });
 
+    // Loads request data from database and renders it with a new visual page 
     app.post('/visual', function (request, response) {
         loadTables(function (measureList) {
             let tableName;
@@ -137,9 +139,21 @@ module.exports = function (app) {
     });
 
     app.post('/submit', function (request, response) {
-        //TODO: get data and store in existing table in db, give user response that values were inserted
-        // check with txt file if table exists
+        console.log(request.body.measure);
+        console.log(request.body.month);
 
+        for (var key in request.body) {
+            console.log(key);
+        }
+
+        loadTables(function (measureList) {
+            response.render('pages/submit', {
+                user: request.session.username,
+                measureListData: measureList
+            });
+        });
+
+        // TODO: insert data into database, sql injection, check if table exists        
     });
 
     app.post('/createTheme', function (request, response) {
@@ -462,6 +476,18 @@ module.exports = function (app) {
         });
     }
 
+
+    const insertIntoTable = function (tableData, callback) {
+        // TODO:
+        const query = 'INSERT INTo .....';
+
+        // https://stackoverflow.com/questions/812437/mysql-ignore-insert-error-duplicate-entry
+
+        connectionData.query(query, function (error) {
+            if (error) return callback(error);
+        });
+    }
+
     // Deletes user with passed i from the accounts database
     const insertUserIntoDB = function (request, callback) {
         if (pwCheck(request.body.password)) {
@@ -474,8 +500,7 @@ module.exports = function (app) {
                 }
             });
 
-            console.log("password check passed");
-            // TODO: check for sql injection
+            // TODO: check for sql injections, but unlikely here, admin section
             const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
             connectionLogin.query(sql, [request.body.username, request.body.password, request.body.mail, request.body.role], function (err) {
                 if (err) return callback(err);
@@ -488,38 +513,38 @@ module.exports = function (app) {
             return callback(err);
         }
     }
-}
 
-// Deletes user with passed i from the accounts database
-const deleteUserFromDB = function (id, callback) {
-    connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
-        if (err) return callback(err);
-        callback();
-    });
-}
+    // Deletes user with passed i from the accounts database
+    const deleteUserFromDB = function (id, callback) {
+        connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
+            if (err) return callback(err);
+            callback();
+        });
+    }
 
-// Check if entered password is a safe password, used when a new user is created
-function pwCheck(password) {
-    const schema = new passwordValidator();
+    // Check if entered password is a safe password, used when a new user is created
+    function pwCheck(password) {
+        const schema = new passwordValidator();
 
-    schema
-        .is().min(8) // Minimum length 8
-        .is().max(100) // Maximum length 100
-        .has().uppercase() // Must have uppercase letters
-        .has().lowercase() // Must have lowercase letters
-        .has().digits() // Must have digits
-        .has().not().spaces() // Should not have spaces
-        .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
+        schema
+            .is().min(8) // Minimum length 8
+            .is().max(100) // Maximum length 100
+            .has().uppercase() // Must have uppercase letters
+            .has().lowercase() // Must have lowercase letters
+            .has().digits() // Must have digits
+            .has().not().spaces() // Should not have spaces
+            .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
 
-    const checkedPw = schema.validate(password, {
-        list: true
-    });
+        const checkedPw = schema.validate(password, {
+            list: true
+        });
 
-    if (checkedPw.length === 0) {
-        console.log("Paswort safe");
-        return true;
-    } else {
-        console.log("Password unsafe: " + checkedPw);
-        return false;
+        if (checkedPw.length === 0) {
+            console.log("Paswort check passed");
+            return true;
+        } else {
+            console.log("Password check not passed: " + checkedPw);
+            return false;
+        }
     }
 }

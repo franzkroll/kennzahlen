@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 
-<!-- TODO: comment -->
+<!-- Form for submitting measure-data to the system. Has selection menu for month and measure, dynamically loaded in. -->
 
 <head>
     <% include ../partials/head %>
@@ -19,16 +19,14 @@
             Daten ab.
         </div>
         <span style="display:block; height: 10px;"></span>
-        <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
-            <select style="width:30%" id="measure" class="dropdownS">
-            </select>
-            <select id="duration" class="dropdownS">
-            </select>
-        </div>
 
         <div class="login-formS">
             <form action="submit" method="POST">
-                <!-- TODO: add as many text fields as theme as measures -->
+                <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
+                    <select id="measure" style="width:80%" name="measure" class="dropdownS"></select>
+                    <select id="duration" style="width:50%" name="month" class="dropdownS"></select>
+                </div>
+                <span style="display:block; height: 10px"></span>
                 <div id="container">
                 </div>
                 <span style="display:block; height: 10px;"></span>

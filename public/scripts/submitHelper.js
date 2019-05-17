@@ -15,6 +15,8 @@ for (i = 0; i < measureArray.length - 1; i++) {
 
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
+// TODO: display already submitted values when month is selected
+
 selM.onclick = function () {
     var index = this.selectedIndex;
     var inputText = this.children[index].innerHTML.trim();
@@ -44,7 +46,8 @@ selM.onclick = function () {
                     var div = document.createElement("div");
                     var text = document.createElement("input");
                     text.setAttribute("type", "text");
-                    text.setAttribute("name", "var" + i);
+                    text.setAttribute("name", "var" + (i - 2));
+                    text.setAttribute("id", "id" + (i - 2));
                     text.setAttribute("placeholder", measure[i]);
                     text.setAttribute("title", "TODO: Beschreibung speichern und laden");
                     // ... and add it to the container
