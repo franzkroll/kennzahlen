@@ -132,7 +132,7 @@ selGraph.onchange = function (e) {
         currentChart.destroy();
     }
 
-    // Create chart options, maybe add more here
+    // Create chart options, maybe add more here, TODO: add another option
     if (svalue === "bar") {
         currentChart = new Chart(document.getElementById("chart"), {
             type: 'bar',
@@ -143,23 +143,23 @@ selGraph.onchange = function (e) {
             options: {
                 title: {
                     display: true,
-                }
-            },
-            plugins: {
-                zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'xy',
-                    },
-
+                },
+                responsive: true,
+                plugins: {
                     zoom: {
-                        enabled: true,
-                        drag: true,
-                        mode: 'xy',
-                        speed: 0.1,
+                        pan: {
+                            enabled: true,
+                            mode: 'xy',
+                        },
+                        zoom: {
+                            enabled: true,
+                            mode: 'xy',
+                            speed: 0.1,
+                        }
                     }
                 }
-            }
+            },
+
         });
 
     } else if (svalue === "line") {
@@ -173,21 +173,22 @@ selGraph.onchange = function (e) {
                 title: {
                     display: true,
                 },
-            },
-            plugins: {
-                zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'xy',
-                    },
+                responsive: true,
+                plugins: {
                     zoom: {
-                        enabled: true,
-                        drag: true,
-                        mode: 'xy',
-                        speed: 0.1,
+                        pan: {
+                            enabled: true,
+                            mode: 'xy',
+                        },
+                        zoom: {
+                            enabled: true,
+                            mode: 'xy',
+                            speed: 0.1,
+                        }
                     }
                 }
-            }
+            },
+
         });
     }
 
