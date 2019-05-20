@@ -33,7 +33,8 @@ module.exports = function (app) {
         response.render('pages/login');
     });
 
-    /** Queries database with login data,
+    /** 
+     * Queries database with login data,
      * returns homepage if login data is correct, returns error message otherwise
      */
     app.post('/auth', function (request, response) {
@@ -109,21 +110,17 @@ module.exports = function (app) {
                     tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                 }
             }
-            tableName += "_" + request.body.year.trim();
 
-            console.log(tableName);
+            if (request.body.year) {
+                tableName += "_" + request.body.year.trim();
 
-            getMeasureFromDB(tableName, function (result, err) {
-                if (err) {
-                    console.log(err);
-                    response.render('pages/visual', {
-                        user: request.session.username,
-                        measureData: "",
-                        loadedTable: "",
-                        text: "Datensatz nicht vorhanden!",
-                        measureListData: measureList
-                    });
-                } else {
+                getMeasureFromDB(tableName, function (result, err) {
+
+                    console.log(tableName);
+
+                    if (err) {
+                        console.log(err);
+                    }
                     const measureData = JSON.stringify(result);
 
                     response.render('pages/visual', {
@@ -133,27 +130,40 @@ module.exports = function (app) {
                         text: "Daten erfolgreich geladen!",
                         measureListData: measureList
                     });
-                }
-            });
+
+                });
+            } else {
+                response.render('pages/visual', {
+                    user: request.session.username,
+                    measureData: "",
+                    loadedTable: "",
+                    text: "Datensatz nicht vorhanden!",
+                    measureListData: measureList
+                });
+            }
         });
     });
 
+    // Get submitted data from user and put it into the database for the corresponding measure
     app.post('/submit', function (request, response) {
+        // Get measure and date
         console.log(request.body.measure);
         console.log(request.body.month);
 
-        for (var key in request.body) {
-            console.log(key);
+        // Get attributes, they are already in the right order
+        for (let key in request.body) {
+            if (key.includes('var')) {
+                console.log(request.body[key]);
+            }
         }
 
+        // Reload page after values were inserted, TODO: show success or error message
         loadTables(function (measureList) {
             response.render('pages/submit', {
                 user: request.session.username,
                 measureListData: measureList
             });
         });
-
-        // TODO: insert data into database, sql injection, check if table exists        
     });
 
     app.post('/createTheme', function (request, response) {
@@ -479,7 +489,7 @@ module.exports = function (app) {
 
     const insertIntoTable = function (tableData, callback) {
         // TODO:
-        const query = 'INSERT INTo .....';
+        const query = 'INSERT INTO .....';
 
         // https://stackoverflow.com/questions/812437/mysql-ignore-insert-error-duplicate-entry
 
