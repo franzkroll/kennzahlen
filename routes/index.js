@@ -118,14 +118,12 @@ module.exports = function (app) {
                 tableName += "_" + request.body.year.trim();
 
                 getMeasureFromDB(tableName, function (result, err) {
-
                     console.log(tableName);
 
                     if (err) {
                         console.log(err);
-                    } else {
-                        // TODO: show load error here maybe?
                     }
+
                     // Loaded measure data
                     const measureData = JSON.stringify(result);
 
@@ -174,8 +172,8 @@ module.exports = function (app) {
             // Used to convert month to month number
             const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
-            // TODO: escape the year, sql injection
-            const date = tableData[1];
+            // Escaping year for sql injection and slicing out the year
+            const date = connectionData.escape(tableData[1]).slice(1, tableData[1].length + 1);
             const year = date.slice(date.length - 4, date.length);
 
             // Check if entered table really exists, get concrete table name in database
@@ -241,23 +239,35 @@ module.exports = function (app) {
 
     // Used for testing, writes table data into table.txt, needs to be put into createMeasure
     app.get('/test', function (request, response) {
-        //** */TODO: move to creation
-        //TODO: needs attribute if yearly, monthly or quarterly, display options need to be changed accordingly
-        //TODO: yearly measures should start with something else, only save years in database
+        // TODO: move to creation
+        // needs attribute if yearly, monthly or quarterly, display options need to be changed accordingly
+        // yearly measures should start with something else, only save years in database
         let measureList = [];
         let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
         let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
             'Einsatzdauer_des_V-NEF_ab_Alarmierung;'
-        ]
+        ];
         let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt',
             'Zielerreichungsgrad 95% der Notrufe in ≤ 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in ≤ 10 Sekunden anzunehmen',
             'Zielerreichungsgrad 90% der Notrufe in ≤ 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1$1_Annahmezeit;'
-        ]
+        ];
+        let measure4 = ['Anzahl der Alarmierungen', '2018', 'Gesamtanzahl aller Alarmierungen', 'Feuerwehr', 'Katastrophenschutz', 'RTW', 'KTW', 'NEF', 'NAW', 'RTH', 'ITH', 'Sonstige', '2$5_Anzahl_der_Alarmierungen;'];
 
         measureList.push(measure1);
         measureList.push(measure2);
         measureList.push(measure3);
+        measureList.push(measure4);
 
+        // Sort list of measures alphabetically by measure name
+        measureList = measureList.sort(function (a, b) {
+            if (a[0] < b[0]) {
+                return -1;
+            }
+            if (a[0] > b[0]) {
+                return 1;
+            }
+            return 0;
+        });
 
         arrayToTxt(measureList);
 
@@ -510,6 +520,7 @@ module.exports = function (app) {
         console.log('Wrote to file');
     }
 
+    // Loads tables from disk txt file and converts them to an array
     const loadTables = function (callback) {
         let array = [];
         const text = fs.readFileSync("./tables.txt").toString('utf-8');
@@ -582,7 +593,6 @@ module.exports = function (app) {
         if (pwCheck(request.body.password)) {
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
-                    console.log(hash);
                     // TODO: check for sql injections, but unlikely here, admin section
                     const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
                     connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {

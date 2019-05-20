@@ -21,7 +21,13 @@
     text-align: center;
 }
 
-/* TODO: create text_error, red color */
+/* User error text */
+
+.text-error {
+    font-family: Tahoma, Geneva, sans-serif;
+    text-align: center;
+    color: red;
+}
 
 /* Footer */
 

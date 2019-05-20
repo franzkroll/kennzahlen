@@ -13,7 +13,6 @@ for (i = 0; i < measureArray.length - 1; i++) {
     selM.appendChild(opt);
 }
 
-// TODO: sort elements
 function sortSelect(selElem) {
     var tmpAry = new Array();
     for (var i = 0; i < selElem.options.length; i++) {
@@ -34,7 +33,7 @@ function sortSelect(selElem) {
 
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
-// TODO: display already submitted values when month is selected
+// TODO: Display already submitted values when month is selected
 
 selM.onclick = function () {
     var index = this.selectedIndex;

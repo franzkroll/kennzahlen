@@ -8,7 +8,9 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
 
 <head>
     <% include ../partials/head %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.0"></script>
 </head>
 
 <body class="container">
@@ -28,7 +30,7 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         <div style="text-align:center;">
             <form action="visual" method="post">
                 <select id="measure" style="width:30%" name="measure" class="dropdownS"></select>
-                <select style="width: 30%" id="year" name="year" class="dropdownS">
+                <select style="width: 15%" id="year" name="year" class="dropdownS">
                 </select>
                 <div style="text-align: center"><button type="submit" class="button">Daten abfragen</button></div>
             </form>

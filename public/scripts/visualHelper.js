@@ -144,6 +144,21 @@ selGraph.onchange = function (e) {
                 title: {
                     display: true,
                 }
+            },
+            plugins: {
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'xy',
+                    },
+
+                    zoom: {
+                        enabled: true,
+                        drag: true,
+                        mode: 'xy',
+                        speed: 0.1,
+                    }
+                }
             }
         });
 
@@ -157,6 +172,20 @@ selGraph.onchange = function (e) {
             options: {
                 title: {
                     display: true,
+                },
+            },
+            plugins: {
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'xy',
+                    },
+                    zoom: {
+                        enabled: true,
+                        drag: true,
+                        mode: 'xy',
+                        speed: 0.1,
+                    }
                 }
             }
         });
@@ -175,7 +204,9 @@ selGraph.onchange = function (e) {
         const newDataSet = {
             label: measureAttr[i],
             data: dataGraph[i],
+            pointRadius: 5,
             fill: false,
+            borderColor: color,
             backgroundColor: color
         }
         currentChart.data.datasets.push(newDataSet);
