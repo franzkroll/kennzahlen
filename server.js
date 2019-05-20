@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const compression = require('compression');
 const util = require('util');
+const favicon = require('serve-favicon');
 
 // Overwrite default console log and write into debug.log instead..
 const log_file = fs.createWriteStream(__dirname + '/debug.log', {
@@ -36,6 +37,9 @@ app.set('view engine', 'ejs');
 
 // Security function
 app.use(helmet());
+
+// Set icon for tabs etc.
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 
 // Reduces data, increases website reaction speed
 app.use(compression());

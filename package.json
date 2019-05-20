@@ -23,6 +23,7 @@
     "password-sheriff": "1.1.0",
     "password-validator": "4.1.1",
     "pug": "^2.0.3",
+    "serve-favicon": "2.5.0",
     "tabulator-tables": "4.2.7"
   },
   "devDependencies": {}
