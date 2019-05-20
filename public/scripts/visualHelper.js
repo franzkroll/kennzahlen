@@ -62,6 +62,9 @@ selM.onclick = function () {
                         table.deleteRow(i);
                     }
 
+                    measureAttr = [];
+                    dataGraph = [];
+
                     // Clear selection of the years
                     selYear.innerHTML = "";
 
@@ -101,8 +104,8 @@ selM.onclick = function () {
                         // Saves data for graphs
                         let dataBuilder = [];
                         for (k = j + 1; k < columns.length; k += columnCount) {
-                            // Remove everything from data that isn't a number
-                            let cellData = columns[k].split(':')[1].match(/\d+/)[0];
+                            // Remove everything from data that isn't a number or decimal point
+                            let cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
 
                             // Fill correct table cell with data
                             let cell = row.insertCell(-1);
@@ -121,7 +124,7 @@ selM.onclick = function () {
     }
 }
 
-/* Graph stuff here */
+// Listener for graph select, dynamically creates charts
 selGraph.onchange = function (e) {
     let svalue = this.options[this.selectedIndex].value;
 
@@ -129,31 +132,13 @@ selGraph.onchange = function (e) {
         currentChart.destroy();
     }
 
-    for (i = 0; i < dataGraph.length; i++) {
-        console.log(dataGraph[i]);
-    }
-
+    // Create chart options, maybe add more here
     if (svalue === "bar") {
         currentChart = new Chart(document.getElementById("chart"), {
             type: 'bar',
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-                datasets: [{
-                    data: dataGraph[0],
-                    label: measureAttr[0],
-                    backgroundColor: "#3e95cd",
-                    fill: false
-                }, {
-                    data: dataGraph[1],
-                    label: measureAttr[1],
-                    backgroundColor: "#8e5ea2",
-                    fill: false
-                }, {
-                    data: dataGraph[2],
-                    label: measureAttr[2],
-                    backgroundColor: "#3cba9f",
-                    fill: false
-                }]
+                datasets: []
             },
             options: {
                 title: {
@@ -161,27 +146,13 @@ selGraph.onchange = function (e) {
                 }
             }
         });
+
     } else if (svalue === "line") {
         currentChart = new Chart(document.getElementById("chart"), {
             type: 'line',
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-                datasets: [{
-                    data: dataGraph[0],
-                    label: measureAttr[0],
-                    borderColor: "#3e95cd",
-                    fill: false
-                }, {
-                    data: dataGraph[1],
-                    label: measureAttr[1],
-                    borderColor: "#8e5ea2",
-                    fill: false
-                }, {
-                    data: dataGraph[2],
-                    label: measureAttr[2],
-                    borderColor: "#3cba9f",
-                    fill: false
-                }]
+                datasets: []
             },
             options: {
                 title: {
@@ -190,5 +161,34 @@ selGraph.onchange = function (e) {
             }
         });
     }
-    // TODO: needs to loop through, but how?
+
+    // Default colors for graphs, random colors are used if array is empty
+    const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#8c564b', '#bcbd22', '#7f7f7f', '#17becf', '#9467bd', '#d62728', '#e377c2'];
+
+    // Add previously defined and filled arrays to the chart data
+    for (i = 0; i < measureAttr.length; i++) {
+        if (colors.length < i) {
+            color = getRandomColor();
+        } else {
+            color = colors[i];
+        }
+        const newDataSet = {
+            label: measureAttr[i],
+            data: dataGraph[i],
+            fill: false,
+            backgroundColor: color
+        }
+        currentChart.data.datasets.push(newDataSet);
+    }
+    currentChart.update();
+}
+
+// Function for creating random colors, not used at the moment
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
 }
