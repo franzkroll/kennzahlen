@@ -72,6 +72,7 @@ module.exports = function (app) {
     app.post('/createUser', function (request, response) {
         let responseText;
         insertUserIntoDB(request, function (err) {
+            // Show corresponding error messages if password is unsafe or user already exists, user names have to be unique
             if (err === "pw") {
                 console.log(err);
                 responseText = "Fehler bei der Erstellung des Benutzers! Passwort zu unsicher.";
@@ -105,12 +106,14 @@ module.exports = function (app) {
         loadTables(function (measureList) {
             let tableName;
 
+            // Check if inserted measure data really exists
             for (i = 0; i < measureList.length; i++) {
                 if (measureList[i][0] === request.body.measure) {
                     tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                 }
             }
 
+            // If user has also entered a year start query
             if (request.body.year) {
                 tableName += "_" + request.body.year.trim();
 
@@ -120,9 +123,13 @@ module.exports = function (app) {
 
                     if (err) {
                         console.log(err);
+                    } else {
+                        // TODO: show load error here maybe?
                     }
+                    // Loaded measure data
                     const measureData = JSON.stringify(result);
 
+                    // Render page with newly acquired data
                     response.render('pages/visual', {
                         user: request.session.username,
                         measureData: JSON.stringify(measureData),
@@ -130,9 +137,9 @@ module.exports = function (app) {
                         text: "Daten erfolgreich geladen!",
                         measureListData: measureList
                     });
-
                 });
             } else {
+                // Show error page if data couldn't be found
                 response.render('pages/visual', {
                     user: request.session.username,
                     measureData: "",
@@ -164,6 +171,9 @@ module.exports = function (app) {
         loadTables(function (measureList) {
             let tableName;
 
+            // Used to convert month to month number
+            const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
             // TODO: escape the year, sql injection
             const date = tableData[1];
             const year = date.slice(date.length - 4, date.length);
@@ -179,7 +189,7 @@ module.exports = function (app) {
             tableName += "_" + year;
 
             // Build sql string
-            let query = 'INSERT IGNORE INTO ' + tableName + ' () values (';
+            let query = 'REPLACE INTO ' + tableName + ' () values (';
 
             // First case handles the year entry, second case entries with month
             if (date.length === 5) {
@@ -229,27 +239,20 @@ module.exports = function (app) {
         // add new table to database
     });
 
-    // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
-    function arrayToTxt(array) {
-        var file = fs.createWriteStream('tables.txt');
-        file.on('error', function (err) {
-            /* error handling */
-        });
-        array.forEach(function (v) {
-            file.write(v.join(', ') + '\n');
-        });
-        file.end();
-
-        console.log('Wrote to file');
-    }
-
     // Used for testing, writes table data into table.txt, needs to be put into createMeasure
     app.get('/test', function (request, response) {
-        //TODO: move to creation
+        //** */TODO: move to creation
+        //TODO: needs attribute if yearly, monthly or quarterly, display options need to be changed accordingly
+        //TODO: yearly measures should start with something else, only save years in database
         let measureList = [];
         let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
-        let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer', 'Einsatzdauer_des_V-NEF_ab_Alarmierung;']
-        let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt', 'Zielerreichungsgrad 95% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 90% der Notrufe in <= 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1$1_Annahmezeit;']
+        let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
+            'Einsatzdauer_des_V-NEF_ab_Alarmierung;'
+        ]
+        let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt',
+            'Zielerreichungsgrad 95% der Notrufe in ≤ 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in ≤ 10 Sekunden anzunehmen',
+            'Zielerreichungsgrad 90% der Notrufe in ≤ 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1$1_Annahmezeit;'
+        ]
 
         measureList.push(measure1);
         measureList.push(measure2);
@@ -438,7 +441,7 @@ module.exports = function (app) {
     })
 
 
-    // Display user creation page, TODO: only for admins
+    // Display user creation page
     app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
@@ -446,6 +449,7 @@ module.exports = function (app) {
                 if (error) console.log(error);
                 role = (result[0].role);
                 if (role === 'admin') {
+                    // Load user from database
                     getAllUsersFromDB(function (result, error) {
                         if (error) console.log(error);
                         role = (result[0].role);
@@ -456,6 +460,7 @@ module.exports = function (app) {
                             sendString += result[i].id + ":" + result[i].username + ":" + result[i].role + ":" + result[i].email + ":";
                         }
 
+                        // Render page with user data
                         response.render('pages/admin/showUser', {
                             user: request.session.username,
                             result: sendString
@@ -490,7 +495,32 @@ module.exports = function (app) {
         response.render('pages/errors/error404');
     });
 
-    /** Code for querying database, TODO: maybe better? */
+    // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
+    // TODO: maybe make callback?
+    function arrayToTxt(array) {
+        var file = fs.createWriteStream('tables.txt');
+        file.on('error', function (err) {
+            /* error handling */
+        });
+        array.forEach(function (v) {
+            file.write(v.join(', ') + '\n');
+        });
+        file.end();
+
+        console.log('Wrote to file');
+    }
+
+    const loadTables = function (callback) {
+        let array = [];
+        const text = fs.readFileSync("./tables.txt").toString('utf-8');
+        const textByLine = text.split("\n")
+        for (i = 0; i < textByLine.length; i++) {
+            array.push(textByLine[i].split(','));
+        }
+        callback(array);
+    }
+
+    // Get Current user from the database, use to check role
     const getCurrentLoginFromDB = function (request, callback) {
         let result = [];
 
@@ -505,17 +535,7 @@ module.exports = function (app) {
         });
     }
 
-    const loadTables = function (callback) {
-        let array = [];
-        const text = fs.readFileSync("./tables.txt").toString('utf-8');
-        const textByLine = text.split("\n")
-        for (i = 0; i < textByLine.length; i++) {
-            array.push(textByLine[i].split(','));
-        }
-        callback(array);
-    }
-
-    /** Code for querying database, TODO: maybe better? */
+    // Code for querying database, TODO: maybe better?
     const getAllUsersFromDB = function (callback) {
         let result = [];
 
@@ -546,8 +566,6 @@ module.exports = function (app) {
             callback(null, res);
         });
     }
-
-    const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
     // Inserts one row into specified table in measures database
     const insertIntoTable = function (query, callback) {

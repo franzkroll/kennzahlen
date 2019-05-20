@@ -24,7 +24,7 @@
 
 
         <div class="login-formS">
-            <form action="createTheme" method="POST">
+            <form action="createTheme" method="POST" style="text-align: center">
                 <!-- Theme for the measure, can be added as text. TODO: maybe add dropdown menu with existing themes. -->
 
                 <!-- Field for setting name of the measure. -->
@@ -37,10 +37,8 @@
                     Erfassungzyklus:
                     <select style="text-align:left; width:50%;" id="cycle" class="dropdownS">
                         <option value="val1">monatlich</option>
-                        <option value="val3">jährlich</option>
                     </select>
                 </div>
-
 
                 <span style="display:block; height: 5px;"></span>
 
@@ -50,9 +48,9 @@
                         title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
                 </div>
 
-                <input class="button" style="width:300px" type="button" value="Eigenschaft hinzufügen" id="add" />
+                <input class="button" type="button" value="Eigenschaft hinzufügen" id="add" />
 
-                <span style="display:block; height: 15px;"></span>
+                <span style="display:block; height: 20px;"></span>
 
                 <!-- Submits data to server. -->
                 <input type="submit" value="Thema erstellen">

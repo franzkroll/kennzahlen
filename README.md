@@ -20,7 +20,7 @@ node server.js
 ```
 Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die npm packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
 
-Die Anwendung ist nun über [localhost:4000](http://localhost:4000/) erreichbar. (Beim Starten über NodeJS lässt sich ebenso ein anderer Port spezifizieren.)
+Die Anwendung ist nun über [localhost:5000](http://localhost:5000/) erreichbar. (Beim Starten über NodeJS lässt sich ebenso ein anderer Port spezifizieren.)
 
 Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben.
 

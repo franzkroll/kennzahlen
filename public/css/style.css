@@ -21,6 +21,8 @@
     text-align: center;
 }
 
+/* TODO: create text_error, red color */
+
 /* Footer */
 
 html {
@@ -176,6 +178,44 @@ li a:hover:not(.active) {
 }
 
 .login-formS input[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background-color: #535b63;
+    margin-bottom: 15px;
+    border: 0;
+    border-radius: 4px;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.login-formA {
+    width: 470px;
+    margin: 0 auto;
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
+.login-formA h1 {
+    margin-bottom: 15px;
+
+    text-align: center;
+    color: #4d4d4d;
+    font-size: 24px;
+    padding: 20px 0 20px 0;
+}
+
+.login-formA input[type="password"],
+.login-formA input[type="email"],
+.login-formA input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #dddddd;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+.login-formA input[type="submit"] {
     width: 100%;
     padding: 15px;
     background-color: #535b63;
