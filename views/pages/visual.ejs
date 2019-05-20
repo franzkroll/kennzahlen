@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
 
-<!-- TODO: comment -->
+<!-- 
+Loads available measures and shows table, if data isn't present it has to be loaded 
+in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
+-->
 
 <head>
     <% include ../partials/head %>
@@ -29,7 +32,6 @@
                 </select>
                 <div style="text-align: center"><button type="submit" class="button">Daten abfragen</button></div>
             </form>
-            <!-- TODO: maybe more options -->
         </div>
         <div>
             <table id="dataTable">
@@ -55,6 +57,7 @@
         </div>
 
         <div style="text-align: center">
+            <!-- TODO: maybe more options, but which -->
             <select id="graph" class="dropdownS">
                 <option value="bar">Balkendiagramm</option>
                 <option value="line">Liniendiagramm</option>

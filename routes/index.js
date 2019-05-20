@@ -146,22 +146,79 @@ module.exports = function (app) {
 
     // Get submitted data from user and put it into the database for the corresponding measure
     app.post('/submit', function (request, response) {
+        // Array for storing table data
+        tableData = []
+
         // Get measure and date
-        console.log(request.body.measure);
-        console.log(request.body.month);
+        tableData.push(request.body.measure);
+        tableData.push(request.body.date);
 
         // Get attributes, they are already in the right order
         for (let key in request.body) {
             if (key.includes('var')) {
-                console.log(request.body[key]);
+                tableData.push(request.body[key]);
             }
         }
 
-        // Reload page after values were inserted, TODO: show success or error message
+        // Load table data from disk
         loadTables(function (measureList) {
-            response.render('pages/submit', {
-                user: request.session.username,
-                measureListData: measureList
+            let tableName;
+
+            // TODO: escape the year, sql injection
+            const date = tableData[1];
+            const year = date.slice(date.length - 4, date.length);
+
+            // Check if entered table really exists, get concrete table name in database
+            for (i = 0; i < measureList.length; i++) {
+                if (measureList[i][0] === tableData[0]) {
+                    tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+                }
+            }
+
+            // Add year to tablename
+            tableName += "_" + year;
+
+            // Build sql string
+            let query = 'INSERT IGNORE INTO ' + tableName + ' () values (';
+
+            // First case handles the year entry, second case entries with month
+            if (date.length === 5) {
+                query += year + ',';
+            } else {
+                query += parseInt((months.indexOf(date.slice(0, date.length - 5)) + 1 + year), 10) + ',';
+            }
+
+            // Put data into sql string, maybe add directly without values vector?, sql injection
+            for (i = 2; i < tableData.length; i++) {
+                query += connectionData.escape(tableData[i]);
+                query += ',';
+            }
+            // Remove last comma
+            query = query.slice(0, query.length - 1);
+            query += ');'
+
+            // And insert them into the database
+            insertIntoTable(query, function (error) {
+                if (error) {
+                    console.log(error);
+                    loadTables(function (measureList) {
+                        response.render('pages/submit', {
+                            user: request.session.username,
+                            text: "Fehler beim Eintragen der Daten!",
+                            measureListData: measureList
+                        });
+                    });
+                    // TODO: show user error message
+                } else {
+                    // Reload page after values were inserted
+                    loadTables(function (measureList) {
+                        response.render('pages/submit', {
+                            text: "Daten erfolgreich eingetragen!",
+                            user: request.session.username,
+                            measureListData: measureList
+                        });
+                    });
+                }
             });
         });
     });
@@ -192,7 +249,7 @@ module.exports = function (app) {
         let measureList = [];
         let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
         let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer', 'Einsatzdauer_des_V-NEF_ab_Alarmierung;']
-        let measure3 = ['Annahmezeit', '2017:2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'Zielerreichungsgrad 95% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 90% der Notrufe in <= 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1.1;']
+        let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt', 'Zielerreichungsgrad 95% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in <= 10 Sekunden anzunehmen', 'Zielerreichungsgrad 90% der Notrufe in <= 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1$1_Annahmezeit;']
 
         measureList.push(measure1);
         measureList.push(measure2);
@@ -272,6 +329,7 @@ module.exports = function (app) {
             loadTables(function (measureList) {
                 response.render('pages/submit', {
                     user: request.session.username,
+                    text: "",
                     measureListData: measureList
                 });
             });
@@ -359,7 +417,7 @@ module.exports = function (app) {
         }
     });
 
-    // Display user creation page, TODO: only for admins
+    // Display user creation page
     app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
@@ -384,10 +442,12 @@ module.exports = function (app) {
     app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result, error) {
+                if (error) console.log(error);
                 role = (result[0].role);
                 if (role === 'admin') {
-                    getAllUsersFromDB(function (result, err) {
+                    getAllUsersFromDB(function (result, error) {
+                        if (error) console.log(error);
                         role = (result[0].role);
                         let sendString = "";
 
@@ -470,6 +530,7 @@ module.exports = function (app) {
         });
     }
 
+    // Queries database for a complete measure, no sql injection needed because tableName is taken from predefined list
     const getMeasureFromDB = function (tableName, callback) {
         let result = [];
 
@@ -486,26 +547,24 @@ module.exports = function (app) {
         });
     }
 
+    const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
-    const insertIntoTable = function (tableData, callback) {
-        // TODO:
-        const query = 'INSERT INTO .....';
-
-        // https://stackoverflow.com/questions/812437/mysql-ignore-insert-error-duplicate-entry
-
+    // Inserts one row into specified table in measures database
+    const insertIntoTable = function (query, callback) {
         connectionData.query(query, function (error) {
-            if (error) return callback(error);
+            if (error) {
+                return callback(error);
+            }
+            callback();
         });
     }
 
     // Deletes user with passed i from the accounts database
     const insertUserIntoDB = function (request, callback) {
         if (pwCheck(request.body.password)) {
-            // TODO: hash password here, check for good password
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
                     console.log(hash);
-
                     // TODO: check for sql injections, but unlikely here, admin section
                     const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
                     connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
@@ -516,8 +575,6 @@ module.exports = function (app) {
                     console.log(err);
                 }
             });
-
-
         } else {
             err = "pw";
             console.log("password check failed");

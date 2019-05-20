@@ -51,6 +51,11 @@ selM.onclick = function () {
                 selYear.innerHTML = "";
                 fieldContainer.innerHTML = "";
                 for (k = 0; k < years.length; k++) {
+                    let opt = document.createElement('option');
+                    opt.appendChild(document.createTextNode(years[k]));
+                    opt.value = years[k];
+                    selYear.appendChild(opt);
+
                     for (l = 0; l < months.length; l++) {
                         let opt = document.createElement('option');
                         opt.appendChild(document.createTextNode(months[l] + ' ' + years[k]));
@@ -68,6 +73,7 @@ selM.onclick = function () {
                     text.setAttribute("name", "var" + (i - 2));
                     text.setAttribute("id", "id" + (i - 2));
                     text.setAttribute("placeholder", measure[i]);
+                    text.setAttribute("required", "required");
                     text.setAttribute("title", "TODO: Beschreibung speichern und laden");
                     // ... and add it to the container
                     div.appendChild(text);
