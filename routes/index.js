@@ -8,8 +8,8 @@ module.exports = function (app) {
     const bcrypt = require('bcrypt');
     const saltRounds = 10;
 
+    // Shows stats page
     app.use(statusMonitor);
-
     app.get('/status', ensureLoggedIn, statusMonitor.pageRoute)
 
     // Create SQL-Connection for accessing user data

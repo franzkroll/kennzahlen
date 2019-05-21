@@ -1,14 +1,14 @@
+// Split data that was received into an array
 const measureArray = measureListData.split(';');
+
+// Get needed elements from html page
 const table = document.getElementById("dataTable");
+const selGraph = document.getElementById('graph');
+const selM = document.getElementById('measure');
+const selYear = document.getElementById('year');
 
+// Saves current chart so we can destroy it before creating a new one
 let currentChart;
-
-const tName = loadedTableName;
-
-var selGraph = document.getElementById('graph');
-var selM = document.getElementById('measure');
-
-var selYear = document.getElementById('year');
 
 // Format measure array and add to select
 for (i = 0; i < measureArray.length - 1; i++) {
@@ -24,6 +24,7 @@ let dataGraph = [];
 // Saves attributes of the current measure
 let measureAttr = [];
 
+// Replace all because js doesn't have it
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -32,9 +33,10 @@ String.prototype.replaceAll = function (search, replacement) {
 // TODO: better way, to many loop
 selM.onclick = function () {
     // Get parsed name of table
-    const tableName = tName.slice(5, tName.length - 5).replaceAll('_', ' ');
+    const tableName = loadedTableName.slice(5, loadedTableName.length - 5).replaceAll('_', ' ');
     const columns = measureData.split(',');
 
+    // Get selected measure
     var index = this.selectedIndex;
     var inputText = this.children[index].innerHTML.trim();
 
@@ -62,6 +64,7 @@ selM.onclick = function () {
                         table.deleteRow(i);
                     }
 
+                    // Clear data for graphs and saved attributes
                     measureAttr = [];
                     dataGraph = [];
 
@@ -128,13 +131,14 @@ selM.onclick = function () {
 selGraph.onchange = function (e) {
     let svalue = this.options[this.selectedIndex].value;
 
+    // Destroy current chart before creating a new one, if we don't do that they will overlap
     if (currentChart) {
         currentChart.destroy();
     }
 
-    // Create chart options, maybe add more here, TODO: add another option
-    if (svalue === "bar") {
-        currentChart = new Chart(document.getElementById("chart"), {
+    // Create chart options
+    if (svalue === 'bar') {
+        currentChart = new Chart(document.getElementById('chart'), {
             type: 'bar',
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
@@ -158,12 +162,10 @@ selGraph.onchange = function (e) {
                         }
                     }
                 }
-            },
-
+            }
         });
-
-    } else if (svalue === "line") {
-        currentChart = new Chart(document.getElementById("chart"), {
+    } else if (svalue === 'line') {
+        currentChart = new Chart(document.getElementById('chart'), {
             type: 'line',
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
@@ -187,8 +189,22 @@ selGraph.onchange = function (e) {
                         }
                     }
                 }
+            }
+        });
+    } else if (svalue === 'radar') {
+        // Nice to have, but maybe a bit useless here, can't be zoomed either
+        currentChart = new Chart(document.getElementById("chart"), {
+            type: 'radar',
+            data: {
+                labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                datasets: []
             },
-
+            options: {
+                title: {
+                    display: true,
+                },
+                responsive: true,
+            }
         });
     }
 
@@ -215,7 +231,7 @@ selGraph.onchange = function (e) {
     currentChart.update();
 }
 
-// Function for creating random colors, not used at the moment
+// Function for creating random colors, used if we run out of default colors in array
 function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
