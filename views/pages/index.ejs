@@ -3,7 +3,7 @@
 
 <!-- 
 Landing page after login, display different possibilities to interact with the data. 
-Has header and footer for navigation and info 
+Has header and footer for navigation and info.
 -->
 
 <head>
@@ -11,11 +11,13 @@ Has header and footer for navigation and info
 </head>
 
 <body class="container">
+	<!-- Load header, every page hast this. -->
 	<header>
 		<% include ../partials/header %>
 	</header>
 
 	<main>
+		<!-- Buttons for the different sections of the system. -->
 		<div style="text-align:center;">
 			<div>
 				<a href="/visual"><button class="button">Visualisierung bestehender Kennzahlen</button></a>
@@ -39,6 +41,7 @@ Has header and footer for navigation and info
 		</div>
 	</main>
 
+	<!-- Load footer, every page has this. -->
 	<footer>
 		<% include ../partials/footer %>
 	</footer>

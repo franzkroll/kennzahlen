@@ -52,12 +52,13 @@ selM.onclick = function () {
             for (i = 2; i < measure.length - 1; i++) {
                 var div = document.createElement("div");
                 var text = document.createElement("input");
-                text.setAttribute("type", "text");
+                text.setAttribute("type", "number");
+                text.setAttribute("step", "0.01");
                 text.setAttribute("name", "var" + (i - 2));
                 text.setAttribute("id", "id" + (i - 2));
                 text.setAttribute("placeholder", measure[i]);
                 text.setAttribute("required", "required");
-                text.setAttribute("title", "TODO: Beschreibung speichern und laden");
+                text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein."); // TODO: maybe load custom description
                 // ... and add it to the container
                 div.appendChild(text);
                 fieldContainer.appendChild(div);

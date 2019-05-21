@@ -213,6 +213,7 @@ li a:hover:not(.active) {
 
 .login-formA input[type="password"],
 .login-formA input[type="email"],
+.login-formA input[type="number"],
 .login-formA input[type="text"] {
     width: 100%;
     padding: 15px;
