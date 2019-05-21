@@ -118,8 +118,6 @@ module.exports = function (app) {
                 tableName += "_" + request.body.year.trim();
 
                 getMeasureFromDB(tableName, function (result, err) {
-                    console.log(tableName);
-
                     if (err) {
                         console.log(err);
                     }
@@ -216,7 +214,6 @@ module.exports = function (app) {
                             measureListData: measureList
                         });
                     });
-                    // TODO: show user error message
                 } else {
                     // Reload page after values were inserted
                     loadTables(function (measureList) {
@@ -247,6 +244,9 @@ module.exports = function (app) {
         let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
             'Einsatzdauer_des_V-NEF_ab_Alarmierung;'
         ];
+        let measure5 = ['Zeitspanne von Anforderung des V-NEF bis zur Alarmierung', '2018', 'durchschnittliche Zeitspanne', 'minimale Zeitspanne', 'maximale Einsatzdauer',
+            'Zeitspanne_von_Anforderung_des_V-NEF_bis_zur_Alarmierung;'
+        ];
         let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt',
             'Zielerreichungsgrad 95% der Notrufe in ≤ 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in ≤ 10 Sekunden anzunehmen',
             'Zielerreichungsgrad 90% der Notrufe in ≤ 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1$1_Annahmezeit;'
@@ -257,6 +257,7 @@ module.exports = function (app) {
         measureList.push(measure2);
         measureList.push(measure3);
         measureList.push(measure4);
+        measureList.push(measure5);
 
         // Sort list of measures alphabetically by measure name
         measureList = measureList.sort(function (a, b) {
@@ -269,16 +270,16 @@ module.exports = function (app) {
             return 0;
         });
 
-        arrayToTxt(measureList);
-
-        response.end();
+        arrayToTxt(measureList, function (error) {
+            response.render('pages/index');
+        });
     });
 
     // Loads simple help page
     app.get('/help', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     response.render('pages/admin/adminHelp', {
@@ -355,7 +356,7 @@ module.exports = function (app) {
     app.get('/createMeasure', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (!(role === 'submit')) {
                     response.render('pages/createMeasure', {
@@ -374,7 +375,7 @@ module.exports = function (app) {
     app.get('/addAttribute', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (!(role === 'submit')) {
                     response.render('pages/addAttribute', {
@@ -393,7 +394,7 @@ module.exports = function (app) {
     app.get('/admin', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     response.render('pages/admin/admin', {
@@ -414,7 +415,7 @@ module.exports = function (app) {
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     response.render('pages/stats', {
@@ -434,7 +435,7 @@ module.exports = function (app) {
     app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, err) {
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     response.render('pages/admin/createUser', {
@@ -455,8 +456,7 @@ module.exports = function (app) {
     app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result, error) {
-                if (error) console.log(error);
+            getCurrentLoginFromDB(request, function (result) {
                 role = (result[0].role);
                 if (role === 'admin') {
                     // Load user from database
@@ -506,17 +506,15 @@ module.exports = function (app) {
     });
 
     // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
-    // TODO: maybe make callback?
-    function arrayToTxt(array) {
+    const arrayToTxt = function (array) {
         var file = fs.createWriteStream('tables.txt');
         file.on('error', function (err) {
-            /* error handling */
+            console.log(err);
         });
         array.forEach(function (v) {
             file.write(v.join(', ') + '\n');
         });
         file.end();
-
         console.log('Wrote to file');
     }
 
@@ -536,7 +534,7 @@ module.exports = function (app) {
         let result = [];
 
         connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
-            if (err) return callback(err);
+            if (err) console.log(err);
             if (res.length) {
                 for (let i = 0; i < res.length; i++) {
                     result.push(res[i]);
@@ -631,10 +629,12 @@ module.exports = function (app) {
             .has().not().spaces() // Should not have spaces
             .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
 
+        // Save attributes that don't pass in list
         const checkedPw = schema.validate(password, {
             list: true
         });
 
+        // If list is empty its a good password
         if (checkedPw.length === 0) {
             console.log("Paswort check passed");
             return true;

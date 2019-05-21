@@ -30,7 +30,7 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-// TODO: better way, to many loop
+// Handle filling of table and graph data when new measure is selected
 selM.onclick = function () {
     // Get parsed name of table
     const tableName = loadedTableName.slice(5, loadedTableName.length - 5).replaceAll('_', ' ');
