@@ -86,6 +86,14 @@ Standardmäßig werden die MySQL Tabellen nach den Namen der Kennzahlen benannt.
 | März 2019        | 0                 | 4                 | 5                 | 
 | April 2019       | 3                 | 1                 | 2                 |  
 
+#### Beispiel für Tabellenname
+
+Kennzahl: 1.1, Anzahl der Alarmierungen, Jahr 2018
+
+Tabellenname in Datenbank: 1$1_Anzahl_der_Alarmierungen_2018
+
+Punkte werden durch $-Zeichn ersetzt, Leerzeichen durch Unterstriche.
+
 ## Benutzung des Web-Interfaces
 
 Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte Visualisieren und Daten zu bestehenden Kennzahlen eintragen.
@@ -104,7 +112,7 @@ franz.kroll@b-tu.de
 ## Lizenz
 
 TODO: Überprüfen ob richtige Lizenzen
-
+  
 Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php), Inhalt lizenziert unter CC BY NC SA 4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ## Disclaimer 
