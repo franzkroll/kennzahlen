@@ -244,7 +244,7 @@ module.exports = function (app) {
         let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
             'Einsatzdauer_des_V-NEF_ab_Alarmierung;'
         ];
-        let measure5 = ['Zeitspanne von Anforderung des V-NEF bis zur Alarmierung', '2018', 'durchschnittliche Zeitspanne', 'minimale Zeitspanne', 'maximale Einsatzdauer',
+        let measure5 = ['Zeitspanne von Anforderung des V-NEF bis zur Alarmierung', '2018', 'Durchschnittliche Zeitspanne', 'Minimale Zeitspanne', 'Maximale Einsatzdauer',
             'Zeitspanne_von_Anforderung_des_V-NEF_bis_zur_Alarmierung;'
         ];
         let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt',
@@ -259,6 +259,10 @@ module.exports = function (app) {
         measureList.push(measure4);
         measureList.push(measure5);
 
+        // TODO: add measure descriptions, has to be sorted too
+
+        let measureDescriptions = [];
+
         // Sort list of measures alphabetically by measure name
         measureList = measureList.sort(function (a, b) {
             if (a[0] < b[0]) {
@@ -272,6 +276,16 @@ module.exports = function (app) {
 
         arrayToTxt(measureList, function (error) {
             response.render('pages/index');
+        });
+    });
+
+    app.get('/measureHelp', function (request, response) {
+        // TODO: save descriptions in measure list?
+        loadTables(function (measureList) {
+            response.render('pages/measureHelp', {
+                user: request.session.username,
+                measureListData: measureList
+            });
         });
     });
 

@@ -29,7 +29,7 @@ Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu 
 const connectionLogin = mysql.createConnection({
     host: 'localhost',
     user: 'dbaccess',
-    password: 'Pdgy#MW$Jud6F$_B',
+    password: 'passwort',
     database: 'nodelogin'
 });
 ```
@@ -40,7 +40,7 @@ const connectionLogin = mysql.createConnection({
 const connectionData = mysql.createConnection({
     host: 'localhost',
     user: 'dbaccessData',
-    password: 'N&HQkzW]WF2bBA*k',
+    password: 'passwort ',
     database: 'measures'
 });
 ```
@@ -92,7 +92,7 @@ Kennzahl: 1.1, Anzahl der Alarmierungen, Jahr 2018
 
 Tabellenname in Datenbank: 1$1_Anzahl_der_Alarmierungen_2018
 
-Punkte werden durch $-Zeichn ersetzt, Leerzeichen durch Unterstriche.
+Punkte werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
 
 ## Benutzung des Web-Interfaces
 
@@ -101,6 +101,7 @@ Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es mög
 Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich.
 
 Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer.
+Neu erstellte Benutzer müssen einen eindeutigen Namen sowie E-Mail Adresse haben. Das Passwort wird automatisch auf gute Sicherheit überprüft.
 
 About zeigt Kontaktinformationen.
 

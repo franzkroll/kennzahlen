@@ -28,8 +28,8 @@
             <form action="submit" method="POST">
                 <!-- Selection menu for measure and year/month. -->
                 <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
-                    <select id="measure" style="width:60%" name="measure" class="dropdownS" required></select>
-                    <select id="duration" style="width:30%" name="date" class="dropdownS" required></select>
+                    <select id="measure" style="width:90%" name="measure" class="dropdownS" required></select>
+                    <select id="duration" style="width:40%" name="date" class="dropdownS" required></select>
                 </div>
                 <span style="display:block; height: 10px"></span>
                 <!-- Text fields with attributes get added here. -->
@@ -42,7 +42,7 @@
     </main>
 
     <script>
-        const measureData = '<%- measureListData %>'
+        const measureData = '<%- measureListData %>';
     </script>
 
     <script src="/scripts/submitHelper.js"></script>

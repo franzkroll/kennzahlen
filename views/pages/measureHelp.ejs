@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<!-- 
+Shows descriptions of measures and their attributes 
+-->
+
+<head>
+    <% include ../partials/head %>
+</head>
+
+<body class="container">
+    <header>
+        <% include ../partials/header %>
+    </header>
+
+    <main>
+        <span style="display:block; height: 10px;"></span>
+        <div class="misc-text">
+            Wählen Sie aus dem Dropdown-Menü die gewünschte Kennzahl aus. Danach werden Ihnen Informationen zur Kennzahl
+            und zu den jeweiligen Attributen der Kennzahl angzeigt.
+        </div>
+        <span style="display:block; height: 10px;"></span>
+        <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
+            <select id="measure" style="width:50%" name="measure" class="dropdownS" required></select>
+        </div>
+    </main>
+
+    <script>
+        const measureListData = '<%- measureListData %>';
+    </script>
+
+    <script src="/scripts/measureHelper.js"></script>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+</body>
+
+</html>
