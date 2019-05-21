@@ -58,7 +58,7 @@ app.use(session({
 	rolling: true,
 	resave: false,
 	secret: 'secret',
-	saveUninitialized: false // Don't save sessions that aren' logged in.
+	saveUninitialized: false // Don't save sessions that aren't logged in.
 }));
 
 // Handles post Request for Login

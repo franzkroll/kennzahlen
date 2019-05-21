@@ -6,11 +6,11 @@ System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen.
 
 Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, beziehungsweise auch neue Kennzahlen anzulegen. Es ist möglich Nutzern verschiedene Bereiche zum Zugriff auf verschiedenen Kennzahlen zuzuweisen. Ein Admin hat die Möglichkeit Serverstatistiken einzusehen, sowie Nutzer zu erstellen und zu verwalten.
 
-## Installation einer eigenen Instanz des Servers
+## Installation und Start einer eigenen Instanz des Servers
 
 Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt. 
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in /routes/index.js, im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden.
+Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die npm packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
 
 ```sh
 git clone https://github.com/franzkroll/kennzahlen.git
@@ -18,9 +18,38 @@ cd kennzahlen
 npm install
 node server.js
 ```
-Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die npm packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
 
-Die Anwendung ist nun über [localhost:5000](http://localhost:5000/) erreichbar. (Beim Starten über NodeJS lässt sich ebenso ein anderer Port spezifizieren.)
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in /routes/index.js, im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. 
+
+### Datenfelder die an lokale MySQL-Zugangsdaten angepasst werden müssen:
+
+#### Zugang zu Benutzerdatenbank
+
+```js
+const connectionLogin = mysql.createConnection({
+    host: 'localhost',
+    user: 'dbaccess',
+    password: 'Pdgy#MW$Jud6F$_B',
+    database: 'nodelogin'
+});
+```
+
+#### Zugang zu Kennzahlendatebank
+
+```js
+const connectionData = mysql.createConnection({
+    host: 'localhost',
+    user: 'dbaccessData',
+    password: 'N&HQkzW]WF2bBA*k',
+    database: 'measures'
+});
+```
+Die Anwendung ist nun über [localhost:5000](http://localhost:5000/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
+
+```sh
+port:4444 node server.js
+```
+(Beispiel mit Port 4444)
 
 Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben.
 
@@ -31,7 +60,7 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 
 ### Benutzerdatenbank
 
-Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden.
+Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
 
 #### Beispiel
 
@@ -45,7 +74,8 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 ### Kennzahlendatenbank
 
 Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Spalten speichern jeweils die Eigenschaften der Kennzahlen. Die Zeilen stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Zeitabschnitt und Kennzahl-Eigenschaft. Pro Jahr und Kennzahl wird eine neue Tabelle erstellt. Möchten für ein neues Jahr neue Kennzahlendaten eingetragen werden muss eine neue Tabelle erstellet werde.
-Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt. Die Zuordnung der Kennzahlen zu Themen wird in einer separaten Tabelle gespeichert.
+Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt. Werden Kennzahl erstellt werden diese in tables.txt im Serverordner hinterlegt, dieser dient zur einfacheren Zuordnung der Kennzahlen zu den Tabllen. Ebenso muss zum Füllen der GUI-Elemente in vielen Fällen nicht auf die Datenbank zugegriffen werden.
+Standardmäßig werden die MySQL Tabellen nach den Namen der Kennzahlen benannt.
 
 #### Beispiel
 
@@ -60,7 +90,11 @@ Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt
 
 Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte Visualisieren und Daten zu bestehenden Kennzahlen eintragen.
 
+Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich.
+
 Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer.
+
+About zeigt Kontaktinformationen.
 
 ## Kontakt
 

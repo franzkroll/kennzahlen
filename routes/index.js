@@ -73,14 +73,14 @@ module.exports = function (app) {
         let responseText;
         insertUserIntoDB(request, function (err) {
             // Show corresponding error messages if password is unsafe or user already exists, user names have to be unique
-            if (err === "pw") {
+            if (err === 'pw') {
                 console.log(err);
-                responseText = "Fehler bei der Erstellung des Benutzers! Passwort zu unsicher.";
+                responseText = 'Fehler bei der Erstellung des Benutzers! Passwort zu unsicher.';
             } else if (err) {
                 console.log(err);
-                responseText = "Fehler bei der Erstellung des Benutzers! Benutzer bereits vorhanden.";
+                responseText = 'Fehler bei der Erstellung des Benutzers! Benutzer bereits vorhanden.';
             } else {
-                responseText = "Benutzer erfolgreich erstellt!";
+                responseText = 'Benutzer erfolgreich erstellt!';
             };
             response.render('pages/admin/admin', {
                 user: request.session.username,
