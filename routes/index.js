@@ -44,7 +44,9 @@ module.exports = function (app) {
 
         if (username && password) {
             // Query database for username
-            connectionLogin.query('SELECT * FROM accounts WHERE username = ?', [username], function (error, results, fields) {
+            console.log(connectionLogin.escape(username));
+            connectionLogin.query('SELECT * FROM accounts WHERE username = ' + connectionLogin.escape(username), function (error, results) {
+                if (error) console.log(error);
                 if (results.length > 0) {
                     // Hash and compare with stored hash
                     bcrypt.compare(password, results[0].password, function (err, res) {
@@ -239,9 +241,12 @@ module.exports = function (app) {
     });
 
     app.post('/createTheme', function (request, response) {
-        // TODO: load tableData with txtToArray, let user enter values
-        // create new entry in txt file
-        // add new table to database
+        // TODO:
+        // Get post data from user form
+        // Convert them to array, check for sql injections
+        // Insert into database
+        // Add description to array, add other values to table array
+        // Write them to disk
     });
 
     // Used for testing, writes table data into table.txt, needs to be put into createMeasure
@@ -643,7 +648,6 @@ module.exports = function (app) {
         if (pwCheck(request.body.password)) {
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
-                    // TODO: check for sql injections, but unlikely here, admin section
                     const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
                     connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
                         if (err) return callback(err);
