@@ -49,7 +49,6 @@ selM.onclick = function () {
         }
     }
 
-
     // Add function to collapsible fields
     for (i = 0; i < coll.length; i++) {
         coll[i].addEventListener('click', function () {

@@ -16,7 +16,7 @@ for (i = 0; i < measureArray.length - 1; i++) {
 // Needed for converting month number to text
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
-// TODO: Display already submitted values when month is selected
+// TODO: Display already submitted values when month is selected or too much to do?
 
 // Search for measure that was input by the user, when found display attributes
 selM.onclick = function () {
@@ -46,7 +46,6 @@ selM.onclick = function () {
                     selYear.appendChild(opt);
                 }
             }
-
 
             // Create text fields for all measure attributes
             for (i = 2; i < measure.length - 1; i++) {

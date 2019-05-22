@@ -121,19 +121,27 @@ module.exports = function (app) {
                 getMeasureFromDB(tableName, function (result, error) {
                     if (error) {
                         console.log(error);
+                        // Show error page if data couldn't be found
+                        response.render('pages/visual', {
+                            user: request.session.username,
+                            measureData: "",
+                            loadedTable: "",
+                            text: "Datensatz nicht vorhanden!",
+                            measureListData: measureList
+                        });
+                    } else {
+                        // Loaded measure data
+                        const measureData = JSON.stringify(result);
+
+                        // Render page with newly acquired data
+                        response.render('pages/visual', {
+                            user: request.session.username,
+                            measureData: JSON.stringify(measureData),
+                            loadedTable: tableName,
+                            text: "Daten erfolgreich geladen!",
+                            measureListData: measureList
+                        });
                     }
-
-                    // Loaded measure data
-                    const measureData = JSON.stringify(result);
-
-                    // Render page with newly acquired data
-                    response.render('pages/visual', {
-                        user: request.session.username,
-                        measureData: JSON.stringify(measureData),
-                        loadedTable: tableName,
-                        text: "Daten erfolgreich geladen!",
-                        measureListData: measureList
-                    });
                 });
             } else {
                 // Show error page if data couldn't be found
@@ -626,7 +634,7 @@ module.exports = function (app) {
     const insertIntoTable = function (query, callback) {
         connectionData.query(query, function (err) {
             if (err) return callback(err);
-            callback();
+            callback(err);
         });
     }
 
