@@ -6,6 +6,7 @@ module.exports = function (app) {
     const passwordValidator = require('password-validator');
     const fs = require('fs');
     const bcrypt = require('bcrypt');
+    // Salt rounds for password encryption
     const saltRounds = 10;
 
     // Shows stats page
@@ -103,7 +104,7 @@ module.exports = function (app) {
 
     // Loads request data from database and renders it with a new visual page 
     app.post('/visual', function (request, response) {
-        loadTables(function (measureList) {
+        loadTables('tables', function (measureList) {
             let tableName;
 
             // Check if inserted measure data really exists
@@ -117,9 +118,9 @@ module.exports = function (app) {
             if (request.body.year) {
                 tableName += "_" + request.body.year.trim();
 
-                getMeasureFromDB(tableName, function (result, err) {
-                    if (err) {
-                        console.log(err);
+                getMeasureFromDB(tableName, function (result, error) {
+                    if (error) {
+                        console.log(error);
                     }
 
                     // Loaded measure data
@@ -164,7 +165,8 @@ module.exports = function (app) {
         }
 
         // Load table data from disk
-        loadTables(function (measureList) {
+        loadTables('tables', function (measureList) {
+            // Table to write into
             let tableName;
 
             // Used to convert month to month number
@@ -207,7 +209,7 @@ module.exports = function (app) {
             insertIntoTable(query, function (error) {
                 if (error) {
                     console.log(error);
-                    loadTables(function (measureList) {
+                    loadTables('tables', function (measureList) {
                         response.render('pages/submit', {
                             user: request.session.username,
                             text: "Fehler beim Eintragen der Daten!",
@@ -216,7 +218,7 @@ module.exports = function (app) {
                     });
                 } else {
                     // Reload page after values were inserted
-                    loadTables(function (measureList) {
+                    loadTables('tables', function (measureList) {
                         response.render('pages/submit', {
                             text: "Daten erfolgreich eingetragen!",
                             user: request.session.username,
@@ -236,10 +238,12 @@ module.exports = function (app) {
 
     // Used for testing, writes table data into table.txt, needs to be put into createMeasure
     app.get('/test', function (request, response) {
-        // TODO: move to creation
+        // TODO: move to creation, just dummy data
         // needs attribute if yearly, monthly or quarterly, display options need to be changed accordingly
         // yearly measures should start with something else, only save years in database
         let measureList = [];
+        let measureDescriptions = [];
+
         let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
         let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
             'Einsatzdauer_des_V-NEF_ab_Alarmierung;'
@@ -259,9 +263,18 @@ module.exports = function (app) {
         measureList.push(measure4);
         measureList.push(measure5);
 
-        // TODO: add measure descriptions, has to be sorted too
+        // Descriptions here, also need to be created when creating new measures, just dummy data
+        let description1 = ['Anzahl der Anrufe', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
+        let description2 = ['Einsatzdauer des V-NEF ab Alarmierung', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
+        let description3 = ['Zeitspanne von Anforderung des V-NEF bis zur Alarmierung', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
+        let description4 = ['Annahmezeit', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
+        let description5 = ['Anzahl der Alarmierungen', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
 
-        let measureDescriptions = [];
+        measureDescriptions.push(description1);
+        measureDescriptions.push(description2);
+        measureDescriptions.push(description3);
+        measureDescriptions.push(description4);
+        measureDescriptions.push(description5);
 
         // Sort list of measures alphabetically by measure name
         measureList = measureList.sort(function (a, b) {
@@ -274,17 +287,42 @@ module.exports = function (app) {
             return 0;
         });
 
-        arrayToTxt(measureList, function (error) {
-            response.render('pages/index');
+        // Sort measure descriptions, so they are ordered the same
+        measureDescriptions = measureDescriptions.sort(function (a, b) {
+            if (a[0] < b[0]) {
+                return -1;
+            }
+            if (a[0] > b[0]) {
+                return 1;
+            }
+            return 0;
+        });
+
+        // Write table data
+        arrayToTxt('tables', measureList, function (error) {
+            if (error) console.log(error);
+        });
+
+        // Write description data of measures
+        arrayToTxt('desc', measureDescriptions, function (error) {
+            if (error) console.log(error);
+        })
+
+        response.render('pages/index', {
+            user: request.session.username
         });
     });
 
+    // Displays information about measures in the system and their attributes
     app.get('/measureHelp', function (request, response) {
-        // TODO: save descriptions in measure list?
-        loadTables(function (measureList) {
-            response.render('pages/measureHelp', {
-                user: request.session.username,
-                measureListData: measureList
+        // Load measures and their descriptions
+        loadTables('tables', function (measureList) {
+            loadTables('desc', function (measureDescriptions) {
+                response.render('pages/measureHelp', {
+                    user: request.session.username,
+                    measureListData: measureList,
+                    measureDescriptions: measureDescriptions
+                });
             });
         });
     });
@@ -337,7 +375,7 @@ module.exports = function (app) {
     // Display visualization of data
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
-            loadTables(function (measureList) {
+            loadTables('tables', function (measureList) {
                 response.render('pages/visual', {
                     user: request.session.username,
                     measureData: "",
@@ -354,7 +392,7 @@ module.exports = function (app) {
     // Display menu for entering data
     app.get('/submit', function (request, response) {
         if (request.session.loggedin) {
-            loadTables(function (measureList) {
+            loadTables('tables', function (measureList) {
                 response.render('pages/submit', {
                     user: request.session.username,
                     text: "",
@@ -520,8 +558,8 @@ module.exports = function (app) {
     });
 
     // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
-    const arrayToTxt = function (array) {
-        var file = fs.createWriteStream('tables.txt');
+    const arrayToTxt = function (name, array) {
+        var file = fs.createWriteStream(name + '.txt');
         file.on('error', function (err) {
             console.log(err);
         });
@@ -533,9 +571,10 @@ module.exports = function (app) {
     }
 
     // Loads tables from disk txt file and converts them to an array
-    const loadTables = function (callback) {
+    const loadTables = function (name, callback) {
         let array = [];
-        const text = fs.readFileSync("./tables.txt").toString('utf-8');
+        let text;
+        text = fs.readFileSync('./' + name + '.txt').toString('utf-8');
         const textByLine = text.split("\n")
         for (i = 0; i < textByLine.length; i++) {
             array.push(textByLine[i].split(','));
@@ -548,7 +587,7 @@ module.exports = function (app) {
         let result = [];
 
         connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
-            if (err) console.log(err);
+            if (err) return callback(err);
             if (res.length) {
                 for (let i = 0; i < res.length; i++) {
                     result.push(res[i]);
@@ -575,27 +614,18 @@ module.exports = function (app) {
 
     // Queries database for a complete measure, no sql injection needed because tableName is taken from predefined list
     const getMeasureFromDB = function (tableName, callback) {
-        let result = [];
-
         const query = 'SELECT * FROM ' + tableName;
 
-        connectionData.query(query, function (res, error) {
-            if (error) return callback(error, null);
-            if (res.length) {
-                for (var i = 0; i < res.length; i++) {
-                    result.push(res[i]);
-                }
-            }
-            callback(null, res);
+        connectionData.query(query, function (err, res) {
+            if (err) return callback(null, err);
+            callback(res, null);
         });
     }
 
     // Inserts one row into specified table in measures database
     const insertIntoTable = function (query, callback) {
-        connectionData.query(query, function (error) {
-            if (error) {
-                return callback(error);
-            }
+        connectionData.query(query, function (err) {
+            if (err) return callback(err);
             callback();
         });
     }

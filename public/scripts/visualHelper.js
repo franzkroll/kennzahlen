@@ -201,7 +201,7 @@ selGraph.onchange = function (e) {
             },
             options: {
                 title: {
-                    display: true,
+                    display: false,
                 },
                 responsive: true,
             }

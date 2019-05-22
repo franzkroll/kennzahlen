@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 
-<!-- 
-Shows descriptions of measures and their attributes 
--->
-
-<!-- TODO: comments -->
+<!-- Shows descriptions of measures and their attributes -->
 
 <head>
     <% include ../partials/head %>
@@ -23,15 +19,23 @@ Shows descriptions of measures and their attributes
             und zu den jeweiligen Attributen der Kennzahl angzeigt.
         </div>
         <span style="display:block; height: 10px;"></span>
+        <!-- Measures get loaded into here. -->
         <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
-            <select id="measure" style="width:50%" name="measure" class="dropdownS" required></select>
+            <select id="measure" style="width:40%" name="measure" class="dropdownS" required></select>
         </div>
+        <!-- Main description gets added to this div. -->
+        <div id="mainDesc" class="misc-text"></div>
+        <span style="display:block; height: 20px;"></span>
+        <div id="add"></div>
     </main>
 
+    <!-- Put received into variables for loaded script. -->
     <script>
         const measureListData = '<%- measureListData %>';
+        const measureDescriptions = '<%- measureDescriptions %>';
     </script>
 
+    <!-- Load script for displaying descriptions. -->
     <script src="/scripts/measureHelper.js"></script>
 
     <footer>

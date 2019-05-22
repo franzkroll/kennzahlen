@@ -20,8 +20,8 @@ const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'A
 
 // Search for measure that was input by the user, when found display attributes
 selM.onclick = function () {
-    var index = this.selectedIndex;
-    var inputText = this.children[index].innerHTML.trim();
+    const index = this.selectedIndex;
+    const inputText = this.children[index].innerHTML.trim();
 
     // Loop through measure known to the system
     for (i = 0; i < measureArray.length; i++) {
