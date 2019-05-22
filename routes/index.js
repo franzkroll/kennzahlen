@@ -572,10 +572,12 @@ module.exports = function (app) {
 
     // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
     const arrayToTxt = function (name, array) {
+        // Open file stream
         var file = fs.createWriteStream(name + '.txt');
         file.on('error', function (err) {
             console.log(err);
         });
+        // Append each array element to file
         array.forEach(function (v) {
             file.write(v.join(', ') + '\n');
         });
@@ -587,7 +589,9 @@ module.exports = function (app) {
     const loadTables = function (name, callback) {
         let array = [];
         let text;
+        // Read file from page into text string
         text = fs.readFileSync('./' + name + '.txt').toString('utf-8');
+        // Split at line breaks and put it into array
         const textByLine = text.split("\n")
         for (i = 0; i < textByLine.length; i++) {
             array.push(textByLine[i].split(','));
@@ -643,11 +647,14 @@ module.exports = function (app) {
         });
     }
 
-    // Deletes user with passed i from the accounts database
+    // Insert user with provided data into the user database
     const insertUserIntoDB = function (request, callback) {
+        // Check password strength
         if (pwCheck(request.body.password)) {
+            // Hash insert password
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
+                    // Insert the user into database, question marks provide prevention against sql attack
                     const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
                     connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
                         if (err) return callback(err);
@@ -657,6 +664,7 @@ module.exports = function (app) {
                     console.log(err);
                 }
             });
+            // Return error if test failed
         } else {
             err = "pw";
             console.log("password check failed");

@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html lang="de">
-
 <!--
 Displays simple animation and text if user tries to access page without the necessary rights. Doesn't use the standard header and footer. 
 Offers button for going one page back.
 -->
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <% include ../../partials/head %>
 </head>
 
 <body>
+    <!-- Fancy animation. -->
     <svg width="380px" height="500px" viewBox="0 0 837 1045" version="1.1" xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
@@ -26,6 +24,7 @@ Offers button for going one page back.
                 id="Polygon-5" stroke="#4169E1" stroke-width="6" sketch:type="MSShapeGroup"></path>
         </g>
     </svg>
+    <!-- Offer button for going back. -->
     <div class="message-box">
         <p>Dafür besitzen Sie nicht die nötigen Rechte!</p>
         <div class="buttons-con">

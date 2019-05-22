@@ -140,15 +140,19 @@ selGraph.onchange = function (e) {
     if (svalue === 'bar') {
         currentChart = new Chart(document.getElementById('chart'), {
             type: 'bar',
+            // Basic labels, data gets added later
             data: {
                 labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
                 datasets: []
             },
             options: {
+                // Display title
                 title: {
                     display: true,
                 },
+                // Make chart resize to canvas
                 responsive: true,
+                // Make it possible to zoom and pan the chart
                 plugins: {
                     zoom: {
                         pan: {
@@ -213,11 +217,13 @@ selGraph.onchange = function (e) {
 
     // Add previously defined and filled arrays to the chart data
     for (i = 0; i < measureAttr.length; i++) {
+        // Use random color if we run out of predefined colors
         if (colors.length < i) {
             color = getRandomColor();
         } else {
             color = colors[i];
         }
+        // Create the new dataset
         const newDataSet = {
             label: measureAttr[i],
             data: dataGraph[i],
@@ -226,8 +232,10 @@ selGraph.onchange = function (e) {
             borderColor: color,
             backgroundColor: color
         }
+        // And append it to the chart
         currentChart.data.datasets.push(newDataSet);
     }
+    // Update the chart, otherwise the data isn't visible
     currentChart.update();
 }
 

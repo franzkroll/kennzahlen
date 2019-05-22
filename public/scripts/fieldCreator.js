@@ -26,6 +26,7 @@ window.addEventListener("load", function () {
         div2.appendChild(text2);
         document.getElementById("container").appendChild(div2);
 
+        // Increment i for every added field, so every field has unique name
         i++;
     });
 });

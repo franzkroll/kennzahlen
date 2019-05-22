@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="de">
-
 <!--
 Displays simple animation and text if user tries to access page that can't be found or doesn't exist. Doesn't use the standard header and footer. 
 Offers button for going one page back.
 -->
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <% include ../../partials/head %>
 </head>
 
 <body>
@@ -27,6 +24,7 @@ Offers button for going one page back.
         </g>
     </svg>
     <div class="message-box">
+        <!-- Display error message, offer button for going back. -->
         <h1>404</h1>
         <p>Seite nicht gefunden</p>
         <div class="buttons-con">

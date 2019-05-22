@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html lang="de">
-
 <!-- 
 Shows users that are currently registered in the system with their attributes.
 Also has a dropdown menu, in which a user can be selected and deleted from the database.
@@ -16,6 +13,7 @@ Also has a dropdown menu, in which a user can be selected and deleted from the d
     </header>
 
     <main>
+        <!-- Prepare table here for data insertion. -->
         <div style="text-align: center">
             <table style="width:70%" id="userTable">
                 <tr>
@@ -26,6 +24,7 @@ Also has a dropdown menu, in which a user can be selected and deleted from the d
                 </tr>
             </table>
         </div>
+        <!-- Dropdown menu and button for deleting users. -->
         <div style="text-align:center">
             <form action="deleteUser" method="post">
                 <select name="id" id="userDelete" style="width:10%; margin-right: 30px" class="dropdown">ID</select>
