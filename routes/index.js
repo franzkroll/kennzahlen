@@ -36,7 +36,7 @@ module.exports = function (app) {
 
     /**
      * 
-     * POST REQUESTS HERE
+     * POST REQUESTS FOLLOW HERE
      * 
      */
 
@@ -292,7 +292,7 @@ module.exports = function (app) {
 
                 let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.replaceAll(' ', '_');
 
-                // Build sql string for table creation, TODO: sql injection
+                // Build sql string for table creation, TODO: sql injection for every element in sql
                 let sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
 
                 // Add attribute names and descriptions, should always be same number of items
@@ -363,15 +363,31 @@ module.exports = function (app) {
         });
     });
 
+    // Handles deletion of a measure, TODO:
     app.post('/deleteMeasure', function (request, response) {
         // Get select item from user page
-        // drop the table from mysql
-        // delete the entry from the txt files
+        loadTables('tables', function (measureList) {
+            for (i = 0; i < measureList.length; i++) {
+                if (measureList[i][0] === request.body.measureSelect) {
+                    // Delete this entry, sort again and write to disk
+                    // Delete from database
+                    console.log(i);
+                }
+            }
+        });
+
+        // Render page again with information text
+        loadTables('tables', function (measureList) {
+            response.render('pages/admin/showMeasures', {
+                user: request.session.username,
+                measures: measureList
+            });
+        });
     });
 
     /**
      * 
-     * GET REQUESTS HERE
+     * GET REQUESTS FOLLOW HERE
      * 
      */
 
@@ -639,6 +655,13 @@ module.exports = function (app) {
         response.render('pages/errors/error404');
     });
 
+
+    // Replaces all occurrences in a string, no built in function
+    String.prototype.replaceAll = function (search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+    };
+
     // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
     const arrayToTxt = function (name, array) {
         // Open file stream
@@ -685,12 +708,6 @@ module.exports = function (app) {
         });
     }
 
-    // Replaces all occurrences in a string, no built in function
-    String.prototype.replaceAll = function (search, replacement) {
-        var target = this;
-        return target.replace(new RegExp(search, 'g'), replacement);
-    };
-
     // Code for querying database
     const getAllUsersFromDB = function (callback) {
         let result = [];
@@ -720,7 +737,15 @@ module.exports = function (app) {
     const measureDataRequest = function (query, callback) {
         connectionData.query(query, function (err) {
             if (err) return callback(err);
-            callback(err);
+            callback();
+        });
+    }
+
+    // Deletes specified table from the database
+    const deleteMeasureFromDB = function (tableName, callback) {
+        connectionData.query('DROP TABLE ' + connectionData.escape(tableName), function (err) {
+            if (err) return callback(err);
+            callback();
         });
     }
 
