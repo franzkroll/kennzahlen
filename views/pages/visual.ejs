@@ -52,7 +52,7 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
                         <th>Juli</th>
                         <th>August</th>
                         <th>September</th>
-                        <th>Oktobber</th>
+                        <th>Oktober</th>
                         <th>November</th>
                         <th>Dezember</th>
                     </tr>
@@ -84,9 +84,11 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
 
     <!-- Load sent data and helper script. -->
     <script>
-        const loadedTableName = '<%- loadedTable %>'
+        let loadedTableName = '<%- loadedTable %>';
+        loadedTableName = loadedTableName.trim();
+        console.log(loadedTableName);
         const measureData = '<%- measureData %>';
-        const measureListData = '<%- measureListData %>'
+        const measureListData = '<%- measureListData %>';
     </script>
 
     <script src="/scripts/visualHelper.js"></script>

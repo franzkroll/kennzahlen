@@ -33,7 +33,8 @@ String.prototype.replaceAll = function (search, replacement) {
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
-    const tableName = loadedTableName.slice(5, loadedTableName.length - 5).replaceAll('_', ' ');
+    const tableName = loadedTableName.slice(4, loadedTableName.length - 5).replaceAll('_', ' ');
+
     const columns = measureData.split(',');
 
     // Get selected measure
@@ -52,7 +53,6 @@ selM.onclick = function () {
             for (j = 0; j < measure.length - 1; j++) {
                 // If measure is found clear table and prepare select for new data
                 if (measure[j] === inputText) {
-                    console.log(measure);
 
                     filled = true;
 
@@ -74,7 +74,7 @@ selM.onclick = function () {
                     selYear.innerHTML = "";
 
                     // Split years here for year table
-                    years = measure[j + 1].split(':');
+                    years = measure[j + 1].trim().split(':');
 
                     // Put years into the select menu for tables
                     for (k = 0; k < years.length; k++) {
@@ -90,15 +90,15 @@ selM.onclick = function () {
 
                 // Precaution so we don't leave the array length later on
                 if (j < measure.length - 3) {
-                    // Filter 
                     let opt = document.createElement('option');
                     opt.value = measure[j + 1];
                     opt.appendChild(document.createTextNode(measure[j + 1]));
+
                     // Save attributes of measure, location of them starts in the third array cell
                     measureAttr.push(measure[j + 2]);
 
                     // Append data to table if there is any to add and if we got the right data already
-                    if (measureData && (inputText === (tableName.trim()))) {
+                    if (measureData && (inputText === (tableName.replace(/[0-9]/g, '')))) {
                         // Fill first column of the table with the attributes of the measure
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];

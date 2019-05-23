@@ -26,10 +26,10 @@ console.log = function (d) {
 const port = process.env.PORT || 5000;
 
 // link routes 
-var routes = require('./routes/index.js');
+const routes = require('./routes/index.js');
 
 // Application uses express for rendering and displaying pages
-var app = express();
+const app = express();
 
 // Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');
