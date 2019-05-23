@@ -116,7 +116,7 @@ module.exports = function (app) {
                 }
             }
 
-            // If user has also entered a year start query
+            // Query database if user has also entered a year 
             if (request.body.year) {
                 tableName += "_" + request.body.year.trim();
 
@@ -134,6 +134,7 @@ module.exports = function (app) {
                     } else {
                         // Loaded measure data
                         const measureData = JSON.stringify(result);
+                        console.log(measureData);
                         // Render page with newly acquired data
                         response.render('pages/visual', {
                             user: request.session.username,
@@ -210,6 +211,7 @@ module.exports = function (app) {
                 query += connectionData.escape(tableData[i]);
                 query += ',';
             }
+
             // Remove last comma
             query = query.slice(0, query.length - 1);
             query += ');'
@@ -217,7 +219,6 @@ module.exports = function (app) {
             // And insert them into the database
             measureDataRequest(query, function (error) {
                 if (error) {
-                    console.log(error);
                     loadTables('tables', function (measureList) {
                         response.render('pages/submit', {
                             user: request.session.username,
@@ -239,146 +240,122 @@ module.exports = function (app) {
         });
     });
 
-    app.post('/createTheme', function (request, response) {
+    // TODO: yearly and quarterly measures
+    // Handles submitted data when user created a new measure, writes info into local files and creates table
+    app.post('/createMeasure', function (request, response) {
         // Temporary arrays which later get added to measureList and measureDescriptions
         loadTables('tables', function (measureList) {
             loadTables('desc', function (measureDescriptions) {
+                // Saves current table and descriptions so they can be pushed into main arrays
                 const desc = [];
-                const table = [];
+                let table = [];
+
+                let measureExists = false;
+                let yearExists = false;
 
                 // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
-
                 for (i = 0; i < measureList.length; i++) {
                     if (measureList[i][0] == request.body.name) {
-                        console.log('Found it');
-                        console.log(measureList[i][1]);
-                        // Check for year, append 
+                        // Get already existing years in measure
+                        const years = measureList[i][1].trim().split(':');
+                        measureExists = true;
+                        for (j = 0; j < years.length; j++) {
+                            console.log(years[j]);
+                            // Show error if year already exists, which means the measure already exists in the system
+                            if (years[j] == request.body.year) {
+                                yearExists = true;
+                                console.log('Found it');
+                                response.render('pages/createMeasure', {
+                                    text: "Fehler! Kennzahl existiert bereits!",
+                                    user: request.session.username,
+                                });
+                            }
+                        }
+                        // Add year if it doesn't exist
+                        if (!yearExists) {
+                            console.log('Need to add year');
+                            measureList[i][1] += ':' + request.body.year;
+                        }
                     }
                 }
 
-                desc.push(request.body.name);
-                table.push(request.body.name);
+                // If it exists already we don't have to do all this, we already added the year above
+                if (!measureExists) {
+                    desc.push(request.body.name);
+                    desc.push(request.body.mainDesc);
+                    table.push(request.body.name);
+                    table.push(request.body.year);
 
-                // Build sql string for table creation, TODO: sql injection
-                let sql = 'create table ' + request.body.id.replace('.', '$') + '_' + request.body.name.replaceAll(' ', '_') + '_' + request.body.year + ' (Monat INTEGER, ';
+                    let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.replaceAll(' ', '_');
 
-                for (let key in request.body) {
-                    if (key.includes('var')) {
-                        table.push(request.body[key]);
-                        sql += request.body[key].replaceAll(' ', '_') + ' INTEGER,'
-                    } else if (key.includes('desc')) {
-                        desc.push(request.body[key]);
+                    // Build sql string for table creation, TODO: sql injection
+                    let sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+
+                    // Add attribute names and descriptions, should always be same number of items
+                    for (let key in request.body) {
+                        if (key.includes('var')) {
+                            table.push(request.body[key]);
+                            sql += request.body[key].replaceAll(' ', '_') + ' INTEGER,'
+                        } else if (key.includes('desc')) {
+                            desc.push(request.body[key]);
+                        }
                     }
+
+                    sql += ' constraint pk_1 primary key(Monat));';
+
+                    // Add semicolon, later needed for identification
+                    tableName += ';';
+                    table.push(tableName);
+                    desc[desc.length - 1] = desc[desc.length - 1] + ';';
+
+                    // Push table and description data into loaded table
+                    measureList.push(table);
+                    measureDescriptions.push(desc);
+
+                    // Insert into database
+                    measureDataRequest(sql, function (error) {
+                        if (error) {
+                            //console.log(error);
+                            response.render('pages/createMeasure', {
+                                text: "Fehler bei der Erstellung der Kennzahl!",
+                                user: request.session.username,
+                            });
+                        } else {
+                            // Sort list of measures alphabetically by measure name
+                            measureList = measureList.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+
+                            // Sort measure descriptions, so they are ordered the same
+                            measureDescriptions = measureDescriptions.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+
+                            // Write new arrays to txt file
+                            arrayToTxt('tables', measureList);
+                            arrayToTxt('desc', measureDescriptions);
+
+                            response.render('pages/createMeasure', {
+                                text: "Kennzahl erfolgreich erstellt!",
+                                user: request.session.username,
+                            });
+                        }
+                    })
                 }
 
-                sql += ' constraint pk_1 primary key(Monat));';
-
-                console.log(desc);
-                console.log(table);
-
-                console.log(sql);
-
-                // Load old tables, add data and write descriptions to disk
-
-                // Insert into database
-                /*measureDataRequest(sql, function (error) {
-                    if (error) {
-                        //console.log(error);
-                        response.render('pages/createMeasure', {
-                            // TODO: maybe more specific error
-                            text: "Fehler bei der Erstellung der Kennzahl! Möglicherweise existiert die Kennzahl bereits.   ",
-                            user: request.session.username,
-                        });
-                    } else {
-                        response.render('pages/createMeasure', {
-                            text: "Kennzahl erfolgreich erstellt!",
-                            user: request.session.username,
-                        });
-                    }
-                })*/
-
-                // Sort arrays
-
-                // Sort list of measures alphabetically by measure name
-                measureList = measureList.sort(function (a, b) {
-                    if (a[0] < b[0]) {
-                        return -1;
-                    }
-                    if (a[0] > b[0]) {
-                        return 1;
-                    }
-                    return 0;
-                });
-
-                // Sort measure descriptions, so they are ordered the same
-                measureDescriptions = measureDescriptions.sort(function (a, b) {
-                    if (a[0] < b[0]) {
-                        return -1;
-                    }
-                    if (a[0] > b[0]) {
-                        return 1;
-                    }
-                    return 0;
-                });
-
-                /*arrayToTxt(measureList.push(table));
-                arrayToTxt(measureDescriptions.push(desc));*/
             });
-        });
-    });
-
-    // Used for testing, writes table data into table.txt, needs to be put into createMeasure
-    app.get('/test', function (request, response) {
-        // TODO: move to creation, just dummy data
-        // needs attribute if yearly, monthly or quarterly, display options need to be changed accordingly
-        // yearly measures should start with something else, only save years in database
-
-        let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
-        let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
-            'Einsatzdauer_des_V-NEF_ab_Alarmierung;'
-        ];
-        let measure5 = ['Zeitspanne von Anforderung des V-NEF bis zur Alarmierung', '2018', 'Durchschnittliche Zeitspanne', 'Minimale Zeitspanne', 'Maximale Einsatzdauer',
-            'Zeitspanne_von_Anforderung_des_V-NEF_bis_zur_Alarmierung;'
-        ];
-        let measure3 = ['Annahmezeit', '2018', 'durchschnittliche Notrufannahmezeit', 'durchschnittliche Wartezeit sonstiger Anrufe', 'durchschnittliche Rufannahmezeit gesamt',
-            'Zielerreichungsgrad 95% der Notrufe in ≤ 10 Sekunden anzunehmen', 'Zielerreichungsgrad 85% der Notrufe in ≤ 10 Sekunden anzunehmen',
-            'Zielerreichungsgrad 90% der Notrufe in ≤ 10 Sekunden anzunehmen', 'durchschnittliche Annahmezeit der Sprechwünsche (Status 5)', '1$1_Annahmezeit;'
-        ];
-        let measure4 = ['Anzahl der Alarmierungen', '2018', 'Gesamtanzahl aller Alarmierungen', 'Feuerwehr', 'Katastrophenschutz', 'RTW', 'KTW', 'NEF', 'NAW', 'RTH', 'ITH', 'Sonstige', '2$5_Anzahl_der_Alarmierungen;'];
-
-        measureList.push(measure1);
-        measureList.push(measure2);
-        measureList.push(measure3);
-        measureList.push(measure4);
-        measureList.push(measure5);
-
-        // Descriptions here, also need to be created when creating new measures, just dummy data
-        let description1 = ['Anzahl der Anrufe', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
-        let description2 = ['Einsatzdauer des V-NEF ab Alarmierung', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
-        let description3 = ['Zeitspanne von Anforderung des V-NEF bis zur Alarmierung', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
-        let description4 = ['Annahmezeit', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
-        let description5 = ['Anzahl der Alarmierungen', 'Beschreibung Kennzahl', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft', 'Beschreibung Eigenschaft;']
-
-        measureDescriptions.push(description1);
-        measureDescriptions.push(description2);
-        measureDescriptions.push(description3);
-        measureDescriptions.push(description4);
-        measureDescriptions.push(description5);
-
-
-
-        // Write table data
-        arrayToTxt('tables', measureList, function (error) {
-            if (error) console.log(error);
-        });
-
-        // Write description data of measures
-        arrayToTxt('desc', measureDescriptions, function (error) {
-            if (error) console.log(error);
-        })
-
-        response.render('pages/index', {
-            user: request.session.username
         });
     });
 
@@ -656,9 +633,11 @@ module.exports = function (app) {
         // Read file from page into text string
         text = fs.readFileSync('./' + name + '.txt').toString('utf-8');
         // Split at line breaks and put it into array
-        const textByLine = text.split("\n")
-        for (i = 0; i < textByLine.length; i++) {
-            array.push(textByLine[i].split(','));
+        if (text != '') {
+            const textByLine = text.split("\n")
+            for (i = 0; i < textByLine.length; i++) {
+                array.push(textByLine[i].split(','));
+            }
         }
         callback(array);
     }

@@ -52,6 +52,8 @@ selM.onclick = function () {
             for (j = 0; j < measure.length - 1; j++) {
                 // If measure is found clear table and prepare select for new data
                 if (measure[j] === inputText) {
+                    console.log(measure);
+
                     filled = true;
 
                     // Clear chart if changed to an item without data
@@ -96,7 +98,7 @@ selM.onclick = function () {
                     measureAttr.push(measure[j + 2]);
 
                     // Append data to table if there is any to add and if we got the right data already
-                    if (measureData && (inputText === tableName)) {
+                    if (measureData && (inputText === (tableName.trim()))) {
                         // Fill first column of the table with the attributes of the measure
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];

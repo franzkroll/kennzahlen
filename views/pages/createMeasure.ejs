@@ -20,7 +20,7 @@
         <span style="display:block; height: 15px;"></span>
 
         <div class="login-formS">
-            <form action="createTheme" method="POST" style="text-align: center">
+            <form action="createMeasure" method="POST" style="text-align: center">
                 <!-- Field for setting name of the measure. -->
                 <input type="number" step="0.01" name="id" placeholder=" ID"
                     title="Legen Sie hier eine ID für die Kennzahl fest. (Zwei Zahlen getrennt durch einen Punkt)"
@@ -34,6 +34,10 @@
                 <!-- Field for setting year of the measure. -->
                 <input type="number" name="year" placeholder="Erfassungsjahr"
                     title="Legen Sie hier das Erfassungsjahr, dass Sie erstellen wollen fest." required>
+
+                <!-- Field for setting name of the measure. -->
+                <input type="text" name="mainDesc" placeholder="Beschreibung der Kennzahl"
+                    title="Legen Sie hier eine Beschreibung für die Kennzahl fest." required>
 
                 <!-- Dropdown menu for selecting input-cycle for the measure data. -->
                 <div class="misc-text" style="margin-bottom: 10px">
