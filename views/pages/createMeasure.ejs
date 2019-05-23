@@ -14,26 +14,34 @@
         <div class="misc-text" style="text-align:center;margin-bottom: 10px;margin-right: 10px">
             Bitte legen Sie die jeweiligen Kennzahlen des Themas sowie einen Namen für das Thema fest.
         </div>
-        <span style="display:block; height: 10px;"></span>
-
         <!-- Adds new text fields for attributes to the canvas. -->
         <script src="/scripts/fieldCreator.js"></script>
-
+        <div class="misc-text"> <%- text -%></div>
+        <span style="display:block; height: 15px;"></span>
 
         <div class="login-formS">
             <form action="createTheme" method="POST" style="text-align: center">
-                <!-- Theme for the measure, can be added as text. TODO: maybe add dropdown menu with existing themes. -->
+                <!-- Field for setting name of the measure. -->
+                <input type="number" step="0.01" name="id" placeholder=" ID"
+                    title="Legen Sie hier eine ID für die Kennzahl fest. (Zwei Zahlen getrennt durch einen Punkt)"
+                    required>
 
                 <!-- Field for setting name of the measure. -->
-                <input type="text" name="var1" placeholder="Name der Kennzahl"
+                <input type="text" name="name" placeholder="Name der Kennzahl"
                     title="Legen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften."
                     required>
+
+                <!-- Field for setting year of the measure. -->
+                <input type="number" name="year" placeholder="Erfassungsjahr"
+                    title="Legen Sie hier das Erfassungsjahr, dass Sie erstellen wollen fest." required>
 
                 <!-- Dropdown menu for selecting input-cycle for the measure data. -->
                 <div class="misc-text" style="margin-bottom: 10px">
                     Erfassungzyklus:
-                    <select style="text-align:left; width:50%;" id="cycle" class="dropdownS">
-                        <option value="val1">monatlich</option>
+                    <!-- TODO: quarterly measures -->
+                    <select style="text-align:left; width:50%;" name="cycle" id="cycle" class="dropdownS">
+                        <option value="monthly">monatlich</option>
+                        <option value="quarterly">quartalsweise</option>
                     </select>
                 </div>
 
@@ -43,7 +51,7 @@
                 <div id="container">
                     <input type="text" name="var1" placeholder="Eigenschaft 1"
                         title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein." required>
-                    <input type="text" name="var1" placeholder="Beschreibung von Eigenschaft 1"
+                    <input type="text" name="desc1" placeholder="Beschreibung von Eigenschaft 1"
                         title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
                 </div>
 

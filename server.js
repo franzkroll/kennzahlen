@@ -14,7 +14,6 @@ const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 });
 const log_stdout = process.stdout;
 
-
 // Get current time and date, add them to every printed debug
 console.log = function (d) {
 	const time = new Date();
@@ -67,8 +66,6 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(bodyParser.json());
-
-// Display simple server status
 
 routes(app);
 

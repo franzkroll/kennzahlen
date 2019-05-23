@@ -134,7 +134,6 @@ module.exports = function (app) {
                     } else {
                         // Loaded measure data
                         const measureData = JSON.stringify(result);
-
                         // Render page with newly acquired data
                         response.render('pages/visual', {
                             user: request.session.username,
@@ -216,7 +215,7 @@ module.exports = function (app) {
             query += ');'
 
             // And insert them into the database
-            insertIntoTable(query, function (error) {
+            measureDataRequest(query, function (error) {
                 if (error) {
                     console.log(error);
                     loadTables('tables', function (measureList) {
@@ -241,12 +240,91 @@ module.exports = function (app) {
     });
 
     app.post('/createTheme', function (request, response) {
-        // TODO:
-        // Get post data from user form
-        // Convert them to array, check for sql injections
-        // Insert into database
-        // Add description to array, add other values to table array
-        // Write them to disk
+        // Temporary arrays which later get added to measureList and measureDescriptions
+        loadTables('tables', function (measureList) {
+            loadTables('desc', function (measureDescriptions) {
+                const desc = [];
+                const table = [];
+
+                // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
+
+                for (i = 0; i < measureList.length; i++) {
+                    if (measureList[i][0] == request.body.name) {
+                        console.log('Found it');
+                        console.log(measureList[i][1]);
+                        // Check for year, append 
+                    }
+                }
+
+                desc.push(request.body.name);
+                table.push(request.body.name);
+
+                // Build sql string for table creation, TODO: sql injection
+                let sql = 'create table ' + request.body.id.replace('.', '$') + '_' + request.body.name.replaceAll(' ', '_') + '_' + request.body.year + ' (Monat INTEGER, ';
+
+                for (let key in request.body) {
+                    if (key.includes('var')) {
+                        table.push(request.body[key]);
+                        sql += request.body[key].replaceAll(' ', '_') + ' INTEGER,'
+                    } else if (key.includes('desc')) {
+                        desc.push(request.body[key]);
+                    }
+                }
+
+                sql += ' constraint pk_1 primary key(Monat));';
+
+                console.log(desc);
+                console.log(table);
+
+                console.log(sql);
+
+                // Load old tables, add data and write descriptions to disk
+
+                // Insert into database
+                /*measureDataRequest(sql, function (error) {
+                    if (error) {
+                        //console.log(error);
+                        response.render('pages/createMeasure', {
+                            // TODO: maybe more specific error
+                            text: "Fehler bei der Erstellung der Kennzahl! Möglicherweise existiert die Kennzahl bereits.   ",
+                            user: request.session.username,
+                        });
+                    } else {
+                        response.render('pages/createMeasure', {
+                            text: "Kennzahl erfolgreich erstellt!",
+                            user: request.session.username,
+                        });
+                    }
+                })*/
+
+                // Sort arrays
+
+                // Sort list of measures alphabetically by measure name
+                measureList = measureList.sort(function (a, b) {
+                    if (a[0] < b[0]) {
+                        return -1;
+                    }
+                    if (a[0] > b[0]) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                // Sort measure descriptions, so they are ordered the same
+                measureDescriptions = measureDescriptions.sort(function (a, b) {
+                    if (a[0] < b[0]) {
+                        return -1;
+                    }
+                    if (a[0] > b[0]) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                /*arrayToTxt(measureList.push(table));
+                arrayToTxt(measureDescriptions.push(desc));*/
+            });
+        });
     });
 
     // Used for testing, writes table data into table.txt, needs to be put into createMeasure
@@ -254,8 +332,6 @@ module.exports = function (app) {
         // TODO: move to creation, just dummy data
         // needs attribute if yearly, monthly or quarterly, display options need to be changed accordingly
         // yearly measures should start with something else, only save years in database
-        let measureList = [];
-        let measureDescriptions = [];
 
         let measure1 = ['Anzahl der Anrufe', '2018', 'Gesamtanzahl aller Anrufe', 'Gesamtanzahl aller Notrufe', 'Gesamtanzahl aller Sprechwünsche', '1$2_Anzahl_der_Anrufe;'];
         let measure2 = ['Einsatzdauer des V-NEF ab Alarmierung', '2018', 'Durchschnittliche Einsatzdauer', 'Minimale Einsatzdauer', 'Maximale Einsatzdauer',
@@ -289,27 +365,7 @@ module.exports = function (app) {
         measureDescriptions.push(description4);
         measureDescriptions.push(description5);
 
-        // Sort list of measures alphabetically by measure name
-        measureList = measureList.sort(function (a, b) {
-            if (a[0] < b[0]) {
-                return -1;
-            }
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            return 0;
-        });
 
-        // Sort measure descriptions, so they are ordered the same
-        measureDescriptions = measureDescriptions.sort(function (a, b) {
-            if (a[0] < b[0]) {
-                return -1;
-            }
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            return 0;
-        });
 
         // Write table data
         arrayToTxt('tables', measureList, function (error) {
@@ -425,7 +481,8 @@ module.exports = function (app) {
                 role = (result[0].role);
                 if (!(role === 'submit')) {
                     response.render('pages/createMeasure', {
-                        user: request.session.username
+                        user: request.session.username,
+                        text: ''
                     });
                 } else {
                     response.render('pages/errors/adminError')
@@ -551,6 +608,13 @@ module.exports = function (app) {
         }
     });
 
+    // Sends user measure data, handle deletion in post, needs to be created
+    app.get('/showMeasures', function (request, response) {
+        if (request.session.loggedin) {
+            console.log('showMeasures called');
+        }
+    });
+
     // Logout user and delete the session object
     app.get('/logout', function (request, response, next) {
         if (request.session) {
@@ -614,7 +678,13 @@ module.exports = function (app) {
         });
     }
 
-    // Code for querying database, TODO: maybe better?
+    // Replaces all occurrences in a string, no built in function
+    String.prototype.replaceAll = function (search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+    };
+
+    // Code for querying database
     const getAllUsersFromDB = function (callback) {
         let result = [];
 
@@ -639,8 +709,7 @@ module.exports = function (app) {
         });
     }
 
-    // Inserts one row into specified table in measures database
-    const insertIntoTable = function (query, callback) {
+    const measureDataRequest = function (query, callback) {
         connectionData.query(query, function (err) {
             if (err) return callback(err);
             callback(err);
