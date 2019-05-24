@@ -368,22 +368,31 @@ module.exports = function (app) {
     // Handles deletion of a measure
     app.post('/deleteMeasure', function (request, response) {
         let tableName;
+        let found = false;
+
         // Get select item from user page
         loadTables('desc', function (measureDescriptions) {
             loadTables('tables', function (measureList) {
-                console.log(measureList);
                 for (i = 0; i < measureList.length; i++) {
-                    console.log(measureList[i]);
-                    if (measureList[i][0] === request.body.measureSelect) {
-
-                        // Delete this entry, sort again and write to disk
+                    if (measureList[i][0] === request.body.measureSelect && !found) {
+                        found = true;
 
                         // Get the table name from the list and format it correctly, TODO: better 
                         const foundElement = measureList[i];
                         tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
 
                         // Delete i-th entry from both lists, just remove year if there are multiple years in the entry
+                        if ((measureList[i][1].split(':').length) === 1) {
+                            if (i > -1) {
+                                measureList.splice(i, 1);
+                                measureDescriptions.splice(i, 1);
+                            }
+                        } else {
+                            // TODO: delete month
+                        }
 
+                        console.log(measureList);
+                        console.log(measureDescriptions);
 
                         // Sort list of measures alphabetically by measure name
                         measureList = measureList.sort(function (a, b) {
@@ -415,14 +424,14 @@ module.exports = function (app) {
             });
         });
 
-        console.log('finished');
-
         // Add the year to the tablename, TODO: sql escape year, tablename is safe because of list comparison
-        tableName += '_' + request.body.yearSelect.trim();
+        if (request.body.yearSelect) {
+            tableName += '_' + request.body.yearSelect.trim();
+        }
 
         // Delete entry from the database
         deleteMeasureFromDB(tableName, function (error) {
-            if (error) {
+            if (error || !found) {
                 console.log(error);
                 // Render page again with information text
                 loadTables('tables', function (measureList) {
@@ -432,8 +441,8 @@ module.exports = function (app) {
                         text: 'Fehler beim Löschen der Tabelle.'
                     });
                 });
-            } else {
-                console.log('table deleted from database');
+                // Only delete from sql database if it existed before
+            } else if (found) {
                 // Render page again with information text
                 loadTables('tables', function (measureList) {
                     response.render('pages/admin/showMeasures', {
