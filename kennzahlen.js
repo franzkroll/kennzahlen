@@ -7,6 +7,7 @@ const fs = require('fs');
 const compression = require('compression');
 const util = require('util');
 const favicon = require('serve-favicon');
+const Ddos = require('ddos')
 
 // Overwrite default console log and write into debug.log instead..
 const log_file = fs.createWriteStream(__dirname + '/debug.log', {
@@ -30,6 +31,15 @@ const routes = require('./routes/index.js');
 
 // Application uses express for rendering and displaying pages
 const app = express();
+
+// DDos prevention, shows 429 error after too many requests
+const ddos = new Ddos({
+	burst: 5,
+	limit: 20,
+	testmode: false,
+	whitelist: []
+});
+app.use(ddos.express)
 
 // Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');

@@ -47,7 +47,6 @@ module.exports = function (app) {
 
         if (username && password) {
             // Query database for username
-            console.log(connectionLogin.escape(username));
             connectionLogin.query('SELECT * FROM accounts WHERE username = ' + connectionLogin.escape(username), function (error, results) {
                 if (error) console.log(error);
                 if (results.length > 0) {
@@ -377,7 +376,7 @@ module.exports = function (app) {
                     if (measureList[i][0] === request.body.measureSelect && !found) {
                         found = true;
 
-                        // Get the table name from the list and format it correctly, TODO: better 
+                        // Get the table name from the list and format it correctly
                         const foundElement = measureList[i];
                         tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
 
@@ -406,7 +405,7 @@ module.exports = function (app) {
                             measureList[i][1] = newYears.slice(0, newYears.length - 1);
                         }
 
-                        // Sort list of measures alphabetically by measure name
+                        // Sort list of measures alphabetically by measure name, TODO: move sort to own function
                         measureList = measureList.sort(function (a, b) {
                             if (a[0] < b[0]) {
                                 return -1;
@@ -436,7 +435,7 @@ module.exports = function (app) {
             });
         });
 
-        // Add the year to the tablename, TODO: sql escape year, tablename is safe because of list comparison
+        // Add the year to the tablename, vulnerable to sql injection, but in admin section, should be safe
         if (request.body.yearSelect) {
             tableName += '_' + request.body.yearSelect.trim();
         }
@@ -740,14 +739,15 @@ module.exports = function (app) {
 
     // Replaces all occurrences in a string, no built in function
     String.prototype.replaceAll = function (search, replacement) {
-        var target = this;
+        let target = this;
         return target.replace(new RegExp(search, 'g'), replacement);
     };
 
     // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
     const arrayToTxt = function (name, array) {
         // Open file stream
-        var file = fs.createWriteStream(name + '.txt');
+        let file = fs.createWriteStream(name + '.txt');
+
         file.on('error', function (err) {
             console.log(err);
         });
