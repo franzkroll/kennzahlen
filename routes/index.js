@@ -206,7 +206,7 @@ module.exports = function (app) {
             if (date.length === 5) {
                 query += year + ',';
             } else {
-                query += parseInt((months.indexOf(date.slice(0, date.length - 5)) + 1 + year), 10) + ',';
+                query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
             }
 
             // Put data into sql string, maybe add directly without values vector?, sql injection
@@ -218,6 +218,8 @@ module.exports = function (app) {
             // Remove last comma
             query = query.slice(0, query.length - 1);
             query += ');'
+
+            console.log(query);
 
             // And insert them into the database
             measureDataRequest(query, function (error) {
@@ -363,26 +365,85 @@ module.exports = function (app) {
         });
     });
 
-    // Handles deletion of a measure, TODO:
+    // Handles deletion of a measure
     app.post('/deleteMeasure', function (request, response) {
+        let tableName;
         // Get select item from user page
-        loadTables('tables', function (measureList) {
-            for (i = 0; i < measureList.length; i++) {
-                if (measureList[i][0] === request.body.measureSelect) {
-                    // Delete this entry, sort again and write to disk
-                    // Delete from database
-                    console.log(i);
-                }
-            }
-        });
+        loadTables('desc', function (measureDescriptions) {
+            loadTables('tables', function (measureList) {
+                console.log(measureList);
+                for (i = 0; i < measureList.length; i++) {
+                    console.log(measureList[i]);
+                    if (measureList[i][0] === request.body.measureSelect) {
 
-        // Render page again with information text
-        loadTables('tables', function (measureList) {
-            response.render('pages/admin/showMeasures', {
-                user: request.session.username,
-                measures: measureList
+                        // Delete this entry, sort again and write to disk
+
+                        // Get the table name from the list and format it correctly, TODO: better 
+                        const foundElement = measureList[i];
+                        tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
+
+                        // Delete i-th entry from both lists, just remove year if there are multiple years in the entry
+
+
+                        // Sort list of measures alphabetically by measure name
+                        measureList = measureList.sort(function (a, b) {
+                            if (a[0] < b[0]) {
+                                return -1;
+                            }
+                            if (a[0] > b[0]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+
+                        // Sort measure descriptions, so they are ordered the same
+                        measureDescriptions = measureDescriptions.sort(function (a, b) {
+                            if (a[0] < b[0]) {
+                                return -1;
+                            }
+                            if (a[0] > b[0]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+
+                        // Write new arrays to txt file
+                        arrayToTxt('tables', measureList);
+                        arrayToTxt('desc', measureDescriptions);
+                    }
+                }
             });
         });
+
+        console.log('finished');
+
+        // Add the year to the tablename, TODO: sql escape year, tablename is safe because of list comparison
+        tableName += '_' + request.body.yearSelect.trim();
+
+        // Delete entry from the database
+        deleteMeasureFromDB(tableName, function (error) {
+            if (error) {
+                console.log(error);
+                // Render page again with information text
+                loadTables('tables', function (measureList) {
+                    response.render('pages/admin/showMeasures', {
+                        user: request.session.username,
+                        measures: measureList,
+                        text: 'Fehler beim Löschen der Tabelle.'
+                    });
+                });
+            } else {
+                console.log('table deleted from database');
+                // Render page again with information text
+                loadTables('tables', function (measureList) {
+                    response.render('pages/admin/showMeasures', {
+                        user: request.session.username,
+                        measures: measureList,
+                        text: 'Tabelle erfolgreich gelöscht.'
+                    });
+                });
+            }
+        })
     });
 
     /**
@@ -424,7 +485,6 @@ module.exports = function (app) {
         } else {
             response.render('pages/errors/loginError');
         }
-
     });
 
     // Render index selection page
@@ -626,7 +686,8 @@ module.exports = function (app) {
                     if (role === 'admin') {
                         response.render('pages/admin/showMeasures', {
                             user: request.session.username,
-                            measures: measureList
+                            measures: measureList,
+                            text: ''
                         });
                     } else {
                         response.render('pages/error/adminError');
@@ -671,7 +732,9 @@ module.exports = function (app) {
         });
         // Append each array element to file
         array.forEach(function (v) {
-            file.write(v.join(', ') + '\n');
+            if (v != '') {
+                file.write(v.join(',') + '\n');
+            }
         });
         file.end();
         console.log('Wrote to file');
@@ -743,7 +806,7 @@ module.exports = function (app) {
 
     // Deletes specified table from the database
     const deleteMeasureFromDB = function (tableName, callback) {
-        connectionData.query('DROP TABLE ' + connectionData.escape(tableName), function (err) {
+        connectionData.query('DROP TABLE ' + tableName, function (err) {
             if (err) return callback(err);
             callback();
         });
