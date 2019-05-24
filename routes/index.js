@@ -382,17 +382,29 @@ module.exports = function (app) {
                         tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
 
                         // Delete i-th entry from both lists, just remove year if there are multiple years in the entry
-                        if ((measureList[i][1].split(':').length) === 1) {
+
+                        const years = measureList[i][1].split(':');
+
+                        // If the measure only had the specified year delete it completely
+                        if ((years.length === 1) && (years[0] === request.body.yearSelect)) {
                             if (i > -1) {
                                 measureList.splice(i, 1);
                                 measureDescriptions.splice(i, 1);
                             }
                         } else {
-                            // TODO: delete month
-                        }
+                            let newYears = '';
+                            // Add everything except the deleted year
+                            for (j = 0; j < years.length; j++) {
+                                if (years[j] != request.body.yearSelect) {
+                                    newYears += years[j] + ':';
+                                }
+                            }
 
-                        console.log(measureList);
-                        console.log(measureDescriptions);
+                            found = true;
+
+                            // Remove last :
+                            measureList[i][1] = newYears.slice(0, newYears.length - 1);
+                        }
 
                         // Sort list of measures alphabetically by measure name
                         measureList = measureList.sort(function (a, b) {
@@ -438,7 +450,7 @@ module.exports = function (app) {
                     response.render('pages/admin/showMeasures', {
                         user: request.session.username,
                         measures: measureList,
-                        text: 'Fehler beim Löschen der Tabelle.'
+                        text: 'Fehler beim Löschen der Kennzahl.'
                     });
                 });
                 // Only delete from sql database if it existed before
@@ -448,7 +460,7 @@ module.exports = function (app) {
                     response.render('pages/admin/showMeasures', {
                         user: request.session.username,
                         measures: measureList,
-                        text: 'Tabelle erfolgreich gelöscht.'
+                        text: 'Kennzahl erfolgreich gelöscht.'
                     });
                 });
             }
