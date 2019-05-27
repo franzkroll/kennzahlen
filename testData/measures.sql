@@ -16,6 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `measures`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `measures` /*!40100 DEFAULT CHARACTER SET latin1 */;
+
+USE `measures`;
+
+--
 -- Table structure for table `1$2_Anzahl_der_Anrufe_2018`
 --
 
@@ -83,4 +91,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-27 16:14:20
+-- Dump completed on 2019-05-27 16:20:29

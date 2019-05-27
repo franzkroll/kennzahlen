@@ -16,6 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `nodelogin`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `nodelogin` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+USE `nodelogin`;
+
+--
 -- Table structure for table `accounts`
 --
 
@@ -53,4 +61,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-27 16:13:42
+-- Dump completed on 2019-05-27 16:20:41
