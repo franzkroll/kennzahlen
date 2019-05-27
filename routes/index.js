@@ -336,6 +336,7 @@ module.exports = function (app) {
                     table.push(request.body.name.trim());
                     table.push(request.body.year);
 
+                    // Format name correctly for mysql and add the year
                     let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
 
                     // Build sql string for table creation, TODO: sql injection for every element in sql
@@ -440,7 +441,6 @@ module.exports = function (app) {
                             tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
 
                             // Delete i-th entry from both lists, just remove year if there are multiple years in the entry
-
                             const years = measureList[i][1].split(':');
 
                             // If the measure only had the specified year delete it completely
