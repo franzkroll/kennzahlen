@@ -196,8 +196,6 @@ module.exports = function (app) {
                     // Check roles if measure is found in access table
                     checkRolePermissions(roleList[i][1], request, function (result) {
                         if (result) {
-                            console.log('accessing write area');
-
                             // Get measure and date
                             tableData.push(request.body.measure);
                             tableData.push(request.body.date);
@@ -251,8 +249,6 @@ module.exports = function (app) {
                                 query = query.slice(0, query.length - 1);
                                 query += ');'
 
-                                console.log(query);
-
                                 // And insert them into the database
                                 measureDataRequest(query, function (error) {
                                     if (error) {
@@ -271,7 +267,6 @@ module.exports = function (app) {
                                     }
                                 });
                             });
-
                         } else {
                             console.log(request.body.username + ' tried accessing measure without correct rights.');
                             loadTextFile('tables', function (measureList) {
@@ -372,7 +367,6 @@ module.exports = function (app) {
                     // Insert into database
                     measureDataRequest(sql, function (error) {
                         if (error) {
-                            //console.log(error);
                             response.render('pages/createMeasure', {
                                 text: "Fehler bei der Erstellung der Kennzahl!",
                                 user: request.session.username,
@@ -391,6 +385,17 @@ module.exports = function (app) {
 
                             // Sort measure descriptions, so they are ordered the same
                             measureDescriptions = measureDescriptions.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+
+                            // Sort role descriptions, so they are ordered the same
+                            roleList = roleList.sort(function (a, b) {
                                 if (a[0] < b[0]) {
                                     return -1;
                                 }
@@ -440,7 +445,7 @@ module.exports = function (app) {
                             // If the measure only had the specified year delete it completely
                             if ((years.length === 1) && (years[0] === request.body.yearSelect)) {
                                 if (i > -1) {
-                                    roleLost.splice(i, 1);
+                                    roleList.splice(i, 1);
                                     measureList.splice(i, 1);
                                     measureDescriptions.splice(i, 1);
                                 }
@@ -481,7 +486,20 @@ module.exports = function (app) {
                                 return 0;
                             });
 
+
+                            // Sort measure descriptions, so they are ordered the same
+                            roleList = roleList.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+
                             // Write new arrays to txt file
+                            arrayToTxt('roles', roleList);
                             arrayToTxt('tables', measureList);
                             arrayToTxt('desc', measureDescriptions);
                         }
@@ -544,7 +562,6 @@ module.exports = function (app) {
     // Loads simple help page
     app.get('/help', function (request, response) {
         if (request.session.loggedin) {
-            let role;
             checkRolePermissions('admin', request, function (result) {
                 if (result) {
                     response.render('pages/admin/adminHelp', {
@@ -619,9 +636,8 @@ module.exports = function (app) {
     // Display menu for creating new key figures
     app.get('/createMeasure', function (request, response) {
         if (request.session.loggedin) {
-            let role;
-            checkRolePermissions('submit', request, function (result) {
-                if (!result) {
+            checkRolePermissions('user', request, function (result) {
+                if (result) {
                     response.render('pages/createMeasure', {
                         user: request.session.username,
                         text: ''
@@ -635,28 +651,9 @@ module.exports = function (app) {
         }
     });
 
-    // Display menu for adding a measure to an existing theme
-    app.get('/addAttribute', function (request, response) {
-        if (request.session.loggedin) {
-            let role;
-            checkRolePermissions('submit', request, function (result) {
-                if (!result) {
-                    response.render('pages/addAttribute', {
-                        user: request.session.username
-                    });
-                } else {
-                    response.render('pages/errors/adminError')
-                }
-            });
-        } else {
-            response.render('pages/errors/loginError');
-        }
-    });
-
     // Displays admin index page
     app.get('/admin', function (request, response) {
         if (request.session.loggedin) {
-            let role;
             checkRolePermissions('admin', request, function (result) {
                 if (result) {
                     response.render('pages/admin/admin', {
@@ -676,7 +673,6 @@ module.exports = function (app) {
     // Display basic managing information for a superuser or admin
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
-            let role;
             checkRolePermissions('admin', request, function (result) {
                 if (result) {
                     response.render('pages/stats', {
@@ -695,7 +691,6 @@ module.exports = function (app) {
     // Display user creation page
     app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
-            let role;
             checkRolePermissions('admin', request, function (result) {
                 if (result) {
                     response.render('pages/admin/createUser', {
@@ -715,7 +710,6 @@ module.exports = function (app) {
     // Display user creation page
     app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
-            let role;
             checkRolePermissions('admin', request, function (result) {
                 if (result) {
                     // Load user from database
@@ -824,11 +818,12 @@ module.exports = function (app) {
         callback(array);
     }
 
-    // Get Current user from the database, use to check role
+    // Get Current user from the database, use to check role, TODO: multiple roles, Mario nochmal fragen? eigentlich unnötig, erst recht mit mandaten
     const checkRolePermissions = function (role, request, callback) {
         let result = [];
         let allowed = false;
 
+        // Query database for user
         connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
             if (err) return callback(err);
             if (res.length) {
@@ -837,15 +832,29 @@ module.exports = function (app) {
                 }
             }
 
-            // Always allow admin access
-            if (result[0].role === role || result[0].role === 'admin') {
-                allowed = true;
-                callback(allowed);
-            } else {
-                callback(allowed);
+            userRoles = result[0].role.split('_');
+            measureRoles = role.split('_');
+
+            // Always allow admin access, don't need for loop for simple cases
+            for (i = 0; i < userRoles.length; i++) {
+                for (j = 0; j < measureRoles.length; j++) {
+                    // Remove semicolon, why is it even there?
+                    if (measureRoles[j].includes(";")) {
+                        measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
+                    }
+
+                    // Just split for visibility
+                    if (userRoles[i] === 'admin' || (userRoles[i] === 'user' && measureRoles[j] !== 'admin')) {
+                        allowed = true;
+                    } else if (userRoles[i] === measureRoles[j]) {
+                        allowed = true;
+                    }
+                }
             }
+            callback(allowed);
         });
     }
+
 
     // Code for querying database
     const getAllUsersFromDB = function (callback) {
@@ -898,6 +907,7 @@ module.exports = function (app) {
                     // Insert the user into database, question marks provide prevention against sql attack
                     const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
                     connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
+                        console.log(request.body.role);
                         if (err) return callback(err);
                         callback();
                     });
