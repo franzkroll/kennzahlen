@@ -109,54 +109,74 @@ module.exports = function (app) {
 
     // Loads request data from database and renders it with a new visual page 
     app.post('/visual', function (request, response) {
-        loadTables('tables', function (measureList) {
+        loadTextFile('tables', function (measureList) {
             let tableName;
+            // Check if user has permission to view the data
+            loadTextFile('roles', function (roleList) {
+                for (i = 0; i < roleList.length; i++ && !found) {
+                    // If measure is found, check if saved role equals current role and admin/user
+                    if (request.body.measure === roleList[i][0]) {
+                        found = true;
+                        // Check roles if measure is found in access table
+                        checkRolePermissions(roleList[i][1], request, function (result) {
+                            if (result) {
+                                // Check if inserted measure data really exists
+                                for (i = 0; i < measureList.length; i++) {
+                                    if (measureList[i][0] === request.body.measure) {
+                                        tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+                                    }
+                                }
+                                // Query database if user has also entered a year 
+                                if (request.body.year) {
+                                    tableName += "_" + request.body.year.trim();
 
-            // Check if inserted measure data really exists
-            for (i = 0; i < measureList.length; i++) {
-                if (measureList[i][0] === request.body.measure) {
-                    tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
-                }
-            }
-
-            // Query database if user has also entered a year 
-            if (request.body.year) {
-                tableName += "_" + request.body.year.trim();
-
-                getMeasureFromDB(tableName, function (result, error) {
-                    if (error) {
-                        console.log(error);
-                        // Show error page if data couldn't be found
-                        response.render('pages/visual', {
-                            user: request.session.username,
-                            measureData: "",
-                            loadedTable: "",
-                            text: "Datensatz nicht vorhanden!",
-                            measureListData: measureList
-                        });
-                    } else {
-                        // Loaded measure data
-                        const measureData = JSON.stringify(result);
-                        // Render page with newly acquired data
-                        response.render('pages/visual', {
-                            user: request.session.username,
-                            measureData: JSON.stringify(measureData),
-                            loadedTable: tableName,
-                            text: "Daten erfolgreich geladen!",
-                            measureListData: measureList
+                                    getMeasureFromDB(tableName, function (result, error) {
+                                        if (error) {
+                                            console.log(error);
+                                            // Show error page if data couldn't be found
+                                            response.render('pages/visual', {
+                                                user: request.session.username,
+                                                measureData: "",
+                                                loadedTable: "",
+                                                text: "Datensatz nicht vorhanden!",
+                                                measureListData: measureList
+                                            });
+                                        } else {
+                                            // Loaded measure data
+                                            const measureData = JSON.stringify(result);
+                                            // Render page with newly acquired data
+                                            response.render('pages/visual', {
+                                                user: request.session.username,
+                                                measureData: JSON.stringify(measureData),
+                                                loadedTable: tableName,
+                                                text: "Daten erfolgreich geladen!",
+                                                measureListData: measureList
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    // Show error page if data couldn't be found
+                                    response.render('pages/visual', {
+                                        user: request.session.username,
+                                        measureData: "",
+                                        loadedTable: "",
+                                        text: "Datensatz nicht vorhanden!",
+                                        measureListData: measureList
+                                    });
+                                }
+                            } else {
+                                response.render('pages/visual', {
+                                    user: request.session.username,
+                                    measureData: "",
+                                    loadedTable: "",
+                                    text: "Dafür besitzen Se nicht die nötigen Rechte!",
+                                    measureListData: measureList
+                                });
+                            }
                         });
                     }
-                });
-            } else {
-                // Show error page if data couldn't be found
-                response.render('pages/visual', {
-                    user: request.session.username,
-                    measureData: "",
-                    loadedTable: "",
-                    text: "Datensatz nicht vorhanden!",
-                    measureListData: measureList
-                });
-            }
+                }
+            });
         });
     });
 
@@ -165,82 +185,106 @@ module.exports = function (app) {
         // Array for storing table data
         tableData = []
 
-        // Get measure and date
-        tableData.push(request.body.measure);
-        tableData.push(request.body.date);
+        let found = false;
 
-        // Get attributes, they are already in the right order
-        for (let key in request.body) {
-            if (key.includes('var')) {
-                tableData.push(request.body[key]);
-            }
-        }
+        // Load user role from database
+        loadTextFile('roles', function (roleList) {
+            for (i = 0; i < roleList.length; i++ && !found) {
+                // If measure is found, check if saved role equals current role and admin/user
+                if (request.body.measure === roleList[i][0]) {
+                    found = true;
+                    // Check roles if measure is found in access table
+                    checkRolePermissions(roleList[i][1], request, function (result) {
+                        if (result) {
+                            console.log('accessing write area');
 
-        // Load table data from disk
-        loadTables('tables', function (measureList) {
-            // Table to write into
-            let tableName;
+                            // Get measure and date
+                            tableData.push(request.body.measure);
+                            tableData.push(request.body.date);
 
-            // Used to convert month to month number
-            const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+                            // Get attributes, they are already in the right order
+                            for (let key in request.body) {
+                                if (key.includes('var')) {
+                                    tableData.push(request.body[key]);
+                                }
+                            }
 
-            // Escaping year for sql injection and slicing out the year
-            const date = connectionData.escape(tableData[1]).slice(1, tableData[1].length + 1);
-            const year = date.slice(date.length - 4, date.length);
+                            // Load table data from disk
+                            loadTextFile('tables', function (measureList) {
+                                // Table to write into
+                                let tableName;
 
-            // Check if entered table really exists, get concrete table name in database
-            for (i = 0; i < measureList.length; i++) {
-                if (measureList[i][0] === tableData[0]) {
-                    tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+                                // Used to convert month to month number
+                                const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+                                // Escaping year for sql injection and slicing out the year
+                                const date = connectionData.escape(tableData[1]).slice(1, tableData[1].length + 1);
+                                const year = date.slice(date.length - 4, date.length);
+
+                                // Check if entered table really exists, get concrete table name in database
+                                for (i = 0; i < measureList.length; i++) {
+                                    if (measureList[i][0] === tableData[0]) {
+                                        tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+                                    }
+                                }
+
+                                // Add year to tablename
+                                tableName += "_" + year;
+
+                                // Build sql string
+                                let query = 'REPLACE INTO ' + tableName + ' () values (';
+
+                                // First case handles the year entry, second case entries with month
+                                if (date.length === 5) {
+                                    query += year + ',';
+                                } else {
+                                    query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
+                                }
+
+                                // Put data into sql string, maybe add directly without values vector?, sql injection
+                                for (i = 2; i < tableData.length; i++) {
+                                    query += connectionData.escape(tableData[i]);
+                                    query += ',';
+                                }
+
+                                // Remove last comma
+                                query = query.slice(0, query.length - 1);
+                                query += ');'
+
+                                console.log(query);
+
+                                // And insert them into the database
+                                measureDataRequest(query, function (error) {
+                                    if (error) {
+                                        response.render('pages/submit', {
+                                            user: request.session.username,
+                                            text: "Fehler beim Eintragen der Daten!",
+                                            measureListData: measureList
+                                        });
+                                    } else {
+                                        // Reload page after values were inserted
+                                        response.render('pages/submit', {
+                                            text: "Daten erfolgreich eingetragen!",
+                                            user: request.session.username,
+                                            measureListData: measureList
+                                        });
+                                    }
+                                });
+                            });
+
+                        } else {
+                            console.log(request.body.username + ' tried accessing measure without correct rights.');
+                            loadTextFile('tables', function (measureList) {
+                                response.render('pages/submit', {
+                                    text: "Dafür besitzen Sie nicht die nötigen Rechte!",
+                                    user: request.session.username,
+                                    measureListData: measureList
+                                });
+                            });
+                        }
+                    });
                 }
             }
-
-            // Add year to tablename
-            tableName += "_" + year;
-
-            // Build sql string
-            let query = 'REPLACE INTO ' + tableName + ' () values (';
-
-            // First case handles the year entry, second case entries with month
-            if (date.length === 5) {
-                query += year + ',';
-            } else {
-                query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
-            }
-
-            // Put data into sql string, maybe add directly without values vector?, sql injection
-            for (i = 2; i < tableData.length; i++) {
-                query += connectionData.escape(tableData[i]);
-                query += ',';
-            }
-
-            // Remove last comma
-            query = query.slice(0, query.length - 1);
-            query += ');'
-
-            console.log(query);
-
-            // And insert them into the database
-            measureDataRequest(query, function (error) {
-                if (error) {
-                    loadTables('tables', function (measureList) {
-                        response.render('pages/submit', {
-                            user: request.session.username,
-                            text: "Fehler beim Eintragen der Daten!",
-                            measureListData: measureList
-                        });
-                    });
-                } else {
-                    // Reload page after values were inserted
-                    loadTables('tables', function (measureList) {
-                        response.render('pages/submit', {
-                            text: "Daten erfolgreich eingetragen!",
-                            user: request.session.username,
-                            measureListData: measureList
-                        });
-                    });
-                }
-            });
         });
     });
 
@@ -248,117 +292,125 @@ module.exports = function (app) {
     // Handles submitted data when user created a new measure, writes info into local files and creates table
     app.post('/createMeasure', function (request, response) {
         // Temporary arrays which later get added to measureList and measureDescriptions
-        loadTables('tables', function (measureList) {
-            loadTables('desc', function (measureDescriptions) {
-                // Saves current table and descriptions so they can be pushed into main arrays
-                const desc = [];
-                let table = [];
+        loadTextFile('tables', function (measureList) {
+            loadTextFile('desc', function (measureDescriptions) {
+                loadTextFile('roles', function (roleList) {
+                    // Saves current table and descriptions so they can be pushed into main arrays
+                    const desc = [];
+                    let table = [];
 
-                // Just used to make code more easily readable
-                let measureExists = false;
-                let yearExists = false;
-                let addYear = false;
+                    // Just used to make code more easily readable
+                    let measureExists = false;
+                    let yearExists = false;
+                    let addYear = false;
 
-                // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
-                for (i = 0; i < measureList.length; i++) {
-                    if (measureList[i][0] == request.body.name) {
-                        // Get already existing years in measure
-                        const years = measureList[i][1].trim().split(':');
-                        measureExists = true;
-                        for (j = 0; j < years.length; j++) {
-                            console.log(years[j]);
-                            // Show error if year already exists, which means the measure already exists in the system
-                            if (years[j] == request.body.year) {
-                                yearExists = true;
-                                console.log('Found it');
-                                response.render('pages/createMeasure', {
-                                    text: "Fehler! Kennzahl existiert bereits!",
-                                    user: request.session.username,
-                                });
+                    // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
+                    for (i = 0; i < measureList.length; i++) {
+                        if (measureList[i][0] == request.body.name) {
+                            // Get already existing years in measure
+                            const years = measureList[i][1].trim().split(':');
+                            measureExists = true;
+                            for (j = 0; j < years.length; j++) {
+                                console.log(years[j]);
+                                // Show error if year already exists, which means the measure already exists in the system
+                                if (years[j] == request.body.year) {
+                                    yearExists = true;
+                                    response.render('pages/createMeasure', {
+                                        text: "Fehler! Kennzahl existiert bereits!",
+                                        user: request.session.username,
+                                    });
+                                }
+                            }
+                            // Add year if it doesn't exist
+                            if (!yearExists && measureExists) {
+                                addYear = true;
+                                console.log('Measure exists, adding year to list');
+                                measureList[i][1] += ':' + request.body.year;
                             }
                         }
-                        // Add year if it doesn't exist
-                        if (!yearExists && measureExists) {
-                            addYear = true;
-                            console.log('Measure exists, adding year to list');
-                            measureList[i][1] += ':' + request.body.year;
+                    }
+
+                    // Need to add role to list if the measure doesn't exist
+                    if (!measureExists) {
+                        roleList.push([request.body.name, request.body.role + ';']);
+                        console.log("created role");
+                    }
+
+                    desc.push(request.body.name.trim());
+                    desc.push(request.body.mainDesc);
+                    table.push(request.body.name.trim());
+                    table.push(request.body.year);
+
+                    let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
+
+                    // Build sql string for table creation, TODO: sql injection for every element in sql
+                    let sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+
+                    // Add attribute names and descriptions, should always be same number of items
+                    for (let key in request.body) {
+                        if (key.includes('var')) {
+                            table.push(request.body[key]);
+                            sql += request.body[key].replaceAll(' ', '_') + ' FLOAT,'
+                        } else if (key.includes('desc')) {
+                            desc.push(request.body[key]);
                         }
                     }
-                }
 
-                desc.push(request.body.name);
-                desc.push(request.body.mainDesc);
-                table.push(request.body.name);
-                table.push(request.body.year);
+                    sql += ' constraint pk_1 primary key(Monat));';
 
-                let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.replaceAll(' ', '_');
+                    // Add semicolon, later needed for identification
+                    tableName += ';';
+                    table.push(tableName);
+                    desc[desc.length - 1] = desc[desc.length - 1] + ';';
 
-                // Build sql string for table creation, TODO: sql injection for every element in sql
-                let sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
-
-                // Add attribute names and descriptions, should always be same number of items
-                for (let key in request.body) {
-                    if (key.includes('var')) {
-                        table.push(request.body[key]);
-                        sql += request.body[key].replaceAll(' ', '_') + ' FLOAT,'
-                    } else if (key.includes('desc')) {
-                        desc.push(request.body[key]);
+                    // Push table and description data into loaded table
+                    if (!addYear) {
+                        measureList.push(table);
+                        measureDescriptions.push(desc);
                     }
-                }
 
-                sql += ' constraint pk_1 primary key(Monat));';
+                    // Insert into database
+                    measureDataRequest(sql, function (error) {
+                        if (error) {
+                            //console.log(error);
+                            response.render('pages/createMeasure', {
+                                text: "Fehler bei der Erstellung der Kennzahl!",
+                                user: request.session.username,
+                            });
+                        } else {
+                            // Sort list of measures alphabetically by measure name
+                            measureList = measureList.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
 
-                // Add semicolon, later needed for identification
-                tableName += ';';
-                table.push(tableName);
-                desc[desc.length - 1] = desc[desc.length - 1] + ';';
+                            // Sort measure descriptions, so they are ordered the same
+                            measureDescriptions = measureDescriptions.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
 
-                // Push table and description data into loaded table
-                if (!addYear) {
-                    measureList.push(table);
-                    measureDescriptions.push(desc);
-                }
+                            // Write new arrays to txt file
+                            arrayToTxt('roles', roleList);
+                            arrayToTxt('tables', measureList);
+                            arrayToTxt('desc', measureDescriptions);
 
-                // Insert into database
-                measureDataRequest(sql, function (error) {
-                    if (error) {
-                        //console.log(error);
-                        response.render('pages/createMeasure', {
-                            text: "Fehler bei der Erstellung der Kennzahl!",
-                            user: request.session.username,
-                        });
-                    } else {
-                        // Sort list of measures alphabetically by measure name
-                        measureList = measureList.sort(function (a, b) {
-                            if (a[0] < b[0]) {
-                                return -1;
-                            }
-                            if (a[0] > b[0]) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-
-                        // Sort measure descriptions, so they are ordered the same
-                        measureDescriptions = measureDescriptions.sort(function (a, b) {
-                            if (a[0] < b[0]) {
-                                return -1;
-                            }
-                            if (a[0] > b[0]) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-
-                        // Write new arrays to txt file
-                        arrayToTxt('tables', measureList);
-                        arrayToTxt('desc', measureDescriptions);
-
-                        response.render('pages/createMeasure', {
-                            text: "Kennzahl erfolgreich erstellt!",
-                            user: request.session.username,
-                        });
-                    }
+                            response.render('pages/createMeasure', {
+                                text: "Kennzahl erfolgreich erstellt!",
+                                user: request.session.username,
+                            });
+                        }
+                    });
                 });
             });
         });
@@ -370,68 +422,71 @@ module.exports = function (app) {
         let found = false;
 
         // Get select item from user page
-        loadTables('desc', function (measureDescriptions) {
-            loadTables('tables', function (measureList) {
-                for (i = 0; i < measureList.length; i++) {
-                    if (measureList[i][0] === request.body.measureSelect && !found) {
-                        found = true;
-
-                        // Get the table name from the list and format it correctly
-                        const foundElement = measureList[i];
-                        tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
-
-                        // Delete i-th entry from both lists, just remove year if there are multiple years in the entry
-
-                        const years = measureList[i][1].split(':');
-
-                        // If the measure only had the specified year delete it completely
-                        if ((years.length === 1) && (years[0] === request.body.yearSelect)) {
-                            if (i > -1) {
-                                measureList.splice(i, 1);
-                                measureDescriptions.splice(i, 1);
-                            }
-                        } else {
-                            let newYears = '';
-                            // Add everything except the deleted year
-                            for (j = 0; j < years.length; j++) {
-                                if (years[j] != request.body.yearSelect) {
-                                    newYears += years[j] + ':';
-                                }
-                            }
-
+        loadTextFile('desc', function (measureDescriptions) {
+            loadTextFile('tables', function (measureList) {
+                loadTextFile('roles', function (roleList) {
+                    for (i = 0; i < measureList.length; i++) {
+                        if (measureList[i][0] === request.body.measureSelect && !found) {
                             found = true;
 
-                            // Remove last :
-                            measureList[i][1] = newYears.slice(0, newYears.length - 1);
+                            // Get the table name from the list and format it correctly
+                            const foundElement = measureList[i];
+                            tableName = foundElement[foundElement.length - 1].slice(0, foundElement[foundElement.length - 1].length - 1);
+
+                            // Delete i-th entry from both lists, just remove year if there are multiple years in the entry
+
+                            const years = measureList[i][1].split(':');
+
+                            // If the measure only had the specified year delete it completely
+                            if ((years.length === 1) && (years[0] === request.body.yearSelect)) {
+                                if (i > -1) {
+                                    roleLost.splice(i, 1);
+                                    measureList.splice(i, 1);
+                                    measureDescriptions.splice(i, 1);
+                                }
+                            } else {
+                                let newYears = '';
+                                // Add everything except the deleted year
+                                for (j = 0; j < years.length; j++) {
+                                    if (years[j] != request.body.yearSelect) {
+                                        newYears += years[j] + ':';
+                                    }
+                                }
+
+                                found = true;
+
+                                // Remove last :
+                                measureList[i][1] = newYears.slice(0, newYears.length - 1);
+                            }
+
+                            // Sort list of measures alphabetically by measure name, TODO: move sort to own function
+                            measureList = measureList.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+
+                            // Sort measure descriptions, so they are ordered the same
+                            measureDescriptions = measureDescriptions.sort(function (a, b) {
+                                if (a[0] < b[0]) {
+                                    return -1;
+                                }
+                                if (a[0] > b[0]) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+
+                            // Write new arrays to txt file
+                            arrayToTxt('tables', measureList);
+                            arrayToTxt('desc', measureDescriptions);
                         }
-
-                        // Sort list of measures alphabetically by measure name, TODO: move sort to own function
-                        measureList = measureList.sort(function (a, b) {
-                            if (a[0] < b[0]) {
-                                return -1;
-                            }
-                            if (a[0] > b[0]) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-
-                        // Sort measure descriptions, so they are ordered the same
-                        measureDescriptions = measureDescriptions.sort(function (a, b) {
-                            if (a[0] < b[0]) {
-                                return -1;
-                            }
-                            if (a[0] > b[0]) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-
-                        // Write new arrays to txt file
-                        arrayToTxt('tables', measureList);
-                        arrayToTxt('desc', measureDescriptions);
                     }
-                }
+                });
             });
         });
 
@@ -445,7 +500,7 @@ module.exports = function (app) {
             if (error || !found) {
                 console.log(error);
                 // Render page again with information text
-                loadTables('tables', function (measureList) {
+                loadTextFile('tables', function (measureList) {
                     response.render('pages/admin/showMeasures', {
                         user: request.session.username,
                         measures: measureList,
@@ -455,7 +510,7 @@ module.exports = function (app) {
                 // Only delete from sql database if it existed before
             } else if (found) {
                 // Render page again with information text
-                loadTables('tables', function (measureList) {
+                loadTextFile('tables', function (measureList) {
                     response.render('pages/admin/showMeasures', {
                         user: request.session.username,
                         measures: measureList,
@@ -475,8 +530,8 @@ module.exports = function (app) {
     // Displays information about measures in the system and their attributes
     app.get('/measureHelp', function (request, response) {
         // Load measures and their descriptions
-        loadTables('tables', function (measureList) {
-            loadTables('desc', function (measureDescriptions) {
+        loadTextFile('tables', function (measureList) {
+            loadTextFile('desc', function (measureDescriptions) {
                 response.render('pages/measureHelp', {
                     user: request.session.username,
                     measureListData: measureList,
@@ -490,9 +545,8 @@ module.exports = function (app) {
     app.get('/help', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (role === 'admin') {
+            checkRolePermissions('admin', request, function (result) {
+                if (result) {
                     response.render('pages/admin/adminHelp', {
                         user: request.session.username
                     });
@@ -533,7 +587,7 @@ module.exports = function (app) {
     // Display visualization of data
     app.get('/visual', function (request, response) {
         if (request.session.loggedin) {
-            loadTables('tables', function (measureList) {
+            loadTextFile('tables', function (measureList) {
                 response.render('pages/visual', {
                     user: request.session.username,
                     measureData: "",
@@ -550,7 +604,7 @@ module.exports = function (app) {
     // Display menu for entering data
     app.get('/submit', function (request, response) {
         if (request.session.loggedin) {
-            loadTables('tables', function (measureList) {
+            loadTextFile('tables', function (measureList) {
                 response.render('pages/submit', {
                     user: request.session.username,
                     text: "",
@@ -566,9 +620,8 @@ module.exports = function (app) {
     app.get('/createMeasure', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (!(role === 'submit')) {
+            checkRolePermissions('submit', request, function (result) {
+                if (!result) {
                     response.render('pages/createMeasure', {
                         user: request.session.username,
                         text: ''
@@ -586,9 +639,8 @@ module.exports = function (app) {
     app.get('/addAttribute', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (!(role === 'submit')) {
+            checkRolePermissions('submit', request, function (result) {
+                if (!result) {
                     response.render('pages/addAttribute', {
                         user: request.session.username
                     });
@@ -605,9 +657,8 @@ module.exports = function (app) {
     app.get('/admin', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (role === 'admin') {
+            checkRolePermissions('admin', request, function (result) {
+                if (result) {
                     response.render('pages/admin/admin', {
                         user: request.session.username,
                         text: ""
@@ -626,9 +677,8 @@ module.exports = function (app) {
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (role === 'admin') {
+            checkRolePermissions('admin', request, function (result) {
+                if (result) {
                     response.render('pages/stats', {
                         user: request.session.username
                     });
@@ -646,9 +696,8 @@ module.exports = function (app) {
     app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (role === 'admin') {
+            checkRolePermissions('admin', request, function (result) {
+                if (result) {
                     response.render('pages/admin/createUser', {
                         user: request.session.username
                     });
@@ -667,9 +716,8 @@ module.exports = function (app) {
     app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
             let role;
-            getCurrentLoginFromDB(request, function (result) {
-                role = (result[0].role);
-                if (role === 'admin') {
+            checkRolePermissions('admin', request, function (result) {
+                if (result) {
                     // Load user from database
                     getAllUsersFromDB(function (result, error) {
                         if (error) console.log(error);
@@ -699,11 +747,10 @@ module.exports = function (app) {
 
     // Load measures and send them to the user, delete is handled in post
     app.get('/showMeasures', function (request, response) {
-        loadTables('tables', function (measureList) {
+        loadTextFile('tables', function (measureList) {
             if (request.session.loggedin) {
-                getCurrentLoginFromDB(request, function (result) {
-                    role = (result[0].role);
-                    if (role === 'admin') {
+                checkRolePermissions('admin', request, function (result) {
+                    if (result) {
                         response.render('pages/admin/showMeasures', {
                             user: request.session.username,
                             measures: measureList,
@@ -762,7 +809,7 @@ module.exports = function (app) {
     }
 
     // Loads tables from disk txt file and converts them to an array
-    const loadTables = function (name, callback) {
+    const loadTextFile = function (name, callback) {
         let array = [];
         let text;
         // Read file from page into text string
@@ -778,8 +825,9 @@ module.exports = function (app) {
     }
 
     // Get Current user from the database, use to check role
-    const getCurrentLoginFromDB = function (request, callback) {
+    const checkRolePermissions = function (role, request, callback) {
         let result = [];
+        let allowed = false;
 
         connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
             if (err) return callback(err);
@@ -788,7 +836,14 @@ module.exports = function (app) {
                     result.push(res[i]);
                 }
             }
-            callback(result);
+
+            // Always allow admin access
+            if (result[0].role === role || result[0].role === 'admin') {
+                allowed = true;
+                callback(allowed);
+            } else {
+                callback(allowed);
+            }
         });
     }
 
