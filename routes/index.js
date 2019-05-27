@@ -351,6 +351,7 @@ module.exports = function (app) {
                         }
                     }
 
+                    // Make month the primary key
                     sql += ' constraint pk_1 primary key(Monat));';
 
                     // Add semicolon, later needed for identification
@@ -778,13 +779,19 @@ module.exports = function (app) {
     });
 
 
-    // Replaces all occurrences in a string, no built in function
+    /**
+     * Replaces all occurrences of search with replacement in the string that it was called from.
+     */
     String.prototype.replaceAll = function (search, replacement) {
         let target = this;
         return target.replace(new RegExp(search, 'g'), replacement);
     };
 
-    // Converts existing array to file and writes it into tables.txt, user for saving currently used tables in the system
+    /**
+     * Loads txt file from disk and converts it to an array.
+     * @param {Data to be loaded from disk. Currently desc, table or roles.} name 
+     * @param {Array with the data that is returned.} array 
+     */
     const arrayToTxt = function (name, array) {
         // Open file stream
         let file = fs.createWriteStream(name + '.txt');
@@ -802,7 +809,11 @@ module.exports = function (app) {
         console.log('Wrote to file');
     }
 
-    // Loads tables from disk txt file and converts them to an array
+    /**
+     * Loads tables from disk txt file and converts them to an array.
+     * @param {Tablename that is to be loaded, currently desc, tables or roles.} name 
+     * @param {Return retrieved data from disk as array.} callback 
+     */
     const loadTextFile = function (name, callback) {
         let array = [];
         let text;
@@ -818,7 +829,12 @@ module.exports = function (app) {
         callback(array);
     }
 
-    // Get Current user from the database, use to check role, TODO: multiple roles, Mario nochmal fragen? eigentlich unnötig, erst recht mit mandaten
+    /**
+     * Query database with specified username, check if user has the needed permissions, returns true or false in callback.
+     * @param {Role that is checked.} role 
+     * @param {Current Request, contains user information, we need the username.} request 
+     * @param {Return true if user has the right role, false if not.} callback 
+     */
     const checkRolePermissions = function (role, request, callback) {
         let result = [];
         let allowed = false;
@@ -855,11 +871,14 @@ module.exports = function (app) {
         });
     }
 
-
-    // Code for querying database
+    /**
+     * Retrieve all users from the database.
+     * @param {Contains all results or error if query couldn't be executed.} callback 
+     */
     const getAllUsersFromDB = function (callback) {
         let result = [];
 
+        // Get all users from the database and put them in array
         connectionLogin.query('SELECT * FROM accounts', function (err, res) {
             if (err) return callback(err);
             if (res.length) {
@@ -871,7 +890,11 @@ module.exports = function (app) {
         });
     }
 
-    // Queries database for a complete measure, no sql injection needed because tableName is taken from predefined list
+    /**
+     * Queries database for a complete measure, no sql injection prevention needed because tableName is taken from predefined list.
+     * @param {Tablename that is to be queried from the database.} tableName 
+     * @param {Returns error if query fails.} callback 
+     */
     const getMeasureFromDB = function (tableName, callback) {
         const query = 'SELECT * FROM ' + tableName + ';';
 
@@ -881,7 +904,11 @@ module.exports = function (app) {
         });
     }
 
-    // Default data request, full query has to be inserted here
+    /**
+     * Default query for measures database, currently used for inserting data into the database, full query has to be inserted here.
+     * @param {Query hast to be passed here. TODO: maybe build query in this method} query 
+     * @param {Returns error if insertion failed.} callback 
+     */
     const measureDataRequest = function (query, callback) {
         connectionData.query(query, function (err) {
             if (err) return callback(err);
@@ -889,7 +916,11 @@ module.exports = function (app) {
         });
     }
 
-    // Deletes specified table from the database
+    /**
+     * Deletes specified table from the database.
+     * @param {Table to be deleted.} tableName 
+     * @param {Returns error if table couldn't be deleted.} callback 
+     */
     const deleteMeasureFromDB = function (tableName, callback) {
         connectionData.query('DROP TABLE ' + tableName, function (err) {
             if (err) return callback(err);
@@ -897,7 +928,11 @@ module.exports = function (app) {
         });
     }
 
-    // Insert user with provided data into the user database
+    /**
+     * Insert user with provided data into the user database. Also executes the password check.
+     * @param {Passed request, it contains all the needed information passed down from the body.} request 
+     * @param {Returns error if insertion of user into the database fails.} callback 
+     */
     const insertUserIntoDB = function (request, callback) {
         // Check password strength
         if (pwCheck(request.body.password)) {
@@ -923,7 +958,11 @@ module.exports = function (app) {
         }
     }
 
-    // Deletes user with passed i from the accounts database
+    /**
+     * Deletes user with passed id from the accounts database.
+     * @param {Passed id, used to identify the user in the database.} id 
+     * @param {Returns error if deletion fails.} callback 
+     */
     const deleteUserFromDB = function (id, callback) {
         connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
             if (err) return callback(err);
@@ -931,7 +970,10 @@ module.exports = function (app) {
         });
     }
 
-    // Check if entered password is a safe password, used when a new user is created
+    /**
+     * Check if entered password is a safe password, used when a new user is created.
+     * @param {Password to be checked.} password 
+     */
     function pwCheck(password) {
         const schema = new passwordValidator();
 

@@ -60,7 +60,7 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 
 ### Benutzerdatenbank
 
-Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
+Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Will man mehrere Rollen festlegen müssen diese durch einen Unterstrich getrennt werden. Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
 
 #### Beispiel
 
