@@ -19,6 +19,11 @@
     text-align: center;
 }
 
+.misc-text-title {
+    font-family: Tahoma, Geneva, sans-serif;
+    text-align: center;
+}
+
 /* User error text */
 
 .text-error {
@@ -462,4 +467,27 @@ and also iPads specifically.
     text-align: center;
     font-family: Tahoma, Geneva, sans-serif;
     font-weight: bold
+}
+
+/* Printing style sheet, remove everything thats unnecessary. */
+@media screen {
+    .misc-text-title {
+        display: none;
+    }
+}
+
+@media print {
+
+    ul,
+    li,
+    li:last-child,
+    li a,
+    .misc-text,
+    .dropdownS,
+    .dropdown,
+    .button,
+    .footer,
+    .footer p {
+        display: none;
+    }
 }

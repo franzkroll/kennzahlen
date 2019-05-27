@@ -53,7 +53,6 @@ selM.onclick = function () {
             for (j = 0; j < measure.length - 1; j++) {
                 // If measure is found clear table and prepare select for new data
                 if (measure[j] === inputText) {
-
                     filled = true;
 
                     // Clear chart if changed to an item without data
@@ -150,7 +149,7 @@ selGraph.onchange = function (e) {
             options: {
                 // Display title
                 title: {
-                    display: true,
+                    display: true
                 },
                 // Make chart resize to canvas
                 responsive: true,

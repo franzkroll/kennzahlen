@@ -27,6 +27,7 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         <div class="misc-text"> <%- text -%></div>
         <span style="display:block; height: 10px;"></span>
 
+
         <!--Dropdown menus for measure and year selection, button queries data from mysql. -->
         <div style="text-align:center;">
             <form action="visual" method="post">
@@ -36,6 +37,9 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
                 <div style="text-align: center"><button type="submit" class="button">Daten abfragen</button></div>
             </form>
         </div>
+
+        <div class="misc-text-title" id="name"></div>
+
         <div>
             <!-- Table with first row, later rows are appended dynamically in helper script. -->
             <table id="dataTable">
@@ -87,7 +91,7 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
     <script>
         let loadedTableName = '<%- loadedTable %>';
         loadedTableName = loadedTableName.trim();
-        console.log(loadedTableName);
+        document.getElementById('name').innerHTML = loadedTableName.slice(4, loadedTableName.length - 5);
         const measureData = '<%- measureData %>';
         const measureListData = '<%- measureListData %>';
     </script>

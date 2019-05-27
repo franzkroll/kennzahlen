@@ -882,7 +882,7 @@ module.exports = function (app) {
         connectionLogin.query('SELECT * FROM accounts', function (err, res) {
             if (err) return callback(err);
             if (res.length) {
-                for (var i = 0; i < res.length; i++) {
+                for (i = 0; i < res.length; i++) {
                     result.push(res[i]);
                 }
             }
