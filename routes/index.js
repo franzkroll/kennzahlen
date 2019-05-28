@@ -76,18 +76,21 @@ module.exports = function (app) {
     // Post action for creating a user, renders admin index after creating and storing user in the database, displays error if that failed
     app.post('/createUser', function (request, response) {
         // TODO: mandates
-        let responseText;
-        insertUserIntoDB(request, function (err) {
+        insertUserIntoDB(request).then(function () {
+            response.render('pages/admin/admin', {
+                user: request.session.username,
+                text: 'Benutzer erfolgreich erstellt.'
+            });
+        }).catch(function (error) {
+            let responseText;
             // Show corresponding error messages if password is unsafe or user already exists, user names have to be unique
-            if (err === 'pw') {
-                console.log(err);
+            if (error === 'pw') {
+                console.log(error);
                 responseText = 'Fehler bei der Erstellung des Benutzers! Passwort zu unsicher.';
-            } else if (err) {
-                console.log(err);
+            } else if (error) {
+                console.log(error);
                 responseText = 'Fehler bei der Erstellung des Benutzers! Benutzer bereits vorhanden.';
-            } else {
-                responseText = 'Benutzer erfolgreich erstellt!';
-            };
+            }
             response.render('pages/admin/admin', {
                 user: request.session.username,
                 text: responseText
@@ -98,19 +101,22 @@ module.exports = function (app) {
     // Post action for deleting a user, if user exists he is deleted from the database
     app.post('/deleteUser', function (request, response) {
         const id = request.body.id;
-        deleteUserFromDB(id, function (err) {
-            console.log(err);
+        deleteUserFromDB(id).then(function () {
             response.render('pages/admin/admin', {
                 user: request.session.username,
                 text: "Benutzer erfolgreich gelöscht."
             });
-        });
+        }).catch(function (error) {
+            response.render('pages/admin/admin', {
+                user: request.session.username,
+                text: "Fehler beim Löschen."
+            });
+        })
     });
 
     // Loads request data from database and renders it with a new visual page 
     app.post('/visual', function (request, response) {
         loadTextFile('tables', function (measureList) {
-            let tableName;
             // Check if user has permission to view the data
             loadTextFile('roles', function (roleList) {
                 for (i = 0; i < roleList.length; i++ && !found) {
@@ -118,8 +124,10 @@ module.exports = function (app) {
                     if (request.body.measure === roleList[i][0]) {
                         found = true;
                         // Check roles if measure is found in access table
-                        checkRolePermissions(roleList[i][1], request, function (result) {
+                        checkRolePermissions(roleList[i][1], request).then(function (result) {
                             if (result) {
+                                let tableName;
+
                                 // Check if inserted measure data really exists
                                 for (i = 0; i < measureList.length; i++) {
                                     if (measureList[i][0] === request.body.measure) {
@@ -130,29 +138,25 @@ module.exports = function (app) {
                                 if (request.body.year) {
                                     tableName += "_" + request.body.year.trim();
 
-                                    getMeasureFromDB(tableName, function (result, error) {
-                                        if (error) {
-                                            console.log(error);
-                                            // Show error page if data couldn't be found
-                                            response.render('pages/visual', {
-                                                user: request.session.username,
-                                                measureData: "",
-                                                loadedTable: "",
-                                                text: "Datensatz nicht vorhanden!",
-                                                measureListData: measureList
-                                            });
-                                        } else {
-                                            // Loaded measure data
-                                            const measureData = JSON.stringify(result);
-                                            // Render page with newly acquired data
-                                            response.render('pages/visual', {
-                                                user: request.session.username,
-                                                measureData: JSON.stringify(measureData),
-                                                loadedTable: tableName,
-                                                text: "Daten erfolgreich geladen!",
-                                                measureListData: measureList
-                                            });
-                                        }
+                                    getMeasureFromDB(tableName).then(function (result) {
+                                        // Loaded measure data
+                                        const measureData = JSON.stringify(result);
+                                        // Render page with newly acquired data
+                                        response.render('pages/visual', {
+                                            user: request.session.username,
+                                            measureData: JSON.stringify(measureData),
+                                            loadedTable: tableName,
+                                            text: "Daten erfolgreich geladen!",
+                                            measureListData: measureList
+                                        });
+                                    }).catch(function (error) {
+                                        response.render('pages/visual', {
+                                            user: request.session.username,
+                                            measureData: "",
+                                            loadedTable: "",
+                                            text: "Datensatz nicht vorhanden!",
+                                            measureListData: measureList
+                                        });
                                     });
                                 } else {
                                     // Show error page if data couldn't be found
@@ -173,7 +177,9 @@ module.exports = function (app) {
                                     measureListData: measureList
                                 });
                             }
-                        });
+                        }).catch(function (error) {
+                            console.log(error);
+                        })
                     }
                 }
             });
@@ -194,7 +200,7 @@ module.exports = function (app) {
                 if (request.body.measure === roleList[i][0]) {
                     found = true;
                     // Check roles if measure is found in access table
-                    checkRolePermissions(roleList[i][1], request, function (result) {
+                    checkRolePermissions(roleList[i][1], request).then(function (result) {
                         if (result) {
                             // Get measure and date
                             tableData.push(request.body.measure);
@@ -250,21 +256,18 @@ module.exports = function (app) {
                                 query += ');'
 
                                 // And insert them into the database
-                                measureDataRequest(query, function (error) {
-                                    if (error) {
-                                        response.render('pages/submit', {
-                                            user: request.session.username,
-                                            text: "Fehler beim Eintragen der Daten!",
-                                            measureListData: measureList
-                                        });
-                                    } else {
-                                        // Reload page after values were inserted
-                                        response.render('pages/submit', {
-                                            text: "Daten erfolgreich eingetragen!",
-                                            user: request.session.username,
-                                            measureListData: measureList
-                                        });
-                                    }
+                                measureDataRequest(query).then(function () {
+                                    response.render('pages/submit', {
+                                        text: "Daten erfolgreich eingetragen!",
+                                        user: request.session.username,
+                                        measureListData: measureList
+                                    });
+                                }).catch(function (error) { // Reload page after values were inserted
+                                    response.render('pages/submit', {
+                                        user: request.session.username,
+                                        text: "Fehler beim Eintragen der Daten!",
+                                        measureListData: measureList
+                                    });
                                 });
                             });
                         } else {
@@ -277,7 +280,9 @@ module.exports = function (app) {
                                 });
                             });
                         }
-                    });
+                    }).catch(function (error) {
+                        console.log(error);
+                    })
                 }
             }
         });
@@ -367,57 +372,55 @@ module.exports = function (app) {
                     }
 
                     // Insert into database
-                    measureDataRequest(sql, function (error) {
-                        if (error) {
-                            response.render('pages/createMeasure', {
-                                text: "Fehler bei der Erstellung der Kennzahl!",
-                                user: request.session.username,
-                            });
-                        } else {
-                            // Sort list of measures alphabetically by measure name
-                            measureList = measureList.sort(function (a, b) {
-                                if (a[0] < b[0]) {
-                                    return -1;
-                                }
-                                if (a[0] > b[0]) {
-                                    return 1;
-                                }
-                                return 0;
-                            });
+                    measureDataRequest(sql).then(function () {
+                        // Sort list of measures alphabetically by measure name
+                        measureList = measureList.sort(function (a, b) {
+                            if (a[0] < b[0]) {
+                                return -1;
+                            }
+                            if (a[0] > b[0]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
 
-                            // Sort measure descriptions, so they are ordered the same
-                            measureDescriptions = measureDescriptions.sort(function (a, b) {
-                                if (a[0] < b[0]) {
-                                    return -1;
-                                }
-                                if (a[0] > b[0]) {
-                                    return 1;
-                                }
-                                return 0;
-                            });
+                        // Sort measure descriptions, so they are ordered the same
+                        measureDescriptions = measureDescriptions.sort(function (a, b) {
+                            if (a[0] < b[0]) {
+                                return -1;
+                            }
+                            if (a[0] > b[0]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
 
-                            // Sort role descriptions, so they are ordered the same
-                            roleList = roleList.sort(function (a, b) {
-                                if (a[0] < b[0]) {
-                                    return -1;
-                                }
-                                if (a[0] > b[0]) {
-                                    return 1;
-                                }
-                                return 0;
-                            });
+                        // Sort role descriptions, so they are ordered the same
+                        roleList = roleList.sort(function (a, b) {
+                            if (a[0] < b[0]) {
+                                return -1;
+                            }
+                            if (a[0] > b[0]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
 
-                            // Write new arrays to txt file
-                            arrayToTxt('roles', roleList);
-                            arrayToTxt('tables', measureList);
-                            arrayToTxt('desc', measureDescriptions);
+                        // Write new arrays to txt file
+                        arrayToTxt('roles', roleList);
+                        arrayToTxt('tables', measureList);
+                        arrayToTxt('desc', measureDescriptions);
 
-                            response.render('pages/createMeasure', {
-                                text: "Kennzahl erfolgreich erstellt!",
-                                user: request.session.username,
-                            });
-                        }
-                    });
+                        response.render('pages/createMeasure', {
+                            text: "Kennzahl erfolgreich erstellt!",
+                            user: request.session.username,
+                        });
+                    }).catch(function (error) {
+                        response.render('pages/createMeasure', {
+                            text: "Fehler bei der Erstellung der Kennzahl!",
+                            user: request.session.username,
+                        });
+                    })
                 });
             });
         });
@@ -515,29 +518,24 @@ module.exports = function (app) {
         }
 
         // Delete entry from the database
-        deleteMeasureFromDB(tableName, function (error) {
-            if (error || !found) {
-                console.log(error);
-                // Render page again with information text
-                loadTextFile('tables', function (measureList) {
-                    response.render('pages/admin/showMeasures', {
-                        user: request.session.username,
-                        measures: measureList,
-                        text: 'Fehler beim Löschen der Kennzahl.'
-                    });
+        deleteMeasureFromDB(tableName).then(function () {
+            // Render page again with information text
+            loadTextFile('tables', function (measureList) {
+                response.render('pages/admin/showMeasures', {
+                    user: request.session.username,
+                    measures: measureList,
+                    text: 'Kennzahl erfolgreich gelöscht.'
                 });
-                // Only delete from sql database if it existed before
-            } else if (found) {
-                // Render page again with information text
-                loadTextFile('tables', function (measureList) {
-                    response.render('pages/admin/showMeasures', {
-                        user: request.session.username,
-                        measures: measureList,
-                        text: 'Kennzahl erfolgreich gelöscht.'
-                    });
+            });
+        }).catch(function (error) {
+            loadTextFile('tables', function (measureList) {
+                response.render('pages/admin/showMeasures', {
+                    user: request.session.username,
+                    measures: measureList,
+                    text: 'Fehler beim Löschen der Kennzahl.'
                 });
-            }
-        })
+            });
+        });
     });
 
     /**
@@ -563,7 +561,7 @@ module.exports = function (app) {
     // Loads simple help page
     app.get('/help', function (request, response) {
         if (request.session.loggedin) {
-            checkRolePermissions('admin', request, function (result) {
+            checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
                     response.render('pages/admin/adminHelp', {
                         user: request.session.username
@@ -573,6 +571,9 @@ module.exports = function (app) {
                         user: request.session.username
                     });
                 }
+                // Can we even reach this?
+            }).catch(function (error) {
+                console.log(error);
             });
         } else {
             response.render('pages/errors/loginError');
@@ -637,7 +638,7 @@ module.exports = function (app) {
     // Display menu for creating new key figures
     app.get('/createMeasure', function (request, response) {
         if (request.session.loggedin) {
-            checkRolePermissions('user', request, function (result) {
+            checkRolePermissions('user', request).then(function (result) {
                 if (result) {
                     response.render('pages/createMeasure', {
                         user: request.session.username,
@@ -646,7 +647,9 @@ module.exports = function (app) {
                 } else {
                     response.render('pages/errors/adminError')
                 }
-            });
+            }).catch(function (error) {
+                console.log(error);
+            })
         } else {
             response.render('pages/errors/loginError');
         }
@@ -655,7 +658,7 @@ module.exports = function (app) {
     // Displays admin index page
     app.get('/admin', function (request, response) {
         if (request.session.loggedin) {
-            checkRolePermissions('admin', request, function (result) {
+            checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
                     response.render('pages/admin/admin', {
                         user: request.session.username,
@@ -665,7 +668,9 @@ module.exports = function (app) {
                     response.render('pages/errors/adminError');
                     console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
                 }
-            });
+            }).catch(function (error) {
+                console.log(error);
+            })
         } else {
             response.render('pages/errors/loginError');
         }
@@ -674,7 +679,7 @@ module.exports = function (app) {
     // Display basic managing information for a superuser or admin
     app.get('/stats', function (request, response) {
         if (request.session.loggedin) {
-            checkRolePermissions('admin', request, function (result) {
+            checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
                     response.render('pages/stats', {
                         user: request.session.username
@@ -683,7 +688,9 @@ module.exports = function (app) {
                     response.render('pages/errors/adminError');
                     console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
                 }
-            });
+            }).catch(function (error) {
+                console.log(error);
+            })
         } else {
             response.render('pages/errors/loginError');
         }
@@ -692,7 +699,7 @@ module.exports = function (app) {
     // Display user creation page
     app.get('/createUser', function (request, response) {
         if (request.session.loggedin) {
-            checkRolePermissions('admin', request, function (result) {
+            checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
                     response.render('pages/admin/createUser', {
                         user: request.session.username
@@ -701,7 +708,9 @@ module.exports = function (app) {
                     response.render('pages/errors/adminError');
                     console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
                 }
-            });
+            }).catch(function (error) {
+                console.log(error);
+            })
         } else {
             response.render('pages/errors/loginError');
         }
@@ -711,11 +720,10 @@ module.exports = function (app) {
     // Display user creation page
     app.get('/showUser', function (request, response) {
         if (request.session.loggedin) {
-            checkRolePermissions('admin', request, function (result) {
+            checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
                     // Load user from database
-                    getAllUsersFromDB(function (result, error) {
-                        if (error) console.log(error);
+                    getAllUsersFromDB().then(function (result) {
                         role = (result[0].role);
                         let sendString = "";
 
@@ -729,12 +737,17 @@ module.exports = function (app) {
                             user: request.session.username,
                             result: sendString
                         });
+                    }).catch(function (error) {
+                        // TODO: create page with error message
+                        console.log(error);
                     });
                 } else {
                     response.render('pages/errors/adminError');
                     console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
                 }
-            });
+            }).catch(function (error) {
+                console.log(error);
+            })
         } else {
             response.render('pages/errors/loginError');
         }
@@ -744,7 +757,7 @@ module.exports = function (app) {
     app.get('/showMeasures', function (request, response) {
         loadTextFile('tables', function (measureList) {
             if (request.session.loggedin) {
-                checkRolePermissions('admin', request, function (result) {
+                checkRolePermissions('admin', request).then(function (result) {
                     if (result) {
                         response.render('pages/admin/showMeasures', {
                             user: request.session.username,
@@ -754,7 +767,9 @@ module.exports = function (app) {
                     } else {
                         response.render('pages/error/adminError');
                     }
-                });
+                }).catch(function (error) {
+                    console.log(error);
+                })
             }
         });
     });
@@ -829,45 +844,52 @@ module.exports = function (app) {
         callback(array);
     }
 
+    // TODO: update javadoc and move to different file
+
     /**
      * Query database with specified username, check if user has the needed permissions, returns true or false in callback.
      * @param {Role that is checked.} role 
      * @param {Current Request, contains user information, we need the username.} request 
      * @param {Return true if user has the right role, false if not.} callback 
      */
-    const checkRolePermissions = function (role, request, callback) {
-        let result = [];
-        let allowed = false;
+    function checkRolePermissions(role, request) {
+        return new Promise(function (resolve, reject) {
+            let result = [];
+            let allowed = false;
 
-        // Query database for user
-        connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
-            if (err) return callback(err);
-            if (res.length) {
-                for (let i = 0; i < res.length; i++) {
-                    result.push(res[i]);
-                }
-            }
-
-            userRoles = result[0].role.split('_');
-            measureRoles = role.split('_');
-
-            // Always allow admin access, don't need for loop for simple cases
-            for (i = 0; i < userRoles.length; i++) {
-                for (j = 0; j < measureRoles.length; j++) {
-                    // Remove semicolon, why is it even there?
-                    if (measureRoles[j].includes(";")) {
-                        measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
+            // Query database for user
+            connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
+                if (err) {
+                    return reject(err);
+                } else {
+                    if (res.length) {
+                        for (let i = 0; i < res.length; i++) {
+                            result.push(res[i]);
+                        }
                     }
 
-                    // Just split for visibility
-                    if (userRoles[i] === 'admin' || (userRoles[i] === 'user' && measureRoles[j] !== 'admin')) {
-                        allowed = true;
-                    } else if (userRoles[i] === measureRoles[j]) {
-                        allowed = true;
+                    userRoles = result[0].role.split('_');
+                    measureRoles = role.split('_');
+
+                    // Always allow admin access, don't need for loop for simple cases
+                    for (i = 0; i < userRoles.length; i++) {
+                        for (j = 0; j < measureRoles.length; j++) {
+                            // Remove semicolon, why is it even there?
+                            if (measureRoles[j].includes(";")) {
+                                measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
+                            }
+
+                            // Just split for visibility
+                            if (userRoles[i] === 'admin' || (userRoles[i] === 'user' && measureRoles[j] !== 'admin')) {
+                                allowed = true;
+                            } else if (userRoles[i] === measureRoles[j]) {
+                                allowed = true;
+                            }
+                        }
                     }
+                    resolve(allowed);
                 }
-            }
-            callback(allowed);
+            });
         });
     }
 
@@ -875,18 +897,19 @@ module.exports = function (app) {
      * Retrieve all users from the database.
      * @param {Contains all results or error if query couldn't be executed.} callback 
      */
-    const getAllUsersFromDB = function (callback) {
-        let result = [];
-
-        // Get all users from the database and put them in array
-        connectionLogin.query('SELECT * FROM accounts', function (err, res) {
-            if (err) return callback(err);
-            if (res.length) {
-                for (i = 0; i < res.length; i++) {
-                    result.push(res[i]);
+    function getAllUsersFromDB() {
+        return new Promise(function (resolve, reject) {
+            let result = [];
+            // Get all users from the database and put them in array
+            connectionLogin.query('SELECT * FROM accounts', function (err, res) {
+                if (err) return reject(err);
+                if (res.length) {
+                    for (i = 0; i < res.length; i++) {
+                        result.push(res[i]);
+                    }
                 }
-            }
-            callback(result);
+                resolve(result);
+            });
         });
     }
 
@@ -895,12 +918,17 @@ module.exports = function (app) {
      * @param {Tablename that is to be queried from the database.} tableName 
      * @param {Returns error if query fails.} callback 
      */
-    const getMeasureFromDB = function (tableName, callback) {
-        const query = 'SELECT * FROM ' + tableName + ';';
+    function getMeasureFromDB(tableName) {
+        return new Promise(function (resolve, reject) {
+            console.log('promise called');
 
-        connectionData.query(query, function (err, res) {
-            if (err) return callback(null, err);
-            callback(res, null);
+            connectionData.query('SELECT * FROM ' + tableName + ';', function (err, res) {
+                if (err) {
+                    return reject(err);
+                } else {
+                    resolve(res);
+                }
+            });
         });
     }
 
@@ -909,10 +937,12 @@ module.exports = function (app) {
      * @param {Query hast to be passed here. TODO: maybe build query in this method} query 
      * @param {Returns error if insertion failed.} callback 
      */
-    const measureDataRequest = function (query, callback) {
-        connectionData.query(query, function (err) {
-            if (err) return callback(err);
-            callback();
+    function measureDataRequest(query) {
+        return new Promise(function (resolve, reject) {
+            connectionData.query(query, function (err) {
+                if (err) return reject(err);
+                resolve();
+            });
         });
     }
 
@@ -921,10 +951,12 @@ module.exports = function (app) {
      * @param {Table to be deleted.} tableName 
      * @param {Returns error if table couldn't be deleted.} callback 
      */
-    const deleteMeasureFromDB = function (tableName, callback) {
-        connectionData.query('DROP TABLE ' + tableName, function (err) {
-            if (err) return callback(err);
-            callback();
+    function deleteMeasureFromDB(tableName) {
+        return new Promise(function (resolve, reject) {
+            connectionData.query('DROP TABLE ' + tableName, function (err) {
+                if (err) return reject(err);
+                resolve();
+            });
         });
     }
 
@@ -933,40 +965,43 @@ module.exports = function (app) {
      * @param {Passed request, it contains all the needed information passed down from the body.} request 
      * @param {Returns error if insertion of user into the database fails.} callback 
      */
-    const insertUserIntoDB = function (request, callback) {
-        // Check password strength
-        if (pwCheck(request.body.password)) {
-            // Hash insert password
-            bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
-                if (!err) {
-                    // Insert the user into database, question marks provide prevention against sql attack
-                    const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
-                    connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
-                        console.log(request.body.role);
-                        if (err) return callback(err);
-                        callback();
-                    });
-                } else {
-                    console.log(err);
-                }
-            });
-            // Return error if test failed
-        } else {
-            err = "pw";
-            console.log("password check failed");
-            return callback(err);
-        }
+    function insertUserIntoDB(request) {
+        return new Promise(function (resolve, reject) {
+            // Check password strength
+            if (pwCheck(request.body.password)) {
+                // Hash insert password
+                bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
+                    if (!err) {
+                        // Insert the user into database, question marks provide prevention against sql attack
+                        const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
+                        connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
+                            console.log(request.body.role);
+                            if (err) return reject(err);
+                            resolve();
+                        });
+                    } else {
+                        console.log(err);
+                    }
+                });
+                // Return error if test failed
+            } else {
+                err = "pw";
+                console.log("password check failed");
+                return reject(err);
+            }
+        });
     }
-
     /**
      * Deletes user with passed id from the accounts database.
      * @param {Passed id, used to identify the user in the database.} id 
      * @param {Returns error if deletion fails.} callback 
      */
-    const deleteUserFromDB = function (id, callback) {
-        connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
-            if (err) return callback(err);
-            callback();
+    function deleteUserFromDB(id) {
+        return new Promise(function (resolve, reject) {
+            connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
+                if (err) return reject(err);
+                resolve();
+            });
         });
     }
 
