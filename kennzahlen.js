@@ -45,8 +45,10 @@ app.use(ddos.express)
 // Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');
 
-// Security function
+// Prevention against multiple attacks
 app.use(helmet());
+app.use(helmet.noCache());
+app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
 
 // Set icon for tabs etc.
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))

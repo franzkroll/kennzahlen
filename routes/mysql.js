@@ -34,7 +34,7 @@ function getUserFromDB(username) {
     return new Promise(function (resolve, reject) {
         let result = [];
         // Get all users from the database and put them in array
-        connectionLogin.query('SELECT * FROM accounts WHERE username = ' + connectionLogin.escape(username), function (err, res) {
+        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', username, function (err, res) {
             if (err) return reject(err);
             if (res.length) {
                 for (i = 0; i < res.length; i++) {
@@ -78,7 +78,7 @@ function checkRolePermissions(role, request) {
         let allowed = false;
 
         // Query database for user
-        connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
+        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', request.session.username, function (err, res) {
             if (err) {
                 return reject(err);
             } else {
@@ -145,7 +145,7 @@ function measureDataRequest(query) {
 }
 
 /**
- * Deletes specified table from the database.
+ * Deletes specified table from the database. No sql injection needed because tableName ist checked against a list.
  * @param {Table to be deleted.} tableName 
  * @param {Returns error if table couldn't be deleted.} callback 
  */
@@ -170,7 +170,7 @@ function insertUserIntoDB(request) {
             // Hash insert password
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
-                    // Insert the user into database, question marks provide prevention against sql attack
+                    // Insert the user into database
                     const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
                     connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
                         if (err) return reject(err);
@@ -195,7 +195,7 @@ function insertUserIntoDB(request) {
  */
 function deleteUserFromDB(id) {
     return new Promise(function (resolve, reject) {
-        connectionLogin.query('DELETE FROM accounts where id=' + connectionLogin.escape(id), function (err) {
+        connectionLogin.query('DELETE FROM accounts where id = ?', id, function (err) {
             if (err) return reject(err);
             resolve();
         });
@@ -209,6 +209,9 @@ function deleteUserFromDB(id) {
 function pwCheck(password) {
     const schema = new passwordValidator();
 
+    // List with forbidden passwords
+    const dumbPasswords = ['Passw0rt', 'Passwort123', 'passwort', 'password', 'kennzahlen', 'Kennzahlen'];
+
     schema
         .is().min(8) // Minimum length 8
         .is().max(100) // Maximum length 100
@@ -216,7 +219,7 @@ function pwCheck(password) {
         .has().lowercase() // Must have lowercase letters
         .has().digits() // Must have digits
         .has().not().spaces() // Should not have spaces
-        .is().not().oneOf(['Passw0rt', 'Passwort123', 'passwort', 'password']); // Blacklist these values
+        .is().not().oneOf(dumbPasswords); // Blacklist these values
 
     // Save attributes that don't pass in list
     const checkedPw = schema.validate(password, {

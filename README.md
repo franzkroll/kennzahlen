@@ -51,6 +51,20 @@ port:4444 node server.js
 ```
 (Beispiel mit Port 4444)
 
+Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2). Diese sorgt für einen automatischen Neustart bei Absturz der App. Starten, bzw. stoppen erfolgt dann mit folgenden befehlen:
+
+```sh
+pm2 start kennzahlen
+pm2 stop kennzahlen
+```
+
+Folgende Befehle geben Statusinformation über die Anwendung:
+
+```sh
+pm2 ls
+pm2 monit
+```
+
 Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben.
 
 

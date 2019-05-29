@@ -263,7 +263,7 @@ const createHelper = function (request, response) {
             } else {
                 response.render('pages/errors/adminError')
             }
-
+            // Catch sql errors here and print them
         }).catch(function (error) {
             console.log(error);
         })

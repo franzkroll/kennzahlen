@@ -433,6 +433,7 @@ and also iPads specifically.
 
 /* Collapsible */
 /* Style the button that is used to open and close the collapsible content */
+
 .collapsible {
     background-color: #eee;
     color: #444;
@@ -449,11 +450,13 @@ and also iPads specifically.
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+
 .collapsible:hover {
     background-color: rgba(65, 105, 225, 0.7);
 }
 
 /* Style the collapsible content. Note: hidden by default */
+
 .content {
     font-family: Tahoma, Geneva, sans-serif;
     padding: 10px 14px;
@@ -470,6 +473,7 @@ and also iPads specifically.
 }
 
 /* Printing style sheet, remove everything thats unnecessary. */
+
 @media screen {
     .misc-text-title {
         display: none;
