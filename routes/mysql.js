@@ -188,6 +188,7 @@ function insertUserIntoDB(request) {
         }
     });
 }
+
 /**
  * Deletes user with passed id from the accounts database.
  * @param {Passed id, used to identify the user in the database.} id 

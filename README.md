@@ -10,7 +10,7 @@ Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, b
 
 Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt. 
 
-Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die npm packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
+Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die npm benötigten packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
 
 ```sh
 git clone https://github.com/franzkroll/kennzahlen.git
@@ -19,7 +19,7 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in /routes/index.js, im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. 
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in [routes/mysql.js](routes/mysql.js), im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. 
 
 ### Datenfelder die an lokale MySQL-Zugangsdaten angepasst werden müssen:
 
@@ -51,9 +51,10 @@ port:4444 node server.js
 ```
 (Beispiel mit Port 4444)
 
-Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2). Diese sorgt für einen automatischen Neustart bei Absturz der App. Starten, bzw. stoppen erfolgt dann mit folgenden befehlen:
+Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2). Diese sorgt für einen automatischen Neustart bei Absturz der App. Installation, Starten, bzw. stoppen erfolgt dann mit folgenden befehlen:
 
 ```sh
+npm install pm2
 pm2 start kennzahlen
 pm2 stop kennzahlen
 ```
@@ -114,10 +115,10 @@ Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es mög
 
 Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich.
 
-Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer.
+Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer und das Löschen von Kennzahlen.
 Neu erstellte Benutzer müssen einen eindeutigen Namen sowie E-Mail Adresse haben. Das Passwort wird automatisch auf gute Sicherheit überprüft.
 
-About zeigt Kontaktinformationen.
+Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen über das Web-Interface. About zeigt Kontaktinformationen.
 
 ## Bisher noch fehlende Funktionen
 

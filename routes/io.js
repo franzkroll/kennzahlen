@@ -10,7 +10,7 @@ function loadTextFile(name) {
     return new Promise(function (resolve, reject) {
         let array = [];
         let text;
-        // Read file from page into text string
+        // Try to read file from page into text string
         try {
             text = fs.readFileSync('./' + name + '.txt').toString('utf-8');
             // Split at line breaks and put it into array
@@ -21,6 +21,7 @@ function loadTextFile(name) {
                 }
             }
             resolve(array);
+            console.log('Read from file.');
         } catch (error) {
             reject(err);
         }
@@ -28,12 +29,13 @@ function loadTextFile(name) {
 }
 
 /**
- * Loads txt file from disk and converts it to an array. Convert to promise? But not really necessary
+ * Loads txt file from disk and converts it to an array. Convert to promise? But not really necessary, we don't 
+ * really care if it takes longer to write the data onto the disk.
  * @param {Data to be loaded from disk. Currently desc, table or roles.} name 
  * @param {Array with the data that is returned.} array 
  */
 const arrayToTxt = function (name, array) {
-    // Open file stream
+    // Try to write array to disk, overwrites existing file
     try {
         let file = fs.createWriteStream(name + '.txt');
 
