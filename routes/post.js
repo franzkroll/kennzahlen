@@ -6,6 +6,7 @@
 const bcrypt = require('bcrypt');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
+const mysql = require('mysql');
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -104,6 +105,8 @@ const deleteUserHelper = function (request, response) {
 const visualPostHelper = async (request, response) => {
     let measureList, roleList;
 
+    let found = false;
+
     // Load Measures and their corresponding roles from disk.
     try {
         measureList = await IO.loadTextFile('tables');
@@ -196,15 +199,15 @@ const submitDataHelper = async (request, response) => {
 
     // Load user role from database
     for (i = 0; i < roleList.length; i++ && !found) {
-        // If measure is found, check if saved role equals current role and admin/user
-        try {
-            // Can only get it here because we need i
-            result = await SQL.checkRolePermissions(roleList[i][1], request);
-        } catch (error) {
-            console.log(error);
-        }
-
         if (request.body.measure === roleList[i][0]) {
+            // If measure is found, check if saved role equals current role and admin/user
+            try {
+                // Can only get it here because we need i
+                result = await SQL.checkRolePermissions(roleList[i][1], request);
+            } catch (error) {
+                console.log(error);
+            }
+
             found = true;
             // Check roles if measure is found in access table
             if (result) {
@@ -326,7 +329,6 @@ const createMeasureHelper = async (request, response) => {
             const years = measureList[i][1].trim().split(':');
             measureExists = true;
             for (j = 0; j < years.length; j++) {
-                console.log(years[j]);
                 // Show error if year already exists, which means the measure already exists in the system
                 if (years[j] == request.body.year) {
                     yearExists = true;

@@ -8,7 +8,6 @@ const fs = require('fs');
  */
 function loadTextFile(name) {
     return new Promise(function (resolve, reject) {
-        console.log(name);
         let array = [];
         let text;
         // Read file from page into text string

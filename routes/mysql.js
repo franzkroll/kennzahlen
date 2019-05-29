@@ -114,53 +114,6 @@ function checkRolePermissions(role, request) {
 }
 
 /**
- * Query database with specified username, check if user has the needed permissions, returns true or false in callback.
- * @param {Role that is checked.} role 
- * @param {Current Request, contains user information, we need the username.} request 
- * @param {Return true if user has the right role, false if not.} callback 
- */
-function checkRolePermissions(role, request) {
-    return new Promise(function (resolve, reject) {
-        let result = [];
-        let allowed = false;
-
-        // Query database for user
-        connectionLogin.query('SELECT * FROM accounts WHERE username =' + connectionLogin.escape(request.session.username), function (err, res) {
-            if (err) {
-                return reject(err);
-            } else {
-                if (res.length) {
-                    for (let i = 0; i < res.length; i++) {
-                        result.push(res[i]);
-                    }
-                }
-
-                userRoles = result[0].role.split('_');
-                measureRoles = role.split('_');
-
-                // Always allow admin access, don't need for loop for simple cases
-                for (i = 0; i < userRoles.length; i++) {
-                    for (j = 0; j < measureRoles.length; j++) {
-                        // Remove semicolon, why is it even there?
-                        if (measureRoles[j].includes(";")) {
-                            measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
-                        }
-
-                        // Just split for visibility
-                        if (userRoles[i] === 'admin' || (userRoles[i] === 'user' && measureRoles[j] !== 'admin')) {
-                            allowed = true;
-                        } else if (userRoles[i] === measureRoles[j]) {
-                            allowed = true;
-                        }
-                    }
-                }
-                resolve(allowed);
-            }
-        });
-    });
-}
-
-/**
  * Queries database for a complete measure, no sql injection prevention needed because tableName is taken from predefined list.
  * @param {Tablename that is to be queried from the database.} tableName 
  * @param {Returns error if query fails.} callback 
