@@ -1,3 +1,0 @@
-Anzahl der Alarmierungen,Ausgewertet wird die Anzahl der Alarmierungen differenziert nach Einsatzmitteltypen.,Beschreibung 1,Beschreibung 2,Beschreibung 3,Beschreibung 4,Beschreibung 5,Beschreibung 6,Beschreibung 7,Beschreibung 8,Beschreibung 9,Beschreibung 10;
-Anzahl der Anrufe,Ausgewertet wird die Anzahl der Anrufe in der Leitstelle Lausitz.,Beschreibung 1,Beschreibung 2,Beschreibung 3;
-Einsatzzahlen,Die Kennzahl gibt die Einsatzzahlen eines Zeitraums getrennt nach Einsatzarten an.,Beschreibung 1,Beschreibung 2,Beschreibung 3,Beschreibung 4,Beschreibung 5,Beschreibung 6,Beschreibung 7,Beschreibung 8;
