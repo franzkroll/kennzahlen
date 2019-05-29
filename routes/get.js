@@ -2,35 +2,37 @@
  * Contains all the functions used in get routes.
  */
 
-// TODO: comments
-
 // Imports..
 const IO = require('./io.js');
 const SQL = require('./mysql.js');
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Display index page after logging in.
+ * @param {Used for checking for a successful log in} request 
+ * @param {Sends back index page to the user} response 
  */
 const homeHelper = function (request, response) {
+    // Make sure that the user is logged in
     if (request.session.loggedin) {
-        response.setHeader('Content-Type', 'text/html');
+        // Show index page
         response.render('pages/index', {
             user: request.session.username
         });
+        // Show error page if not
     } else {
         response.render('pages/errors/loginError');
     }
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Display page for loading data of measures. Loads list with tables and shows them to the user.
+ * @param {Used for checking login status of the user.} request 
+ * @param {Renders page back to the user.} response 
  */
 const visualHelper = function (request, response) {
+    // Check if user is logged in
     if (request.session.loggedin) {
+        // Load file with tables and sent them to the client
         IO.loadTextFile('tables').then(function (measureList) {
             response.render('pages/visual', {
                 user: request.session.username,
@@ -39,6 +41,7 @@ const visualHelper = function (request, response) {
                 text: "",
                 measureListData: measureList
             });
+            // Catch errors while loading from disk
         }).catch(function (error) {
             console.log(error);
         })
@@ -48,36 +51,45 @@ const visualHelper = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Loads descriptions for measure in the system when the user calls the corresponding function from the index page.
+ * @param {Used for checking login status of the user.} request 
+ * @param {Renders page back to the user.} response 
  */
 const loadHelpData = async (request, response) => {
-    try {
-        const measureList = await IO.loadTextFile('tables');
-        const measureDescriptions = await IO.loadTextFile('desc');
+    // Make it only accessible to logged in users
+    if (request.session.loggedin) {
+        // Load tables from disc and show them to the user with new page
+        try {
+            const measureList = await IO.loadTextFile('tables');
+            const measureDescriptions = await IO.loadTextFile('desc');
 
-        response.render('pages/measureHelp', {
-            user: request.session.username,
-            measureListData: measureList,
-            measureDescriptions: measureDescriptions
-        });
-    } catch (error) {
-        console.log(error);
+            response.render('pages/measureHelp', {
+                user: request.session.username,
+                measureListData: measureList,
+                measureDescriptions: measureDescriptions
+            });
+            // Log file errors
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        response.render('pages/errors/loginError');
     }
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Logs out user if a session exists.
+ * @param {Used to check if a session exists.} request 
+ * @param {Used for redirecting user to the home page.} response 
  */
 const logoutHelper = function (request, response) {
     if (request.session) {
+        // Log event in log file
         console.log("User '" + request.session.username + "' logged out.");
+        // Try to destroy session element and redirect user to /
         request.session.destroy(function (err) {
             if (err) {
-                return next(err);
+                console.log(error);
             } else {
                 return response.redirect('/');
             }
@@ -86,9 +98,9 @@ const logoutHelper = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Loads all user from the database and sends them to the client
+ * @param {Used for checking login status of the user.} request 
+ * @param {Renders page back to the user.} response 
  */
 const showUserHelper = function (request, response) {
     if (request.session.loggedin) {
@@ -112,10 +124,12 @@ const showUserHelper = function (request, response) {
                 }).catch(function (error) {
                     console.log(error);
                 });
+                // Display error page if user had insufficient rights
             } else {
                 response.render('pages/errors/adminError');
                 console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
             }
+            // Mysql errors are caught here.
         }).catch(function (error) {
             console.log(error);
         })
@@ -125,13 +139,15 @@ const showUserHelper = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Used in admin sections, shows measures to the admin. Admin has the possibility to delete measures.
+ * @param {Used for checking login status.} request 
+ * @param {Send back template page and user data.} response 
  */
 const showHelper = function (request, response) {
-    IO.loadTextFile('tables').then(function (measureList) {
-        if (request.session.loggedin) {
+    // Check if user is logged in
+    if (request.session.loggedin) {
+        // Load file with tables and check if logged in user is admin.
+        IO.loadTextFile('tables').then(function (measureList) {
             SQL.checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
                     response.render('pages/admin/showMeasures', {
@@ -142,21 +158,26 @@ const showHelper = function (request, response) {
                 } else {
                     response.render('pages/error/adminError');
                 }
+                // Log mysql errors here
             }).catch(function (error) {
                 console.log(error);
             })
-        }
-    }).catch(function (error) {
-        console.log(error);
-    })
+            // Log file IO errors here
+        }).catch(function (error) {
+            console.log(error);
+        })
+    } else {
+        response.render('pages/errors/loginError');
+    }
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Renders page for creating new users in the admin section.
+ * @param {Used for login and role check.} request 
+ * @param {Sends back error with success or failure message.} response 
  */
 const createUser = function (request, response) {
+    // Check if user is logged in and is admin
     if (request.session.loggedin) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
             if (result) {
@@ -167,6 +188,7 @@ const createUser = function (request, response) {
                 response.render('pages/errors/adminError');
                 console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
             }
+            // SQL errors are printed here
         }).catch(function (error) {
             console.log(error);
         });
@@ -176,9 +198,9 @@ const createUser = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Loads help section that explains section of the program. Admin sees more info than a normal user.
+ * @param {Used for login and role check.} request 
+ * @param {Sends back correct help page for the user.} response 
  */
 const helpFunction = async (request, response) => {
     if (request.session.loggedin) {
@@ -202,11 +224,12 @@ const helpFunction = async (request, response) => {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Loads table data, sends it to the client. There all elements are created for submitting new data.
+ * @param {Used for login and role check.} request 
+ * @param {Sends back submit page with table info.} response 
  */
 const submitHelper = function (request, response) {
+    // Check if user is logged in 
     if (request.session.loggedin) {
         IO.loadTextFile('tables').then(function (measureList) {
             response.render('pages/submit', {
@@ -214,6 +237,7 @@ const submitHelper = function (request, response) {
                 text: "",
                 measureListData: measureList
             });
+            // Catch file IO errors
         }).catch(function (error) {
             console.log(error);
         })
@@ -223,11 +247,12 @@ const submitHelper = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Renders page for creating new measures to the user.
+ * @param {Used for login and role check.} request 
+ * @param {Sends back createUser page.} response 
  */
 const createHelper = function (request, response) {
+    // Check if user is logged in and has rights to create new measures
     if (request.session.loggedin) {
         SQL.checkRolePermissions('user', request).then(function (result) {
             if (result) {
@@ -238,6 +263,7 @@ const createHelper = function (request, response) {
             } else {
                 response.render('pages/errors/adminError')
             }
+
         }).catch(function (error) {
             console.log(error);
         })
@@ -247,11 +273,12 @@ const createHelper = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Renders admin index page to the client.
+ * @param {Used for login and role check.} request 
+ * @param {Sends back createUser page.} response 
  */
 const adminHelper = function (request, response) {
+    // Check if user is logged in and is admin
     if (request.session.loggedin) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
             if (result) {
@@ -263,30 +290,7 @@ const adminHelper = function (request, response) {
                 response.render('pages/errors/adminError');
                 console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
             }
-        }).catch(function (error) {
-            console.log(error);
-        })
-    } else {
-        response.render('pages/errors/loginError');
-    }
-}
-
-/**
- * 
- * @param {*} request 
- * @param {*} response 
- */
-const statHelper = function (request, response) {
-    if (request.session.loggedin) {
-        SQL.checkRolePermissions('admin', request).then(function (result) {
-            if (result) {
-                response.render('pages/stats', {
-                    user: request.session.username
-                });
-            } else {
-                response.render('pages/errors/adminError');
-                console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
-            }
+            // Print sql errors here
         }).catch(function (error) {
             console.log(error);
         })
@@ -308,6 +312,5 @@ module.exports = {
     submitHelper: submitHelper,
     createHelper: createHelper,
     adminHelper: adminHelper,
-    statHelper: statHelper,
     helpFunction: helpFunction
 }

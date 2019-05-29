@@ -35,19 +35,23 @@ function loadTextFile(name) {
  */
 const arrayToTxt = function (name, array) {
     // Open file stream
-    let file = fs.createWriteStream(name + '.txt');
+    try {
+        let file = fs.createWriteStream(name + '.txt');
 
-    file.on('error', function (err) {
-        console.log(err);
-    });
-    // Append each array element to file
-    array.forEach(function (v) {
-        if (v != '') {
-            file.write(v.join(',') + '\n');
-        }
-    });
-    file.end();
-    console.log('Wrote to file');
+        file.on('error', function (err) {
+            console.log(err);
+        });
+        // Append each array element to file
+        array.forEach(function (v) {
+            if (v != '') {
+                file.write(v.join(',') + '\n');
+            }
+        });
+        file.end();
+        console.log('Wrote to file');
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // Export function so they can be used elsewhere

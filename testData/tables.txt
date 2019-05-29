@@ -1,2 +1,0 @@
-Anzahl der Alarmierungen,2018,Gesamtzahl aller Alarmierungen,Feuerwehr,Katastrophenschutz,RTW,KTW,NEF,NAW,RTH,ITH,Sonstige,2$5_Anzahl_der_Alarmierungen;
-Anzahl der Anrufe,2018,Gesamtzahl aller Anrufe,Gesamtzahl aller Notrufe,Gesamtzahl aller Sprechwünsche Status 5,1$2_Anzahl_der_Anrufe;

@@ -2,70 +2,60 @@
  * Contains all the functions used in post routes.
  */
 
-//TODO: comments
-
 // Import needed functions
-const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 
-// Create SQL-Connection for accessing user data
-const connectionLogin = mysql.createConnection({
-    host: 'localhost',
-    user: 'dbaccess',
-    password: 'Pdgy#MW$Jud6F$_B',
-    database: 'nodelogin'
-});
-
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Called while logging in, queries database for user password, hashes the input password and compares 
+ * it with the queried password. Also contains error handling for things that can go wrong.
+ * @param {The request received from the client. Should contain body with username and password.} request 
+ * @param {Response sent to the client, either error page or rendering of index page if login was successful.} response 
  */
 const authHelper = function (request, response) {
+    // Grab username and password from body
     const username = request.body.username;
     const password = request.body.password;
 
-    if (username && password) {
-        // Query database for username
-        connectionLogin.query('SELECT * FROM accounts WHERE username = ' + connectionLogin.escape(username), function (error, results) {
-            if (error) console.log(error);
-            if (results.length > 0) {
-                // Hash and compare with stored hash
-                bcrypt.compare(password, results[0].password, function (err, res) {
-                    // Log in user if correct
-                    if (res === true) {
-                        request.session.loggedin = true;
-                        request.session.username = username;
-                        response.render('pages/index', {
-                            user: request.session.username
-                        });
-                        console.log("User '" + request.session.username + "' logged in.");
-                    } else {
-                        response.render('pages/errors/loginFailed');
-                    }
+    // Query database for username
+    SQL.getUserFromDB(username).then(function (results) {
+        // Hash and compare with stored hash
+        bcrypt.compare(password, results[0].password, function (err, res) {
+            // Log possible error
+            if (err) console.log(err);
+            // Log in user if correct
+            if (res === true) {
+                request.session.loggedin = true;
+                request.session.username = username;
+                response.render('pages/index', {
+                    user: request.session.username
                 });
+                console.log("User '" + request.session.username + "' logged in.");
             } else {
                 response.render('pages/errors/loginFailed');
             }
         });
-    } else {
+        // Catch sql errors
+    }).catch(function (error) {
+        if (error) console.log(error);
         response.render('pages/errors/loginFailed');
-    }
+    });
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Called after user has input data for a new user. Tries to insert it into the database.
+ * @param {Contains body with received user data.} request 
+ * @param {Sends new admin page to the user, either with success or error message.} response 
  */
 const createUserHelper = function (request, response) {
+    // Try to insert new user into the database.
     SQL.insertUserIntoDB(request).then(function () {
         response.render('pages/admin/admin', {
             user: request.session.username,
             text: 'Benutzer erfolgreich erstellt.'
         });
+        // Catch possible sql errors    
     }).catch(function (error) {
         let responseText;
         // Show corresponding error messages if password is unsafe or user already exists, user names have to be unique
@@ -84,18 +74,20 @@ const createUserHelper = function (request, response) {
 }
 
 /**
- * 
+ * Called after admin tried to the delete user from the database.
  * @param {*} request 
  * @param {*} response 
  */
 const deleteUserHelper = function (request, response) {
-    const id = request.body.id;
-    SQL.deleteUserFromDB(id).then(function () {
+    // Sent query to the database for deleting a user
+    SQL.deleteUserFromDB(request.body.id).then(function () {
         response.render('pages/admin/admin', {
             user: request.session.username,
             text: "Benutzer erfolgreich gelöscht."
         });
+        // Catch possible errors, log them and sent error page to the user
     }).catch(function (error) {
+        console.log(error);
         response.render('pages/admin/admin', {
             user: request.session.username,
             text: "Fehler beim Löschen des Benutzers."
@@ -104,13 +96,15 @@ const deleteUserHelper = function (request, response) {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Checks for role permissions after user has queried server for data of measures from sql. 
+ * Formats it correctly and sends it back to the user with a new page.
+ * @param {Contains requested measure and year.} request 
+ * @param {Sends measure data back to the user together with a new page.} response 
  */
 const visualPostHelper = async (request, response) => {
     let measureList, roleList;
 
+    // Load Measures and their corresponding roles from disk.
     try {
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
@@ -133,6 +127,9 @@ const visualPostHelper = async (request, response) => {
                             tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                         }
                     }
+
+                    // (Error handling could be simplified here)
+
                     // Query database if user has also entered a year 
                     if (request.body.year) {
                         tableName += "_" + request.body.year.trim();
@@ -148,6 +145,7 @@ const visualPostHelper = async (request, response) => {
                                 text: "Daten erfolgreich geladen!",
                                 measureListData: measureList
                             });
+                            // Show error if data query failed
                         }).catch(function (error) {
                             response.render('pages/visual', {
                                 user: request.session.username,
@@ -157,16 +155,8 @@ const visualPostHelper = async (request, response) => {
                                 measureListData: measureList
                             });
                         });
-                    } else {
-                        // Show error page if data couldn't be found
-                        response.render('pages/visual', {
-                            user: request.session.username,
-                            measureData: "",
-                            loadedTable: "",
-                            text: "Datensatz nicht vorhanden!",
-                            measureListData: measureList
-                        });
                     }
+                    // Show error page if rights check failed.
                 } else {
                     response.render('pages/visual', {
                         user: request.session.username,
@@ -176,6 +166,7 @@ const visualPostHelper = async (request, response) => {
                         measureListData: measureList
                     });
                 }
+                // Show error page if rights check failed.
             }).catch(function (error) {
                 console.log(error);
             })
@@ -184,9 +175,9 @@ const visualPostHelper = async (request, response) => {
 }
 
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Handles post request after user has submitted data. Checks if user has rights to input the data and tries to input it afterwards.
+ * @param {Request from the client, contains body with all necessary data for the sql request.} request 
+ * @param {Sends new submit page back to the user, either with error or success text.} response 
  */
 const submitDataHelper = async (request, response) => {
     let roleList, measureList, result;
@@ -276,15 +267,17 @@ const submitDataHelper = async (request, response) => {
                         user: request.session.username,
                         measureListData: measureList
                     });
-                }).catch(function (error) { // Reload page after values were inserted
+                    // Catch sql errors
+                }).catch(function (error) {
+                    console.log(error);
                     response.render('pages/submit', {
                         user: request.session.username,
                         text: "Fehler beim Eintragen der Daten!",
                         measureListData: measureList
                     });
                 });
-
             } else {
+                // Displayed when user has insufficient rights
                 console.log(request.body.username + ' tried accessing measure without correct rights.');
                 IO.loadTextFile('tables', function (measureListNew) {
                     response.render('pages/submit', {
@@ -299,7 +292,9 @@ const submitDataHelper = async (request, response) => {
 }
 
 /**
- * 
+ * Called when user tries to create a new measure. Has to check if table already exists, the new year already exists.
+ * If one of the above is true, then only the lists on disk are modified. If they don't exist already a new measure 
+ * is also created in the mysql database.
  * @param {*} request 
  * @param {*} response 
  */
@@ -392,39 +387,17 @@ const createMeasureHelper = async (request, response) => {
     }
 
     // Insert into database
-    SQL.measureDataRequest(sql).then(function () {
-        // Sort list of measures alphabetically by measure name
-        measureList = measureList.sort(function (a, b) {
-            if (a[0] < b[0]) {
-                return -1;
-            }
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            return 0;
-        });
-
-        // Sort measure descriptions, so they are ordered the same
-        measureDescriptions = measureDescriptions.sort(function (a, b) {
-            if (a[0] < b[0]) {
-                return -1;
-            }
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            return 0;
-        });
-
-        // Sort role descriptions, so they are ordered the same
-        roleList = roleList.sort(function (a, b) {
-            if (a[0] < b[0]) {
-                return -1;
-            }
-            if (a[0] > b[0]) {
-                return 1;
-            }
-            return 0;
-        });
+    SQL.measureDataRequest(sql).then(async () => {
+        try {
+            // Sort list of measures alphabetically by measure name
+            measureList = await sort2DArray(measureList);
+            // Sort measure descriptions, so they are ordered the same
+            measureDescriptions = await sort2DArray(measureDescriptions);
+            // Sort measure descriptions, so they are ordered the same
+            roleList = await sort2DArray(roleList);
+        } catch (error) {
+            console.log(error);
+        }
 
         // Write new arrays to txt file
         IO.arrayToTxt('roles', roleList);
@@ -435,6 +408,7 @@ const createMeasureHelper = async (request, response) => {
             text: "Kennzahl erfolgreich erstellt!",
             user: request.session.username,
         });
+        // Catch mysql errors from the database
     }).catch(function (error) {
         console.log(error);
         response.render('pages/createMeasure', {
@@ -445,7 +419,9 @@ const createMeasureHelper = async (request, response) => {
 }
 
 /**
- * 
+ * Called when client tried to delete a measure from the database. Only the lists on disk are modified 
+ * if only one year of the measure is deleted. If the measure only had this one year it also gets deleted 
+ * from the database.
  * @param {*} request 
  * @param {*} response 
  */
@@ -496,39 +472,17 @@ const deleteHelper = async (request, response) => {
                 measureList[i][1] = newYears.slice(0, newYears.length - 1);
             }
 
-            // Sort list of measures alphabetically by measure name, TODO: move sort to own function
-            measureList = measureList.sort(function (a, b) {
-                if (a[0] < b[0]) {
-                    return -1;
-                }
-                if (a[0] > b[0]) {
-                    return 1;
-                }
-                return 0;
-            });
-
-            // Sort measure descriptions, so they are ordered the same
-            measureDescriptions = measureDescriptions.sort(function (a, b) {
-                if (a[0] < b[0]) {
-                    return -1;
-                }
-                if (a[0] > b[0]) {
-                    return 1;
-                }
-                return 0;
-            });
-
-
-            // Sort measure descriptions, so they are ordered the same
-            roleList = roleList.sort(function (a, b) {
-                if (a[0] < b[0]) {
-                    return -1;
-                }
-                if (a[0] > b[0]) {
-                    return 1;
-                }
-                return 0;
-            });
+            // Try to sort arrays, print error if it fails
+            try {
+                // Sort list of measures alphabetically by measure name
+                measureList = await sort2DArray(measureList);
+                // Sort measure descriptions, so they are ordered the same
+                measureDescriptions = await sort2DArray(measureDescriptions);
+                // Sort measure descriptions, so they are ordered the same
+                roleList = await sort2DArray(roleList);
+            } catch (error) {
+                console.log(error);
+            }
 
             // Write new arrays to txt file
             IO.arrayToTxt('roles', roleList);
@@ -542,28 +496,54 @@ const deleteHelper = async (request, response) => {
         tableName += '_' + request.body.yearSelect.trim();
     }
 
+    // Load new measureList from disk 
+    let measureListNew;
+
+    try {
+        measureListNew = await IO.loadTextFile('tables');
+    } catch (error) {
+        console.log(error);
+    }
+
     // Delete entry from the database
     SQL.deleteMeasureFromDB(tableName).then(function () {
         // Render page again with information text
-        IO.loadTextFile('tables').then(function (measureList) {
-            response.render('pages/admin/showMeasures', {
-                user: request.session.username,
-                measures: measureList,
-                text: 'Kennzahl erfolgreich gelöscht.'
-            });
-        }).catch(function (error) {
-            console.log(error);
+        response.render('pages/admin/showMeasures', {
+            user: request.session.username,
+            measures: measureListNew,
+            text: 'Kennzahl erfolgreich gelöscht.'
         });
+        // Or catch mysql error and show user corresponding error
     }).catch(function (error) {
-        IO.loadTextFile('tables').then(function (measureList) {
-            response.render('pages/admin/showMeasures', {
-                user: request.session.username,
-                measures: measureList,
-                text: 'Fehler beim Löschen der Kennzahl.'
-            });
-        }).catch(function (error) {
-            console.log(error);
+        console.log(error);
+        response.render('pages/admin/showMeasures', {
+            user: request.session.username,
+            measures: measureListNew,
+            text: 'Fehler beim Löschen der Kennzahl.'
         });
+    });
+}
+
+/**
+ * Sorts a two-dimensional array by the value of the first entry in every array
+ * @param {Array to be sorted.} array 
+ */
+const sort2DArray = function (array) {
+    return new Promise(function (resolve, reject) {
+        try {
+            array = array.sort(function (a, b) {
+                if (a[0] < b[0]) {
+                    return -1;
+                }
+                if (a[0] > b[0]) {
+                    return 1;
+                }
+                return 0;
+            });
+            resolve(array);
+        } catch (error) {
+            reject(error);
+        }
     });
 }
 

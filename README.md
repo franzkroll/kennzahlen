@@ -105,6 +105,12 @@ Neu erstellte Benutzer müssen einen eindeutigen Namen sowie E-Mail Adresse habe
 
 About zeigt Kontaktinformationen.
 
+## Bisher noch fehlende Funktionen
+
+* Kennzahlen, die nur quartalsweise oder jährlich erfasst werden
+* Erstellung von Reports (Druck oder PDF) von mehreren Kennzahlen gleichzeitig
+* Mandate für die Verwendung in mehrere Leitstellen gleichzeitg / es ist eventuell möglich dies über Rollen zu lösen
+
 ## Kontakt
 
 https://www.leitstelle-lausitz.de/ |

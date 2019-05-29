@@ -1,6 +1,5 @@
 module.exports = function (app) {
     // Imports ...
-    const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
     const statusMonitor = require('express-status-monitor')();
 
     // Load in helper functions, which contain the functions for the routes
@@ -9,7 +8,7 @@ module.exports = function (app) {
 
     // Shows stats page
     app.use(statusMonitor);
-    app.get('/status', ensureLoggedIn, statusMonitor.pageRoute);
+    app.get('/status', statusMonitor);
 
     /**
      * 
@@ -56,9 +55,6 @@ module.exports = function (app) {
 
     // Displays admin index page
     app.get('/admin', GetHelpers.adminHelper);
-
-    // Display basic managing information for a superuser or admin
-    app.get('/stats', GetHelpers.statHelper);
 
     // Display user creation page
     app.get('/showUser', GetHelpers.showUserHelper);

@@ -30,6 +30,26 @@ const connectionLogin = mysql.createConnection({
  * Retrieve all users from the database.
  * @param {Contains all results or error if query couldn't be executed.} callback 
  */
+function getUserFromDB(username) {
+    return new Promise(function (resolve, reject) {
+        let result = [];
+        // Get all users from the database and put them in array
+        connectionLogin.query('SELECT * FROM accounts WHERE username = ' + connectionLogin.escape(username), function (err, res) {
+            if (err) return reject(err);
+            if (res.length) {
+                for (i = 0; i < res.length; i++) {
+                    result.push(res[i]);
+                }
+            }
+            resolve(result);
+        });
+    });
+}
+
+/**
+ * Retrieve all users from the database.
+ * @param {Contains all results or error if query couldn't be executed.} callback 
+ */
 function getAllUsersFromDB() {
     return new Promise(function (resolve, reject) {
         let result = [];
@@ -159,7 +179,7 @@ function getMeasureFromDB(tableName) {
 
 /**
  * Default query for measures database, currently used for inserting data into the database, full query has to be inserted here.
- * @param {Query hast to be passed here. TODO: maybe build query in this method} query 
+ * @param {Query hast to be passed here. (Maybe build query in this method.} query 
  * @param {Returns error if insertion failed.} callback 
  */
 function measureDataRequest(query) {
@@ -268,5 +288,6 @@ module.exports = {
     measureDataRequest: measureDataRequest,
     deleteMeasureFromDB: deleteMeasureFromDB,
     insertUserIntoDB: insertUserIntoDB,
-    deleteUserFromDB: deleteUserFromDB
+    deleteUserFromDB: deleteUserFromDB,
+    getUserFromDB: getUserFromDB
 }

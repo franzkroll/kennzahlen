@@ -31,8 +31,8 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         <!--Dropdown menus for measure and year selection, button queries data from mysql. -->
         <div style="text-align:center;">
             <form action="visual" method="post">
-                <select id="measure" style="width:50%" name="measure" class="dropdownS"></select>
-                <select style="width: 20%" id="year" name="year" class="dropdownS">
+                <select id="measure" style="width:50%" name="measure" class="dropdownS" required></select>
+                <select style="width: 20%" id="year" name="year" class="dropdownS" required>
                 </select>
                 <div style="text-align: center"><button type="submit" class="button">Daten abfragen</button></div>
             </form>

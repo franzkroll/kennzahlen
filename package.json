@@ -13,7 +13,6 @@
     "chart.js": "^2.8.0",
     "chartjs-plugin-zoom": "0.7.0",
     "compression": "1.7.4",
-    "connect-ensure-login": "0.1.1",
     "ddos": "0.2.1",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
