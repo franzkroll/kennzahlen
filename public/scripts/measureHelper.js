@@ -37,10 +37,7 @@ selM.onclick = function () {
 
             // Add text here for measure description
             for (j = 2; j < length - 1; j++) {
-                console.log(measure[j]);
-                console.log(j);
                 if (measure[j] != 'quarterly') {
-                    console.log("entered here");
                     // Add Button collapsible for every attribute
                     const button = document.createElement('button');
                     button.innerHTML = measure[j];

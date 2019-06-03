@@ -76,8 +76,8 @@ const createUserHelper = function (request, response) {
 
 /**
  * Called after admin tried to the delete user from the database.
- * @param {*} request 
- * @param {*} response 
+ * @param {Request received from the client, contains user that is to be deleted.} request 
+ * @param {Page sent back to the user, contains success or error message.} response 
  */
 const deleteUserHelper = function (request, response) {
     // Sent query to the database for deleting a user
@@ -231,13 +231,13 @@ const submitDataHelper = async (request, response) => {
                 // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
                 const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
 
-                // Get just the year
+                // Get just the year, TODO: do we need to escape the year here?
                 const year = date.slice(date.length - 4, date.length);
 
                 // Build sql string
                 let query = 'REPLACE INTO ' + tableName;
 
-                // Different cases for different kinds of measures
+                // Different cases for different kinds of measures, yearly, quarterly and monthly
                 if (measureList[indexSave][1] === 'yearly') {
                     // Needed for yearly measures
                     query += '_yearly () values (' + mysql.escape(year) + ',';
@@ -249,7 +249,6 @@ const submitDataHelper = async (request, response) => {
                     if (date.length === 4) {
                         query += mysql.escape(year) + ',';
                     } else {
-                        // TODO: danger when using year unescaped here?
                         query += parseInt((quarters.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
                     }
                 } else {
@@ -284,7 +283,7 @@ const submitDataHelper = async (request, response) => {
                     });
                     // Catch sql errors
                 }).catch(function (error) {
-                    //console.log(error);
+                    console.log(error);
                     response.render('pages/submit', {
                         user: request.session.username,
                         text: "Fehler beim Eintragen der Daten!",
@@ -310,8 +309,8 @@ const submitDataHelper = async (request, response) => {
  * Called when user tries to create a new measure. Has to check if table already exists, the new year already exists.
  * If one of the above is true, then only the lists on disk are modified. If they don't exist already a new measure 
  * is also created in the mysql database.
- * @param {*} request 
- * @param {*} response 
+ * @param {Request received from the user, hopefully contains all the necessary data to save the measure in the system.} request 
+ * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
 const createMeasureHelper = async (request, response) => {
     let measureDescriptions, measureList, roleList;
@@ -334,132 +333,147 @@ const createMeasureHelper = async (request, response) => {
     let addYear = false;
     let monthly = false;
     let quarterly = false;
+    let error = false;
 
-    if (request.body.year) {
-        monthly = true;
-    }
+    // Determine which kind of measure was entered by the user
 
-    if (request.body.cycle === "quarterly") {
+    if (request.body.cycle === 'quarterly' && request.body.year) {
         quarterly = true;
+    } else if (request.body.cycle === 'monthly' && request.body.year) {
+        monthly = true;
+    } else if (request.body.cycle === 'yearly') {
+        // nothing to do here yet
+    } else {
+        // Something went wrong
+        error = true;
+        // Show error if year is missing
+        response.render('pages/createMeasure', {
+            text: "Fehler! Bitte geben Sie das Jahr der Erfassung ein!",
+            user: request.session.username,
+        });
     }
 
-    // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
-    for (i = 0; i < measureList.length; i++) {
-        if (measureList[i][0] == request.body.name) {
-            // Get already existing years in measure
-            const years = measureList[i][1].trim().split(':');
-            measureExists = true;
-            for (j = 0; j < years.length; j++) {
-                // Show error if year already exists, which means the measure already exists in the system
-                if ((quarterly || monthly) && years[j] == request.body.year) {
-                    yearExists = true;
-                    response.render('pages/createMeasure', {
-                        text: "Fehler! Kennzahl existiert bereits!",
-                        user: request.session.username,
-                    });
+    // Don't need all this if something went wrong before
+    if (!error) {
+        // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
+        for (i = 0; i < measureList.length; i++) {
+            if (measureList[i][0] == request.body.name) {
+                // Get already existing years in measure
+                const years = measureList[i][1].trim().split(':');
+                measureExists = true;
+                for (j = 0; j < years.length; j++) {
+                    // Show error if year already exists, which means the measure already exists in the system
+                    if ((quarterly || monthly) && years[j] == request.body.year) {
+                        yearExists = true;
+                        response.render('pages/createMeasure', {
+                            text: "Fehler! Kennzahl existiert bereits!",
+                            user: request.session.username,
+                        });
+                    }
+                }
+                // Add year if it doesn't exist
+                if ((quarterly || monthly) && !yearExists && measureExists) {
+                    addYear = true;
+                    measureList[i][1] += ':' + request.body.year;
                 }
             }
-            // Add year if it doesn't exist
-            if ((quarterly || monthly) && !yearExists && measureExists) {
-                addYear = true;
-                measureList[i][1] += ':' + request.body.year;
+        }
+
+        // Need to add role to list if the measure doesn't exist
+        if (!measureExists) {
+            roleList.push([request.body.name, request.body.role + ';']);
+        }
+
+        // Trim any remaining white spaces and push to lists
+        desc.push(request.body.name.trim());
+        desc.push(request.body.mainDesc);
+        table.push(request.body.name.trim());
+
+        let sql;
+
+        // Format name correctly for mysql and add the year
+        let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
+
+        if (quarterly) {
+            // Create table and data for measures that are measured quarterly, they are still stored in the default format
+            table.push(request.body.year);
+            table.push(request.body.cycle);
+            desc.push('dummy');
+            sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+        } else if (monthly) {
+            table.push(request.body.year);
+            // Build sql string for table creation, TODO: prevent sql injection
+            sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+            // Create table without year for measures that are measured once a year
+        } else {
+            // Build sql string for table creation, TODO: prevent sql injection
+            table.push(request.body.cycle);
+            sql = 'create table ' + tableName + '_' + request.body.cycle + ' (Monat INTEGER, ';
+        }
+
+        // Add attribute names and descriptions, should always be same number of items
+        for (let key in request.body) {
+            if (key.includes('var')) {
+                table.push(request.body[key]);
+                sql += request.body[key].replaceAll(' ', '_') + ' FLOAT,'
+            } else if (key.includes('desc')) {
+                desc.push(request.body[key]);
             }
         }
-    }
 
-    // Need to add role to list if the measure doesn't exist
-    if (!measureExists) {
-        roleList.push([request.body.name, request.body.role + ';']);
-    }
+        // Make month the primary key
+        sql += ' constraint pk_1 primary key(Monat));';
 
-    desc.push(request.body.name.trim());
-    desc.push(request.body.mainDesc);
-    table.push(request.body.name.trim());
+        // Add semicolon, later needed for identification
+        tableName += ';';
+        table.push(tableName);
+        desc[desc.length - 1] = desc[desc.length - 1] + ';';
 
-    let sql;
-
-    // Format name correctly for mysql and add the year
-    let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
-
-    if (quarterly) {
-        // Create table and data for measures that are measured quarterly, they are still stored in the default format
-        table.push(request.body.year);
-        table.push(request.body.cycle);
-        desc.push('dummy');
-        sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
-    } else if (monthly) {
-        table.push(request.body.year);
-        // Build sql string for table creation, TODO: prevent sql injection
-        sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
-        // Create table without year for measures that are measured once a year
-    } else {
-        // Build sql string for table creation, TODO: prevent sql injection
-        table.push(request.body.cycle);
-        sql = 'create table ' + tableName + '_' + request.body.cycle + ' (Monat INTEGER, ';
-    }
-
-    // Add attribute names and descriptions, should always be same number of items
-    for (let key in request.body) {
-        if (key.includes('var')) {
-            table.push(request.body[key]);
-            sql += request.body[key].replaceAll(' ', '_') + ' FLOAT,'
-        } else if (key.includes('desc')) {
-            desc.push(request.body[key]);
+        // Push table and description data into loaded table
+        if (!addYear) {
+            measureList.push(table);
+            measureDescriptions.push(desc);
         }
-    }
 
-    // Make month the primary key
-    sql += ' constraint pk_1 primary key(Monat));';
+        // Insert into database
+        SQL.measureDataRequest(sql).then(async () => {
+            try {
+                // Sort list of measures alphabetically by measure name
+                measureList = await sort2DArray(measureList);
+                // Sort measure descriptions, so they are ordered the same
+                measureDescriptions = await sort2DArray(measureDescriptions);
+                // Sort measure descriptions, so they are ordered the same
+                roleList = await sort2DArray(roleList);
+            } catch (error) {
+                console.log(error);
+            }
 
-    // Add semicolon, later needed for identification
-    tableName += ';';
-    table.push(tableName);
-    desc[desc.length - 1] = desc[desc.length - 1] + ';';
+            // Write new arrays to txt file
+            IO.arrayToTxt('roles', roleList);
+            IO.arrayToTxt('tables', measureList);
+            IO.arrayToTxt('desc', measureDescriptions);
 
-    // Push table and description data into loaded table
-    if (!addYear) {
-        measureList.push(table);
-        measureDescriptions.push(desc);
-    }
-
-    // Insert into database
-    SQL.measureDataRequest(sql).then(async () => {
-        try {
-            // Sort list of measures alphabetically by measure name
-            measureList = await sort2DArray(measureList);
-            // Sort measure descriptions, so they are ordered the same
-            measureDescriptions = await sort2DArray(measureDescriptions);
-            // Sort measure descriptions, so they are ordered the same
-            roleList = await sort2DArray(roleList);
-        } catch (error) {
+            response.render('pages/createMeasure', {
+                text: "Kennzahl erfolgreich erstellt!",
+                user: request.session.username,
+            });
+            // Catch mysql errors from the database
+        }).catch(function (error) {
             console.log(error);
-        }
-
-        // Write new arrays to txt file
-        IO.arrayToTxt('roles', roleList);
-        IO.arrayToTxt('tables', measureList);
-        IO.arrayToTxt('desc', measureDescriptions);
-
-        response.render('pages/createMeasure', {
-            text: "Kennzahl erfolgreich erstellt!",
-            user: request.session.username,
-        });
-        // Catch mysql errors from the database
-    }).catch(function (error) {
-        console.log(error);
-        response.render('pages/createMeasure', {
-            text: "Fehler bei der Erstellung der Kennzahl!",
-            user: request.session.username,
-        });
-    })
+            response.render('pages/createMeasure', {
+                text: "Fehler bei der Erstellung der Kennzahl! / Kennzahl existiert bereits!",
+                user: request.session.username,
+            });
+        })
+    }
 }
 
 /**
  * Called when client tried to delete a measure from the database. Only the lists on disk are modified 
  * if only one year of the measure is deleted. If the measure only had this one year it also gets deleted 
  * from the database.
- * @param {*} request 
- * @param {*} response 
+ * @param {Request received from the user, contains measure to be deleted.} request 
+ * @param {Response page sent back to the user, new delete page, contains success or error message.} response 
  */
 const deleteHelper = async (request, response) => {
     let measureDescriptions, measureList, roleList;
@@ -477,8 +491,8 @@ const deleteHelper = async (request, response) => {
     let found = false;
 
     // Iterate through list of measures and search for the needed one
-    for (i = 0; i < measureList.length; i++) {
-        if (measureList[i][0] === request.body.measureSelect && !found) {
+    for (i = 0; i < measureList.length; i++ && !found) {
+        if (measureList[i][0] === request.body.measureSelect) {
             found = true;
 
             // Get the table name from the list and format it correctly
@@ -503,7 +517,6 @@ const deleteHelper = async (request, response) => {
                         newYears += years[j] + ':';
                     }
                 }
-
                 found = true;
 
                 // Remove last :
@@ -534,23 +547,12 @@ const deleteHelper = async (request, response) => {
         tableName += '_' + request.body.yearSelect.trim();
     }
 
-    // Load new measureList from disk 
-    let measureListNew;
-
-
-    // Load table from disk again so we don't make any errors when displaying it
-    try {
-        measureListNew = await IO.loadTextFile('tables');
-    } catch (error) {
-        console.log(error);
-    }
-
     // Delete entry from the database
     SQL.deleteMeasureFromDB(tableName).then(function () {
         // Render page again with information text
         response.render('pages/admin/showMeasures', {
             user: request.session.username,
-            measures: measureListNew,
+            measures: measureList,
             text: 'Kennzahl erfolgreich gelöscht.'
         });
         // Or catch mysql error and show user corresponding error
@@ -558,7 +560,7 @@ const deleteHelper = async (request, response) => {
         console.log(error);
         response.render('pages/admin/showMeasures', {
             user: request.session.username,
-            measures: measureListNew,
+            measures: measureList,
             text: 'Fehler beim Löschen der Kennzahl.'
         });
     });

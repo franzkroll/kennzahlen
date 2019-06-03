@@ -26,11 +26,19 @@ selM.onclick = function () {
             years = measure[1].split(':');
             // Clear any existing fields
             selY.innerHTML = "";
-            // Cycle through years of the measure and add them to the select
-            for (k = 0; k < years.length; k++) {
+            // Check if its yearly measure or not
+            if (/^\d+$/.test(years[0])) {
+                // Cycle through years of the measure and add them to the select
+                for (k = 0; k < years.length; k++) {
+                    let opt = document.createElement('option');
+                    opt.appendChild(document.createTextNode(years[k]));
+                    opt.value = years[k];
+                    selY.appendChild(opt);
+                }
+            } else {
                 let opt = document.createElement('option');
-                opt.appendChild(document.createTextNode(years[k]));
-                opt.value = years[k];
+                opt.appendChild(document.createTextNode('jährliche Erfassung'));
+                opt.value = 'yearly';
                 selY.appendChild(opt);
             }
         }

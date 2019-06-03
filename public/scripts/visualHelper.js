@@ -34,6 +34,8 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+//TODO: correct display for yearly and quarterly measures
+
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
@@ -103,6 +105,11 @@ selM.onclick = function () {
                         selYear.appendChild(opt);
                     } else if (year[0] !== 'quarterly') {
                         console.log("Yearly measure");
+                        // Add first row of years here
+                        let opt = document.createElement('option');
+                        opt.value = years[0];
+                        opt.appendChild(document.createTextNode('jährliche Erfassung'));
+                        selYear.appendChild(opt);
                         // TODO: add table head from years of the measure
                     }
 
