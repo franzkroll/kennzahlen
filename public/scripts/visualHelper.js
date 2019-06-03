@@ -6,6 +6,10 @@ const table = document.getElementById("dataTable");
 const selGraph = document.getElementById('graph');
 const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
+const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+// Labels for the graph, needs months, quarters or years
+let labels = [];
 
 // Saves current chart so we can destroy it before creating a new one
 let currentChart;
@@ -44,6 +48,11 @@ selM.onclick = function () {
     // True if table has already been filled
     let filled = false;
 
+    // 
+    let insertedHead = false;
+
+    let monthHead = false;
+
     // Loop through received array data
     for (i = 0; i < measureArray.length; i++) {
         // Split actual data of the measure 
@@ -71,24 +80,50 @@ selM.onclick = function () {
 
                     // Clear selection of the years
                     selYear.innerHTML = "";
+                    table.innerHTML = "";
 
-                    // Split years here for year table
+                    // Split years here for year table, only if it isn't yearly or quarterly measure
                     years = measure[j + 1].trim().split(':');
 
-                    // Put years into the select menu for tables
-                    for (k = 0; k < years.length; k++) {
+                    // Test if years are really years or if it is a quarterly or yearly measure, TODO: check for quarterly
+                    if (/^\d+$/.test(years[0])) {
+                        monthHead = true;
+                        // Put years into the select menu for tables
+                        for (k = 0; k < years.length; k++) {
+                            let opt = document.createElement('option');
+                            opt.value = years[k];
+                            opt.appendChild(document.createTextNode(years[k]));
+                            selYear.appendChild(opt);
+                        }
+                    } else if (years[0] !== 'yearly') {
+                        // Add first row of years here
                         let opt = document.createElement('option');
-                        opt.value = years[k];
-                        opt.appendChild(document.createTextNode(years[k]));
+                        opt.value = years[0];
+                        opt.appendChild(document.createTextNode(years[0]));
                         selYear.appendChild(opt);
+                    }
+
+                    // Insert table header, needs month and years of data also, maybe move down
+                    if (measureData && !insertedHead && monthHead) {
+                        labels = months.slice(2, months.length);
+
+                        let header = table.createTHead();
+                        let row = header.insertRow(0);
+
+                        insertedHead = true;
+
+                        for (l = 0; l < months.length; l++) {
+                            let cell = row.insertCell(l);
+                            cell.outerHTML = "<th>" + months[l] + "</th>";
+                        }
                     }
                 }
 
-                // Prepare new table row for data
-                let row = table.insertRow(j + 1);
-
                 // Precaution so we don't leave the array length later on
-                if (j < measure.length - 3) {
+                if (insertedHead && (j < measure.length - 3)) {
+                    // Prepare new table rows for data
+                    let row = table.insertRow(j + 1);
+
                     let opt = document.createElement('option');
                     opt.value = measure[j + 1];
                     opt.appendChild(document.createTextNode(measure[j + 1]));
@@ -97,7 +132,7 @@ selM.onclick = function () {
                     measureAttr.push(measure[j + 2]);
 
                     // Append data to table if there is any to add and if we got the right data already
-                    if (measureData && (inputText === (tableName.replace(/[0-9]/g, '')))) {
+                    if ((inputText === (tableName.replace(/[0-9]/g, '')))) {
                         // Fill first column of the table with the attributes of the measure
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];
@@ -123,6 +158,8 @@ selM.onclick = function () {
                         dataGraph.push(dataBuilder);
                     }
                 }
+
+
             }
         }
     }
@@ -143,7 +180,7 @@ selGraph.onchange = function (e) {
             type: 'bar',
             // Basic labels, data gets added later
             data: {
-                labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                labels: labels,
                 datasets: []
             },
             options: {
@@ -173,7 +210,7 @@ selGraph.onchange = function (e) {
         currentChart = new Chart(document.getElementById('chart'), {
             type: 'line',
             data: {
-                labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                labels: labels,
                 datasets: []
             },
             options: {
@@ -201,7 +238,7 @@ selGraph.onchange = function (e) {
         currentChart = new Chart(document.getElementById("chart"), {
             type: 'radar',
             data: {
-                labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                labels: labels,
                 datasets: []
             },
             options: {

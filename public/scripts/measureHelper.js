@@ -33,18 +33,25 @@ selM.onclick = function () {
             // Add main description
             mainDesc.innerHTML = currentDescription[1];
 
+            let length = measure.length;
+
             // Add text here for measure description
-            for (j = 2; j < measure.length - 1; j++) {
-                // Add Button collapsible for every attribute
-                const button = document.createElement('button');
-                button.innerHTML = measure[j];
-                button.setAttribute('class', 'collapsible');
-                col.appendChild(button);
-                // Add content from description array
-                const text = document.createElement('p');
-                text.innerHTML = currentDescription[j];
-                text.setAttribute('class', 'content');
-                col.appendChild(text);
+            for (j = 2; j < length - 1; j++) {
+                console.log(measure[j]);
+                console.log(j);
+                if (measure[j] != 'quarterly') {
+                    console.log("entered here");
+                    // Add Button collapsible for every attribute
+                    const button = document.createElement('button');
+                    button.innerHTML = measure[j];
+                    button.setAttribute('class', 'collapsible');
+                    col.appendChild(button);
+                    // Add content from description array
+                    const text = document.createElement('p');
+                    text.innerHTML = currentDescription[j];
+                    text.setAttribute('class', 'content');
+                    col.appendChild(text);
+                }
             }
         }
     }

@@ -33,7 +33,7 @@
 
                 <!-- Field for setting year of the measure. -->
                 <input type="number" name="year" placeholder="Erfassungsjahr"
-                    title="Legen Sie hier das Erfassungsjahr, dass Sie erstellen wollen fest." required>
+                    title="Legen Sie hier das Erfassungsjahr, dass Sie erstellen wollen fest. Wird die Kennzahl jährlich erfasst lassen Sie dieses Feld frei.">
 
                 <!-- Field for setting name of the measure. -->
                 <input type="text" name="mainDesc" placeholder="Beschreibung der Kennzahl"
@@ -48,9 +48,10 @@
                 <div class="misc-text" style="margin-bottom: 10px">
                     Erfassungzyklus:
                     <!-- TODO: quarterly measures -->
-                    <select style="text-align:left; width:50%;" name="cycle" id="cycle" class="dropdownS">
+                    <select style="text-align:left; width:50%;" name="cycle" id="cycle" class="dropdownS" required>
                         <option value="monthly">monatlich</option>
                         <option value="quarterly">quartalsweise</option>
+                        <option value="yearly">jährlich</option>
                     </select>
                 </div>
 

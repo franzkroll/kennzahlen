@@ -131,7 +131,7 @@ const visualPostHelper = async (request, response) => {
                         }
                     }
 
-                    // (Error handling could be simplified here)
+                    // (Error handling should be simplified here)
 
                     // Query database if user has also entered a year 
                     if (request.body.year) {
@@ -308,7 +308,6 @@ const createMeasureHelper = async (request, response) => {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
-
     } catch (error) {
         console.log(error);
     }
@@ -321,6 +320,16 @@ const createMeasureHelper = async (request, response) => {
     let measureExists = false;
     let yearExists = false;
     let addYear = false;
+    let monthly = false;
+    let quarterly = false;
+
+    if (request.body.year) {
+        monthly = true;
+    }
+
+    if (request.body.cycle === "quarterly") {
+        quarterly = true;
+    }
 
     // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
     for (i = 0; i < measureList.length; i++) {
@@ -330,7 +339,7 @@ const createMeasureHelper = async (request, response) => {
             measureExists = true;
             for (j = 0; j < years.length; j++) {
                 // Show error if year already exists, which means the measure already exists in the system
-                if (years[j] == request.body.year) {
+                if ((quarterly || monthly) && years[j] == request.body.year) {
                     yearExists = true;
                     response.render('pages/createMeasure', {
                         text: "Fehler! Kennzahl existiert bereits!",
@@ -339,9 +348,8 @@ const createMeasureHelper = async (request, response) => {
                 }
             }
             // Add year if it doesn't exist
-            if (!yearExists && measureExists) {
+            if ((quarterly || monthly) && !yearExists && measureExists) {
                 addYear = true;
-                console.log('Measure exists, adding year to list');
                 measureList[i][1] += ':' + request.body.year;
             }
         }
@@ -350,19 +358,33 @@ const createMeasureHelper = async (request, response) => {
     // Need to add role to list if the measure doesn't exist
     if (!measureExists) {
         roleList.push([request.body.name, request.body.role + ';']);
-        console.log("created role");
     }
 
     desc.push(request.body.name.trim());
     desc.push(request.body.mainDesc);
     table.push(request.body.name.trim());
-    table.push(request.body.year);
+
+    let sql;
 
     // Format name correctly for mysql and add the year
     let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
 
-    // Build sql string for table creation, TODO: sql injection for every element in sql
-    let sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+    if (quarterly) {
+        // Create table and data for measures that are measured quarterly, they are still stored in the default format
+        table.push(request.body.year);
+        table.push(request.body.cycle);
+        desc.push('dummy');
+        sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+    } else if (monthly) {
+        table.push(request.body.year);
+        // Build sql string for table creation, TODO: prevent sql injection
+        sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+        // Create table without year for measures that are measured once a year
+    } else {
+        // Build sql string for table creation, TODO: prevent sql injection
+        table.push(request.body.cycle);
+        sql = 'create table ' + tableName + '_' + request.body.cycle + ' (Monat INTEGER, ';
+    }
 
     // Add attribute names and descriptions, should always be same number of items
     for (let key in request.body) {
@@ -430,6 +452,7 @@ const createMeasureHelper = async (request, response) => {
 const deleteHelper = async (request, response) => {
     let measureDescriptions, measureList, roleList;
 
+    // Try to load data about tables from disk
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
@@ -441,6 +464,7 @@ const deleteHelper = async (request, response) => {
     let tableName;
     let found = false;
 
+    // Iterate through list of measures and search for the needed one
     for (i = 0; i < measureList.length; i++) {
         if (measureList[i][0] === request.body.measureSelect && !found) {
             found = true;
@@ -501,6 +525,8 @@ const deleteHelper = async (request, response) => {
     // Load new measureList from disk 
     let measureListNew;
 
+
+    // Load table from disk again so we don't make any errors when displaying it
     try {
         measureListNew = await IO.loadTextFile('tables');
     } catch (error) {

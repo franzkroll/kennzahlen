@@ -15,6 +15,7 @@ for (i = 0; i < measureArray.length - 1; i++) {
 
 // Needed for converting month number to text
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const quarters = ['1. Quartal', '2. Quartal', '3. Quartal', '4. Quartal'];
 
 // TODO: Display already submitted values when month is selected or too much to do?
 
@@ -26,41 +27,66 @@ selM.onclick = function () {
     // Loop through measure known to the system
     for (i = 0; i < measureArray.length; i++) {
         const measure = measureArray[i].split(',').filter(Boolean);
+
         if (measure[0] === inputText) {
-            years = measure[1].split(':');
             // Clear any existing fields
             selYear.innerHTML = "";
             fieldContainer.innerHTML = "";
-            // Cycle through years of the measure
-            for (k = 0; k < years.length; k++) {
-                let opt = document.createElement('option');
-                opt.appendChild(document.createTextNode(years[k]));
-                opt.value = years[k];
-                selYear.appendChild(opt);
 
-                // Adds selection for months
-                for (l = 0; l < months.length; l++) {
+            years = measure[1].split(':');
+
+            // Checks if it is a yearly measure or not
+            if (/^\d+$/.test(years[0])) {
+                for (k = 0; k < years.length; k++) {
                     let opt = document.createElement('option');
-                    opt.appendChild(document.createTextNode(months[l] + ' ' + years[k]));
-                    opt.value = months[l] + years[k];
+                    opt.appendChild(document.createTextNode(years[k]));
+                    opt.value = years[k];
+                    selYear.appendChild(opt);
+
+                    // Add quarters to dropdown menu
+                    if (measure[2] === 'quarterly') {
+                        for (l = 0; l < quarters.length; l++) {
+                            let opt = document.createElement('option');
+                            opt.appendChild(document.createTextNode(quarters[l] + ' ' + years[k]));
+                            opt.value = quarters[l] + years[k];
+                            selYear.appendChild(opt);
+                        }
+                        // Add months to dropdown menu
+                    } else {
+                        for (l = 0; l < months.length; l++) {
+                            let opt = document.createElement('option');
+                            opt.appendChild(document.createTextNode(months[l] + ' ' + years[k]));
+                            opt.value = months[l] + years[k];
+                            selYear.appendChild(opt);
+                        }
+                    }
+                }
+            } else {
+                const currentYear = new Date().getFullYear();
+                for (l = currentYear - 10; l <= currentYear + 10; l++) {
+                    let opt = document.createElement('option');
+                    opt.appendChild(document.createTextNode(l));
+                    opt.value = months[l];
                     selYear.appendChild(opt);
                 }
             }
 
             // Create text fields for all measure attributes
             for (i = 2; i < measure.length - 1; i++) {
-                var div = document.createElement("div");
-                var text = document.createElement("input");
-                text.setAttribute("type", "number");
-                text.setAttribute("step", "0.01");
-                text.setAttribute("name", "var" + (i - 2));
-                text.setAttribute("id", "id" + (i - 2));
-                text.setAttribute("placeholder", measure[i]);
-                text.setAttribute("required", "required");
-                text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein.");
-                // ... and add it to the container
-                div.appendChild(text);
-                fieldContainer.appendChild(div);
+                if (measure[i] !== 'quarterly') {
+                    var div = document.createElement("div");
+                    var text = document.createElement("input");
+                    text.setAttribute("type", "number");
+                    text.setAttribute("step", "0.01");
+                    text.setAttribute("name", "var" + (i - 2));
+                    text.setAttribute("id", "id" + (i - 2));
+                    text.setAttribute("placeholder", measure[i]);
+                    text.setAttribute("required", "required");
+                    text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein.");
+                    // ... and add it to the container
+                    div.appendChild(text);
+                    fieldContainer.appendChild(div);
+                }
             }
         }
     }
