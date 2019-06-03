@@ -185,6 +185,12 @@ const visualPostHelper = async (request, response) => {
 const submitDataHelper = async (request, response) => {
     let roleList, measureList, result;
 
+    // Used to convert month to month number
+    const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+    // Used to convert quarters to 1-4
+    const quarters = ['1. Quartal', '2. Quartal', '3. Quartal', '4. Quartal'];
+
+    // Load table data from disk
     try {
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
@@ -192,14 +198,14 @@ const submitDataHelper = async (request, response) => {
         console.log(error);
     }
 
-    // Array for storing table data
-    tableData = []
+    // Save index, because for keeps running while reading from disk
+    let indexSave = -1;
 
-    let found = false;
-
-    // Load user role from database
-    for (i = 0; i < roleList.length; i++ && !found) {
+    // Search for measure in role list, start building query if found
+    for (i = 0; i < roleList.length; i++) {
         if (request.body.measure === roleList[i][0]) {
+            indexSave = i;
+
             // If measure is found, check if saved role equals current role and admin/user
             try {
                 // Can only get it here because we need i
@@ -209,59 +215,65 @@ const submitDataHelper = async (request, response) => {
             }
 
             found = true;
-            // Check roles if measure is found in access table
+
+            // Check roles if measure is found in access table, TODO: build different queries depending on yearly/quarterly
             if (result) {
-                // Get measure and date
-                tableData.push(request.body.measure);
-                tableData.push(request.body.date);
+                let tableName;
+
+                // Check if entered table really exists, get concrete table name in database
+                for (i = 0; i < measureList.length; i++) {
+                    if (measureList[i][0] === request.body.measure) {
+                        const entry = measureList[i];
+                        tableName = (entry[entry.length - 1]).slice(0, (entry[entry.length - 1]).length - 1);
+                    }
+                }
+
+                // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
+                const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
+
+                // Get just the year
+                const year = date.slice(date.length - 4, date.length);
+
+                // Build sql string
+                let query = 'REPLACE INTO ' + tableName;
+
+                // Different cases for different kinds of measures
+                if (measureList[indexSave][1] === 'yearly') {
+                    // Needed for yearly measures
+                    query += '_yearly () values (' + mysql.escape(year) + ',';
+                } else if (measureList[indexSave][2] === 'quarterly') {
+                    // Add year to tablename
+                    query += '_' + year + ' () values (';
+
+                    // First case handles the year entry, second case entries with quarter
+                    if (date.length === 4) {
+                        query += mysql.escape(year) + ',';
+                    } else {
+                        // TODO: danger when using year unescaped here?
+                        query += parseInt((quarters.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
+                    }
+                } else {
+                    // Add year to tablename
+                    query += '_' + year + ' () values (';
+
+                    // First case handles the year entry, second case entries with months
+                    if (date.length === 4) {
+                        query += mysql.escape(year) + ',';
+                    } else {
+                        query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
+                    }
+                }
 
                 // Get attributes, they are already in the right order
                 for (let key in request.body) {
                     if (key.includes('var')) {
-                        tableData.push(request.body[key]);
+                        query += mysql.escape(request.body[key]);
+                        query += ',';
                     }
-                }
-
-                // Load table data from disk
-                // Table to write into
-                let tableName;
-
-                // Used to convert month to month number
-                const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-
-                // Escaping year for sql injection and slicing out the year
-                const date = mysql.escape(tableData[1]).slice(1, tableData[1].length + 1);
-                const year = date.slice(date.length - 4, date.length);
-
-                // Check if entered table really exists, get concrete table name in database
-                for (i = 0; i < measureList.length; i++) {
-                    if (measureList[i][0] === tableData[0]) {
-                        tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
-                    }
-                }
-
-                // Add year to tablename
-                tableName += "_" + year;
-
-                // Build sql string
-                let query = 'REPLACE INTO ' + tableName + ' () values (';
-
-                // First case handles the year entry, second case entries with month
-                if (date.length === 5) {
-                    query += year + ',';
-                } else {
-                    query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
-                }
-
-                // Put data into sql string, maybe add directly without values vector?, sql injection
-                for (i = 2; i < tableData.length; i++) {
-                    query += mysql.escape(tableData[i]);
-                    query += ',';
                 }
 
                 // Remove last comma
-                query = query.slice(0, query.length - 1);
-                query += ');'
+                query = query.slice(0, query.length - 1) + ');';
 
                 // And insert them into the database
                 SQL.measureDataRequest(query).then(function () {
@@ -272,7 +284,7 @@ const submitDataHelper = async (request, response) => {
                     });
                     // Catch sql errors
                 }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                     response.render('pages/submit', {
                         user: request.session.username,
                         text: "Fehler beim Eintragen der Daten!",

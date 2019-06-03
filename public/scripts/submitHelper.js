@@ -66,7 +66,7 @@ selM.onclick = function () {
                 for (l = currentYear - 10; l <= currentYear + 10; l++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(l));
-                    opt.value = months[l];
+                    opt.value = l;
                     selYear.appendChild(opt);
                 }
             }

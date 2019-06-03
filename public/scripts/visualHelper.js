@@ -101,9 +101,12 @@ selM.onclick = function () {
                         opt.value = years[0];
                         opt.appendChild(document.createTextNode(years[0]));
                         selYear.appendChild(opt);
+                    } else if (year[0] !== 'quarterly') {
+                        console.log("Yearly measure");
+                        // TODO: add table head from years of the measure
                     }
 
-                    // Insert table header, needs month and years of data also, maybe move down
+                    // Insert table header, needs month and years of data also, maybe move down, TODO: correct table and labels for yearly and quarterly measures
                     if (measureData && !insertedHead && monthHead) {
                         labels = months.slice(2, months.length);
 
