@@ -42,8 +42,6 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-// TODO: better comments and code structure
-
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
@@ -98,7 +96,7 @@ selM.onclick = function () {
                     // Split years here for year table, only if it isn't yearly or quarterly measure
                     years = measure[j + 1].trim().split(':');
 
-                    // Test if years are really years or if it is a quarterly or yearly measure, TODO: check for quarterly
+                    // Returns true if quarterly or monthly measure
                     if (/^\d+$/.test(years[0])) {
 
                         // Put years into the select menu for tables
@@ -114,6 +112,7 @@ selM.onclick = function () {
                         } else {
                             monthHead = true;
                         }
+                        // Returns true if yearly measure
                     } else if (years[0] === 'yearly') {
                         yearHead = true;
                         // Add first row of years here
@@ -159,6 +158,7 @@ selM.onclick = function () {
                                 labels.push(yearArray[h].split(':')[1]);
                             }
 
+                            // Something went wrong if we are adding anything else than a simple year here
                             if (yearArray[h].split(':')[1].length === 5) {
                                 deleteAgain = true;
                                 labels = [];
@@ -184,8 +184,9 @@ selM.onclick = function () {
 
                         measure.splice(2, 1);
                         insertedHead = true;
+                    } else {
+                        console.log("We shouldn't be here. Error.")
                     }
-                    // TODO: do we need to catch any errors here?
                 }
 
                 // Precaution so we don't leave the array length later on

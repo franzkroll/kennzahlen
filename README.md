@@ -122,7 +122,8 @@ Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen 
 
 ## Bisher noch fehlende Funktionen
 
-* Kennzahlen, die nur quartalsweise oder jährlich erfasst werden
+* Darstellung von bereits erfassten Werten beim Eintragen von neuen Werten
+* Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
 * Erstellung von Reports (Druck oder PDF) von mehreren Kennzahlen gleichzeitig
 * Mandate für die Verwendung in mehrere Leitstellen gleichzeitg / es ist eventuell möglich dies über Rollen zu lösen
 
