@@ -138,6 +138,7 @@ selM.onclick = function () {
                         }
                         // Insert correct years from data into table head
                     } else if (measureData && !insertedHead && yearHead) {
+                        labels = [];
                         let header = table.createTHead();
                         let row = header.insertRow(0);
 
