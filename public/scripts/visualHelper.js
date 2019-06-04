@@ -6,7 +6,15 @@ const table = document.getElementById("dataTable");
 const selGraph = document.getElementById('graph');
 const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
+const button = document.getElementById('button');
+
+button.onclick = function () {
+    console.log('button pressed');
+}
+
+// Used for creating table headers with months and quarters
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
 
 // Labels for the graph, needs months, quarters or years
 let labels = [];
@@ -34,7 +42,7 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-//TODO: correct display for yearly and quarterly measures
+// TODO: better comments and code structure
 
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
@@ -50,10 +58,13 @@ selM.onclick = function () {
     // True if table has already been filled
     let filled = false;
 
-    // 
+    // For checking if table head was already inserted
     let insertedHead = false;
 
+    // Stores which type the table is
     let monthHead = false;
+    let yearHead = false;
+    let quarterHead = false;
 
     // Loop through received array data
     for (i = 0; i < measureArray.length; i++) {
@@ -72,7 +83,7 @@ selM.onclick = function () {
                     }
 
                     //Clear rows of the table except the first row
-                    for (var i = table.rows.length - 1; i > 0; i--) {
+                    for (i = table.rows.length - 1; i > 0; i--) {
                         table.deleteRow(i);
                     }
 
@@ -89,7 +100,7 @@ selM.onclick = function () {
 
                     // Test if years are really years or if it is a quarterly or yearly measure, TODO: check for quarterly
                     if (/^\d+$/.test(years[0])) {
-                        monthHead = true;
+
                         // Put years into the select menu for tables
                         for (k = 0; k < years.length; k++) {
                             let opt = document.createElement('option');
@@ -97,23 +108,22 @@ selM.onclick = function () {
                             opt.appendChild(document.createTextNode(years[k]));
                             selYear.appendChild(opt);
                         }
-                    } else if (years[0] !== 'yearly') {
-                        // Add first row of years here
-                        let opt = document.createElement('option');
-                        opt.value = years[0];
-                        opt.appendChild(document.createTextNode(years[0]));
-                        selYear.appendChild(opt);
-                    } else if (year[0] !== 'quarterly') {
-                        console.log("Yearly measure");
+
+                        if (measure[2] === 'quarterly') {
+                            quarterHead = true;
+                        } else {
+                            monthHead = true;
+                        }
+                    } else if (years[0] === 'yearly') {
+                        yearHead = true;
                         // Add first row of years here
                         let opt = document.createElement('option');
                         opt.value = years[0];
                         opt.appendChild(document.createTextNode('jährliche Erfassung'));
                         selYear.appendChild(opt);
-                        // TODO: add table head from years of the measure
                     }
 
-                    // Insert table header, needs month and years of data also, maybe move down, TODO: correct table and labels for yearly and quarterly measures
+                    // Insert table header for months
                     if (measureData && !insertedHead && monthHead) {
                         labels = months.slice(2, months.length);
 
@@ -126,7 +136,55 @@ selM.onclick = function () {
                             let cell = row.insertCell(l);
                             cell.outerHTML = "<th>" + months[l] + "</th>";
                         }
+                        // Insert correct years from data into table head
+                    } else if (measureData && !insertedHead && yearHead) {
+                        let header = table.createTHead();
+                        let row = header.insertRow(0);
+
+                        let cellCount = 1;
+
+                        let deleteAgain = false;
+
+                        let cellMain = row.insertCell(0);
+                        cellMain.outerHTML = "<th>Eigenschaft der Kennzahl</th>";
+
+                        const yearArray = measureData.split(',');
+
+                        for (h = 0; h < yearArray.length - 1; h++) {
+                            if (yearArray[h].includes('Monat')) {
+                                let cell = row.insertCell(cellCount);
+                                cell.outerHTML = "<th>" + yearArray[h].split(':')[1] + "</th>";
+                                cellCount++;
+                                labels.push(yearArray[h].split(':')[1]);
+                            }
+
+                            if (yearArray[h].split(':')[1].length === 5) {
+                                deleteAgain = true;
+                                labels = [];
+                            }
+                        }
+
+                        if (deleteAgain) {
+                            table.innerHTML = "";
+                        } else {
+                            insertedHead = true;
+                        }
+                        // Insert quarters here into table head
+                    } else if (measureData && !insertedHead && quarterHead) {
+                        labels = quarters.slice(2, months.length);
+
+                        let header = table.createTHead();
+                        let row = header.insertRow(0);
+
+                        for (l = 0; l < quarters.length; l++) {
+                            let cell = row.insertCell(l);
+                            cell.outerHTML = "<th>" + quarters[l] + "</th>";
+                        }
+
+                        measure.splice(2, 1);
+                        insertedHead = true;
                     }
+                    // TODO: do we need to catch any errors here?
                 }
 
                 // Precaution so we don't leave the array length later on
@@ -141,8 +199,9 @@ selM.onclick = function () {
                     // Save attributes of measure, location of them starts in the third array cell
                     measureAttr.push(measure[j + 2]);
 
+                    // TODO: why is the 'y' here? needs fix, otherwise no measure can't contain ' y'
                     // Append data to table if there is any to add and if we got the right data already
-                    if ((inputText === (tableName.replace(/[0-9]/g, '')))) {
+                    if ((inputText === (tableName.replace(/[0-9]/g, '').replace(' y', '')))) {
                         // Fill first column of the table with the attributes of the measure
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];
@@ -161,15 +220,15 @@ selM.onclick = function () {
                             cell.innerHTML = cellData;
                             if (k != j + 1) {
                                 dataBuilder.push(cellData);
+                                // Special case for yearly measures, in monthly and quarterly measures the year is left out
+                            } else if (yearHead) {
+                                dataBuilder.push(cellData);
                             }
                         }
-
                         // Push data to array for graphs
                         dataGraph.push(dataBuilder);
                     }
                 }
-
-
             }
         }
     }

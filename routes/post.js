@@ -131,7 +131,7 @@ const visualPostHelper = async (request, response) => {
                         }
                     }
 
-                    // (Error handling should be simplified here)
+                    // TODO: better error handling
 
                     // Query database if user has also entered a year 
                     if (request.body.year) {
@@ -336,7 +336,6 @@ const createMeasureHelper = async (request, response) => {
     let error = false;
 
     // Determine which kind of measure was entered by the user
-
     if (request.body.cycle === 'quarterly' && request.body.year) {
         quarterly = true;
     } else if (request.body.cycle === 'monthly' && request.body.year) {
