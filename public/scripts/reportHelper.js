@@ -2,22 +2,10 @@
 measureList = measureList.split(';');
 
 // Grab elements from the document
-const selM = document.getElementById('measure');
-const selY = document.getElementById('year');
+const selM = document.getElementById('measure0');
+let selY = document.getElementById('year0');
 
-// Handles adding of new selection fields if needed, just clones the original and adds it again
-window.addEventListener('load', function () {
-    let i = 0;
-    document.getElementById('addBtn').addEventListener('click', function () {
-        let original = document.getElementById('clone' + i);
-        let clone = original.cloneNode(true); // "deep" clone
-        clone.id = "clone" + ++i; // there can only be one element with an ID
-        // TODO: clone.onclick = duplicate; // event handlers are not cloned
-        document.getElementById('addDiv').appendChild(clone);
-    });
-});
-
-// Cycle through all arrays and add them to the selection menus
+// Cycle through measure array and add them to first div
 for (i = 0; i < measureList.length - 1; i++) {
     const measure = measureList[i].split(',').filter(Boolean);
     let opt = document.createElement('option');
@@ -26,10 +14,38 @@ for (i = 0; i < measureList.length - 1; i++) {
     selM.appendChild(opt);
 }
 
-// Add years if user selects an item
-selM.onclick = function () {
-    const index = this.selectedIndex;
-    const inputText = this.children[index].innerHTML.trim();
+// And add event listener to the first element
+selM.addEventListener('click', eventFunc, false);
+
+// Handles adding of new selection fields if needed, just clones the original and adds it again
+window.addEventListener('load', function () {
+    let i = 0;
+    // Clone 
+    document.getElementById('addBtn').addEventListener('click', function () {
+        // Get original elements
+        let original = document.getElementById('measure' + i);
+        let originalY = document.getElementById('year' + i);
+
+        i++;
+
+        // Clone them and add them to the correct div
+        let clone = original.cloneNode(true);
+        clone.id = 'measure' + i;
+        clone.addEventListener('click', eventFunc, false);
+        document.getElementById('addDiv').appendChild(clone);
+
+        let cloneY = originalY.cloneNode(true);
+        cloneY.id = 'year' + i;
+        document.getElementById('addDiv').appendChild(cloneY);
+    });
+});
+
+function eventFunc() {
+    // Get corresponding year select for current measure select
+    selY = document.getElementById('year' + this.id.slice(this.id.length - 1, this.id.length));
+
+    // Get the selected item from current measure
+    const inputText = this.children[this.selectedIndex].innerHTML.trim();
 
     // Loop through measure known to the system
     for (i = 0; i < measureList.length; i++) {
@@ -47,6 +63,7 @@ selM.onclick = function () {
                     opt.value = years[k];
                     selY.appendChild(opt);
                 }
+                // Don't add years if its a yearly measure
             } else {
                 let opt = document.createElement('option');
                 opt.appendChild(document.createTextNode('jährliche Erfassung'));

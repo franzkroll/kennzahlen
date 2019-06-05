@@ -313,10 +313,10 @@ const reportHelper = function (request, response) {
                 user: request.session.username,
                 text: "",
                 measureList: measureList
-            }) // Catch errors while loading from disk
+            }); // Catch errors while loading from disk
         }).catch(function (error) {
             console.log(error);
-        })
+        });
     } else {
         response.render('pages/errors/loginError');
     }

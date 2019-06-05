@@ -103,11 +103,9 @@ const deleteUserHelper = function (request, response) {
  * @param {Sends measure data back to the user together with a new page.} response 
  */
 const visualPostHelper = async (request, response) => {
+    // Load Measures and their corresponding roles from disk.
     let measureList, roleList;
 
-    let found = false;
-
-    // Load Measures and their corresponding roles from disk.
     try {
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
@@ -115,7 +113,7 @@ const visualPostHelper = async (request, response) => {
         console.log(error);
     }
 
-    for (i = 0; i < roleList.length; i++ && !found) {
+    for (i = 0; i < roleList.length; i++) {
         // If measure is found, check if saved role equals current role and admin/user
         if (request.body.measure === roleList[i][0]) {
             found = true;
@@ -130,8 +128,6 @@ const visualPostHelper = async (request, response) => {
                             tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                         }
                     }
-
-                    // TODO: better error handling
 
                     // Query database if user has also entered a year 
                     if (request.body.year) {
@@ -578,7 +574,7 @@ const reportHelper = async (request, response) => {
             user: request.session.username,
             text: 'Fehler beim Laden der Daten!',
             measureList: measureList
-        })
+        });
     }).catch(function (error) {
         console.log(error);
     });

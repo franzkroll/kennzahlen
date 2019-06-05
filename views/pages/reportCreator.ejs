@@ -27,18 +27,17 @@ return a pdf with the data.
         <!--Dropdown menus for measure and year selection, button queries data from mysql. -->
         <div style="text-align:center;">
             <form action="report" method="post">
-                <div id="clone0">
-                    <select id="measure" style="width:50%" name="measure" class="dropdownS" required></select>
-                    <select style="width: 20%" id="year" name="year" class="dropdownS" required></select>
+                <div id="addDiv">
+                    <select id="measure0" style="width:50%" name="measure" class="dropdownS" required></select>
+                    <select style="width: 20%" id="year0" name="year" class="dropdownS" required></select>
                 </div>
 
-                <!-- New selection menus get added here. -->
-                <div id="addDiv">
-                </div>
                 <span style="display:block; height: 5px;"></span>
 
                 <!-- Adds new selection fields. -->
                 <input class="button" type="button" value="Kennzahl hinzufügen" id="addBtn" />
+
+                <span style="display:block; height: 5px;"></span>
 
                 <!-- Sends request to the server with request data.-->
                 <div style="text-align: center"><button type="submit" id="button" class="button">Report

@@ -50,8 +50,7 @@ selM.onclick = function () {
     const columns = measureData.split(',');
 
     // Get selected measure
-    var index = this.selectedIndex;
-    var inputText = this.children[index].innerHTML.trim();
+    var inputText = this.children[this.selectedIndex].innerHTML.trim();
 
     // True if table has already been filled
     let filled = false;
