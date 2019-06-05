@@ -26,11 +26,13 @@ window.addEventListener('load', function () {
         let original = document.getElementById('measure' + i);
         let originalY = document.getElementById('year' + i);
 
+        // Increment i, because ids of elements can only exist once
         i++;
 
         // Clone them and add them to the correct div
         let clone = original.cloneNode(true);
         clone.id = 'measure' + i;
+        // This one also needs an event handler so the years can be filled
         clone.addEventListener('click', eventFunc, false);
         document.getElementById('addDiv').appendChild(clone);
 
@@ -40,6 +42,7 @@ window.addEventListener('load', function () {
     });
 });
 
+// Event handler for all measure selection menus
 function eventFunc() {
     // Get corresponding year select for current measure select
     selY = document.getElementById('year' + this.id.slice(this.id.length - 1, this.id.length));
