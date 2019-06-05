@@ -20,7 +20,6 @@ selM.addEventListener('click', eventFunc, false);
 // Handles adding of new selection fields if needed, just clones the original and adds it again
 window.addEventListener('load', function () {
     let i = 0;
-    // Clone 
     document.getElementById('addBtn').addEventListener('click', function () {
         // Get original elements
         let original = document.getElementById('measure' + i);

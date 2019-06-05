@@ -562,12 +562,17 @@ const deleteHelper = async (request, response) => {
 }
 
 /**
- * TODO: more comments
- * TODO: needs implementation
- * @param {*} request 
- * @param {*} response 
+ * Gets all the elements from the client, the requested measures and corresponding time intervals. 
+ * Load them from sql library, format the results correctly and send pdf page back to the user.
+ * @param {Request from the client. Contains all the requested measures.} request 
+ * @param {Sends back new page with, contains pdf with all the formatted measures.} response 
  */
 const reportHelper = async (request, response) => {
+    //  Get all requested tables from the user, put them in correct sql query and server user the pdf file
+    for (let key in request.body) {
+        console.log(request.body[key]);
+    }
+
     // Show error if something goes wrong
     IO.loadTextFile('tables').then(function (measureList) {
         response.render('pages/reportCreator', {
@@ -579,7 +584,6 @@ const reportHelper = async (request, response) => {
         console.log(error);
     });
 }
-
 
 /**
  * Sorts a two-dimensional array by the value of the first entry in every array.
