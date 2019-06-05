@@ -56,7 +56,7 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         </div>
         <span style="display:block; height: 10px;"></span>
 
-        <div style="text-align:center;">
+        <div class="print_canvas">
             <canvas id="chart" width="500" height="400"></canvas>
         </div>
 
@@ -68,12 +68,18 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
                 abrufen</button></div>
     </main>
 
-    <!-- Load sent data and helper script. -->
+    <!-- Load sent data and helper script. Code below could be moved into its own class. -->
     <script>
+        // Replace all because js doesn't have it
+        String.prototype.replaceAll = function (search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+
         let loadedTableName = '<%- loadedTable %>';
         loadedTableName = loadedTableName.trim();
         document.getElementById('name').innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replace('_y',
-            '');
+            '').replaceAll('_', ' ');
         const measureData = '<%- measureData %>';
         const measureListData = '<%- measureListData %>';
     </script>

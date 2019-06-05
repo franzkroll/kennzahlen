@@ -566,7 +566,27 @@ const deleteHelper = async (request, response) => {
 }
 
 /**
- * Sorts a two-dimensional array by the value of the first entry in every array
+ * TODO: more comments
+ * TODO: needs implementation
+ * @param {*} request 
+ * @param {*} response 
+ */
+const reportHelper = async (request, response) => {
+    // Show error if something goes wrong
+    IO.loadTextFile('tables').then(function (measureList) {
+        response.render('pages/reportCreator', {
+            user: request.session.username,
+            text: 'Fehler beim Laden der Daten!',
+            measureList: measureList
+        })
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+
+
+/**
+ * Sorts a two-dimensional array by the value of the first entry in every array.
  * @param {Array to be sorted.} array 
  */
 const sort2DArray = function (array) {
@@ -604,5 +624,6 @@ module.exports = {
     visualPostHelper: visualPostHelper,
     submitDataHelper: submitDataHelper,
     createMeasureHelper: createMeasureHelper,
-    deleteHelper: deleteHelper
+    deleteHelper: deleteHelper,
+    reportHelper: reportHelper
 }

@@ -22,6 +22,8 @@
 .misc-text-title {
     font-family: Tahoma, Geneva, sans-serif;
     text-align: center;
+    font-size: 22;
+    font-weight: bold;
 }
 
 /* User error text */
@@ -493,5 +495,11 @@ and also iPads specifically.
     .footer,
     .footer p {
         display: none;
+    }
+
+    /* TODO: why doesn't it work? */
+    .print_canvas {
+        text-align: center;
+        width: 95%;
     }
 }

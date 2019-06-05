@@ -65,6 +65,9 @@ module.exports = function (app) {
     // Logout user and delete the session object
     app.get('/logout', GetHelpers.logoutHelper);
 
+    // Show selection menu with multiple measures for report creation
+    app.get('/measureReport', GetHelpers.reportHelper);
+
     // Return error message if requested page doesn't exist
     app.get('*', function (request, response) {
         response.render('pages/errors/error404');
@@ -94,6 +97,6 @@ module.exports = function (app) {
     // Handles submitted data when user created a new measure, writes info into local files and creates table
     app.post('/createMeasure', PostHelpers.createMeasureHelper);
 
-    // Handles deletion of a measure
-    app.post('/deleteMeasure', PostHelpers.deleteHelper);
+    // Handles creation of reports
+    app.post('/report', PostHelpers.reportHelper);
 }
