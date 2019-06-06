@@ -10,6 +10,8 @@ const util = require('util');
 const favicon = require('serve-favicon');
 const Ddos = require('ddos')
 
+//feuerwehr\fw137902
+
 // Overwrite default console log and write into debug.log instead..
 const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 	flags: 'w'
@@ -48,7 +50,9 @@ app.set('view engine', 'ejs');
 // Prevention against multiple attacks
 app.use(helmet());
 app.use(helmet.noCache());
-app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
+app.use(helmet.referrerPolicy({
+	policy: 'same-origin'
+}))
 
 // Set icon for tabs etc.
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))

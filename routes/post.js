@@ -119,7 +119,7 @@ const visualPostHelper = async (request, response) => {
             // Check roles if measure is found in access table
             SQL.checkRolePermissions(roleList[i][1], request).then(function (result) {
                 if (result) {
-                    convertNameToSQL(request.body.measure, request.body.year).then(function (result) {
+                    loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
                         // Render page with newly acquired data
                         response.render('pages/visual', {
                             user: request.session.username,
@@ -551,10 +551,43 @@ const deleteHelper = async (request, response) => {
  * @param {Sends back new page with, contains pdf with all the formatted measures.} response 
  */
 const reportHelper = async (request, response) => {
-    //  Get all requested tables from the user, put them in correct sql query and server user the pdf file
+    let yearArray = [];
+    let measureArray = [];
+    const rowPacketArray = [];
+
+    // Split data in the body in the correct arrays for later processing
     for (let key in request.body) {
-        console.log(request.body[key]);
+        if (key === 'measure') {
+            measureArray = request.body[key];
+        } else if (key === 'year') {
+            yearArray = request.body[key];
+        } else {
+            console.log('Error while parsing data.')
+        }
     }
+
+    let promises = [];
+    let data = [];
+
+    // Query all the data from the database
+    for (i = 0; i < yearArray.length; i++) {
+        console.log(i);
+        promises.push(loadNameFromSQL(measureArray[i], yearArray[i]));
+        console.log('need to print data');
+    }
+
+    console.log(promises);
+
+    Promise.all(promises).then(results => {
+        data.push(results);
+    });
+
+    console.log(data);
+
+    // Create pdf report
+
+    // And send it back to the user
+
 
     // Show error if something goes wrong
     IO.loadTextFile('tables').then(function (measureList) {
@@ -575,7 +608,7 @@ const reportHelper = async (request, response) => {
  * @param {Name of the measure that we want the data of.} name 
  * @param {Year of the measure that we want the data of.} year 
  */
-function convertNameToSQL(name, year) {
+function loadNameFromSQL(name, year) {
     return new Promise(function (resolve, reject) {
         // Load file with table names for checking
         IO.loadTextFile('tables').then(function (measureList) {
