@@ -88,6 +88,9 @@ module.exports = function (app) {
     // Post action for deleting a user, if user exists he is deleted from the database
     app.post('/deleteUser', PostHelpers.deleteUserHelper);
 
+    // Post 
+    app.post('/deleteMeasure', PostHelpers.deleteHelper);
+
     // Loads request data from database and renders it with a new visual page 
     app.post('/visual', PostHelpers.visualPostHelper);
 

@@ -377,16 +377,16 @@ const createMeasureHelper = async (request, response) => {
             table.push(request.body.year);
             table.push(request.body.cycle);
             desc.push('dummy');
-            sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+            sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (monthly) {
             table.push(request.body.year);
             // Build sql string for table creation, TODO: prevent sql injection
-            sql = 'create table ' + tableName + '_' + request.body.year + ' (Monat INTEGER, ';
+            sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
             // Create table without year for measures that are measured once a year
         } else {
             // Build sql string for table creation, TODO: prevent sql injection
             table.push(request.body.cycle);
-            sql = 'create table ' + tableName + '_' + request.body.cycle + ' (Monat INTEGER, ';
+            sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
         }
 
         // Add attribute names and descriptions, should always be same number of items
@@ -412,6 +412,7 @@ const createMeasureHelper = async (request, response) => {
             measureList.push(table);
             measureDescriptions.push(desc);
         }
+
 
         // Insert into database
         SQL.measureDataRequest(sql).then(async () => {
