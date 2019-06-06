@@ -389,11 +389,13 @@ const createMeasureHelper = async (request, response) => {
             sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
         }
 
+        console.log(sql);
+
         // Add attribute names and descriptions, should always be same number of items
         for (let key in request.body) {
             if (key.includes('var')) {
                 table.push(request.body[key]);
-                sql += request.body[key].replaceAll(' ', '_') + ' FLOAT,'
+                sql += '`' + request.body[key].replaceAll(' ', '_') + '` FLOAT,'
             } else if (key.includes('desc')) {
                 desc.push(request.body[key]);
             }
