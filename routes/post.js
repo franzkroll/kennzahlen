@@ -119,16 +119,12 @@ const visualPostHelper = async (request, response) => {
             // Check roles if measure is found in access table
             SQL.checkRolePermissions(roleList[i][1], request).then(function (result) {
                 if (result) {
-                    convertNameToSQL(request.body.measure, request.body.year).then(function (tableName, data) {
-                        console.log('returning from promise');
-                        console.log(tableName);
-                        console.log(data);
-                        // Loaded measure data
+                    convertNameToSQL(request.body.measure, request.body.year).then(function (result) {
                         // Render page with newly acquired data
                         response.render('pages/visual', {
                             user: request.session.username,
-                            measureData: JSON.stringify(data),
-                            loadedTable: tableName,
+                            measureData: JSON.stringify(result[1]),
+                            loadedTable: result[0],
                             text: "Daten erfolgreich geladen!",
                             measureListData: measureList
                         });
@@ -573,12 +569,15 @@ const reportHelper = async (request, response) => {
 }
 
 /**
- * 
- * @param {*} name 
- * @param {*} year 
+ * Receives name and year, converts it to corresponding name in sql database and queries
+ * the database for this measure, converts it to a string and passes it upwards. All errors
+ * are also passed upwards.
+ * @param {Name of the measure that we want the data of.} name 
+ * @param {Year of the measure that we want the data of.} year 
  */
 function convertNameToSQL(name, year) {
     return new Promise(function (resolve, reject) {
+        // Load file with table names for checking
         IO.loadTextFile('tables').then(function (measureList) {
             let tableName;
 
@@ -593,17 +592,15 @@ function convertNameToSQL(name, year) {
             if (year) {
                 tableName += "_" + year.trim();
                 SQL.getMeasureFromDB(tableName).then(function (result) {
-                    console.log('loading from db');
-                    console.log(result);
-                    resolve(tableName, JSON.stringify(result));
+                    resolve([tableName, result]);
                 }).catch(function (error) {
-                    console.log(error);
                     reject(error);
                 });
             } else {
                 reject(error);
             }
 
+            // Catch errors while loading and pass them upwards
         }).catch(function (error) {
             reject(error);
         });
