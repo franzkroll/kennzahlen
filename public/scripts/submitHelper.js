@@ -82,7 +82,7 @@ selM.onclick = function () {
                     text.setAttribute("id", "id" + (i - 2));
                     text.setAttribute("placeholder", measure[i]);
                     text.setAttribute("required", "required");
-                    text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein.");
+                    text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein. Falls der Wert nicht vorhanden ist geben Sie bitte -1 ein.");
                     // ... and add it to the container
                     div.appendChild(text);
                     fieldContainer.appendChild(div);
