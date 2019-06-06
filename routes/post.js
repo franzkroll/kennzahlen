@@ -116,46 +116,33 @@ const visualPostHelper = async (request, response) => {
     for (i = 0; i < roleList.length; i++) {
         // If measure is found, check if saved role equals current role and admin/user
         if (request.body.measure === roleList[i][0]) {
-            found = true;
             // Check roles if measure is found in access table
             SQL.checkRolePermissions(roleList[i][1], request).then(function (result) {
                 if (result) {
-                    let tableName;
-
-                    // Check if inserted measure data really exists
-                    for (i = 0; i < measureList.length; i++) {
-                        if (measureList[i][0] === request.body.measure) {
-                            tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
-                        }
-                    }
-
-                    // Query database if user has also entered a year 
-                    if (request.body.year) {
-                        tableName += "_" + request.body.year.trim();
-
-                        SQL.getMeasureFromDB(tableName).then(function (result) {
-                            // Loaded measure data
-                            const measureData = JSON.stringify(result);
-                            // Render page with newly acquired data
-                            response.render('pages/visual', {
-                                user: request.session.username,
-                                measureData: JSON.stringify(measureData),
-                                loadedTable: tableName,
-                                text: "Daten erfolgreich geladen!",
-                                measureListData: measureList
-                            });
-                            // Show error if data query failed
-                        }).catch(function (error) {
-                            response.render('pages/visual', {
-                                user: request.session.username,
-                                measureData: "",
-                                loadedTable: "",
-                                text: "Datensatz nicht vorhanden!",
-                                measureListData: measureList
-                            });
+                    convertNameToSQL(request.body.measure, request.body.year).then(function (tableName, data) {
+                        console.log('returning from promise');
+                        console.log(tableName);
+                        console.log(data);
+                        // Loaded measure data
+                        // Render page with newly acquired data
+                        response.render('pages/visual', {
+                            user: request.session.username,
+                            measureData: JSON.stringify(data),
+                            loadedTable: tableName,
+                            text: "Daten erfolgreich geladen!",
+                            measureListData: measureList
                         });
-                    }
-                    // Show error page if rights check failed.
+                        // Show error if data query failed
+                    }).catch(function (error) {
+                        console.log(error);
+                        response.render('pages/visual', {
+                            user: request.session.username,
+                            measureData: "",
+                            loadedTable: "",
+                            text: "Datensatz nicht vorhanden!",
+                            measureListData: measureList
+                        });
+                    });
                 } else {
                     response.render('pages/visual', {
                         user: request.session.username,
@@ -168,7 +155,7 @@ const visualPostHelper = async (request, response) => {
                 // Show error page if rights check failed.
             }).catch(function (error) {
                 console.log(error);
-            })
+            });
         }
     }
 }
@@ -582,6 +569,44 @@ const reportHelper = async (request, response) => {
         });
     }).catch(function (error) {
         console.log(error);
+    });
+}
+
+/**
+ * 
+ * @param {*} name 
+ * @param {*} year 
+ */
+function convertNameToSQL(name, year) {
+    return new Promise(function (resolve, reject) {
+        IO.loadTextFile('tables').then(function (measureList) {
+            let tableName;
+
+            // Check if inserted measure data really exists
+            for (i = 0; i < measureList.length; i++) {
+                if (measureList[i][0] === name) {
+                    tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
+                }
+            }
+
+            // If user has entered a year we can add it and query the database
+            if (year) {
+                tableName += "_" + year.trim();
+                SQL.getMeasureFromDB(tableName).then(function (result) {
+                    console.log('loading from db');
+                    console.log(result);
+                    resolve(tableName, JSON.stringify(result));
+                }).catch(function (error) {
+                    console.log(error);
+                    reject(error);
+                });
+            } else {
+                reject(error);
+            }
+
+        }).catch(function (error) {
+            reject(error);
+        });
     });
 }
 
