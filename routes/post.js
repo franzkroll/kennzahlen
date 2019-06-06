@@ -214,15 +214,15 @@ const submitDataHelper = async (request, response) => {
                 const year = date.slice(date.length - 4, date.length);
 
                 // Build sql string
-                let query = 'REPLACE INTO ' + tableName;
+                let query = 'REPLACE INTO `' + tableName;
 
                 // Different cases for different kinds of measures, yearly, quarterly and monthly
                 if (measureList[indexSave][1] === 'yearly') {
                     // Needed for yearly measures
-                    query += '_yearly () values (' + mysql.escape(year) + ',';
+                    query += '_yearly` () values (' + mysql.escape(year) + ',';
                 } else if (measureList[indexSave][2] === 'quarterly') {
                     // Add year to tablename
-                    query += '_' + year + ' () values (';
+                    query += '_' + year + '` () values (';
 
                     // First case handles the year entry, second case entries with quarter
                     if (date.length === 4) {
@@ -232,7 +232,7 @@ const submitDataHelper = async (request, response) => {
                     }
                 } else {
                     // Add year to tablename
-                    query += '_' + year + ' () values (';
+                    query += '_' + year + '` () values (';
 
                     // First case handles the year entry, second case entries with months
                     if (date.length === 4) {
@@ -626,7 +626,7 @@ function loadNameFromSQL(name, year) {
 
             // If user has entered a year we can add it and query the database
             if (year) {
-                tableName += "_" + year.trim();
+                tableName = tableName + "_" + year.trim();
                 SQL.getMeasureFromDB(tableName).then(function (result) {
                     resolve([tableName, result]);
                 }).catch(function (error) {

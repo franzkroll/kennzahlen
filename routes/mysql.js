@@ -120,7 +120,7 @@ function checkRolePermissions(role, request) {
  */
 function getMeasureFromDB(tableName) {
     return new Promise(function (resolve, reject) {
-        connectionData.query('SELECT * FROM ' + tableName + ';', function (err, res) {
+        connectionData.query('SELECT * FROM `' + tableName + '`;', function (err, res) {
             if (err) {
                 return reject(err);
             } else {

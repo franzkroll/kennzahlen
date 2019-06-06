@@ -188,6 +188,8 @@ selM.onclick = function () {
                     }
                 }
 
+                // TODO: fill corresponding cell, not just in order
+
                 // Precaution so we don't leave the array length later on
                 if (insertedHead && (j < measure.length - 3)) {
                     // Prepare new table rows for data
@@ -213,12 +215,23 @@ selM.onclick = function () {
                         // Saves data for graphs
                         let dataBuilder = [];
                         for (k = j + 1; k < columns.length; k += columnCount) {
-                            // Remove everything from data that isn't a number or decimal point
-                            let cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
+                            // Remove everything from data that isn't a number or decimal point, TODO: comments
+                            let cellData;
+
+                            if (columns[k].split(':')[1].slice(0, 2) === '-1') {
+                                cellData = 'n/a';
+                            } else {
+                                cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
+                            }
 
                             // Fill correct table cell with data
                             let cell = row.insertCell(-1);
                             cell.innerHTML = cellData;
+
+                            if (cellData === 'n/a') {
+                                cellData = 0;
+                            }
+
                             if (k != j + 1) {
                                 dataBuilder.push(cellData);
                                 // Special case for yearly measures, in monthly and quarterly measures the year is left out

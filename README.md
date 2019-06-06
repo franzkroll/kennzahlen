@@ -19,7 +19,15 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in [routes/mysql.js](routes/mysql.js), im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. 
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in [routes/mysql.js](routes/mysql.js), im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten.
+
+Weiterhin müssen drei Dateien im Hauptordner angelegt werden:
+
+```sh
+touch desc.txt
+touch tables.txt
+touch roles.txt
+```
 
 ### Datenfelder die an lokale MySQL-Zugangsdaten angepasst werden müssen:
 
