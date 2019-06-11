@@ -4,6 +4,7 @@ const selM = document.getElementById('measure');
 const selYear = document.getElementById('duration');
 const fieldContainer = document.getElementById("container");
 
+
 // Fill leftmost select with items so that they are selectable
 for (i = 0; i < measureArray.length - 1; i++) {
     const measure = measureArray[i].split(',').filter(Boolean);
@@ -12,6 +13,7 @@ for (i = 0; i < measureArray.length - 1; i++) {
     opt.value = measure[0];
     selM.appendChild(opt);
 }
+
 
 // TODO: automatically reselect item after submitting
 // TODO: color filled values differently
@@ -92,5 +94,14 @@ selM.onclick = function () {
                 }
             }
         }
+    }
+}
+
+// Automatically reselect last item that was entered
+for (var i, j = 0; i = selM.options[j]; j++) {
+    if (i.value === lastMeasure) {
+        selM.selectedIndex = j;
+        selM.onclick();
+        break;
     }
 }

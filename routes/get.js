@@ -234,7 +234,8 @@ const submitHelper = function (request, response) {
         IO.loadTextFile('tables').then(function (measureList) {
             response.render('pages/submit', {
                 user: request.session.username,
-                text: "",
+                text: '',
+                measure: '',
                 measureListData: measureList
             });
             // Catch file IO errors

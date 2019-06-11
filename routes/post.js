@@ -258,6 +258,7 @@ const submitDataHelper = async (request, response) => {
                     response.render('pages/submit', {
                         text: "Daten erfolgreich eingetragen!",
                         user: request.session.username,
+                        measure: request.body.measure,
                         measureListData: measureList
                     });
                     // Catch sql errors
@@ -266,6 +267,7 @@ const submitDataHelper = async (request, response) => {
                     response.render('pages/submit', {
                         user: request.session.username,
                         text: "Fehler beim Eintragen der Daten!",
+                        measure: request.body.measure,
                         measureListData: measureList
                     });
                 });
@@ -276,6 +278,7 @@ const submitDataHelper = async (request, response) => {
                     response.render('pages/submit', {
                         text: "Dafür besitzen Sie nicht die nötigen Rechte!",
                         user: request.session.username,
+                        measure: request.body.measure,
                         measureListData: measureListNew
                     });
                 });
