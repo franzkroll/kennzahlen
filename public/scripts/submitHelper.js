@@ -14,26 +14,27 @@ for (i = 0; i < measureArray.length - 1; i++) {
     selM.appendChild(opt);
 }
 
-
-// TODO: automatically reselect item after submitting
-// TODO: color filled values differently
+// TODO: Different background colors for entries that have data
 
 // Needed for converting month number to text
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['1. Quartal', '2. Quartal', '3. Quartal', '4. Quartal'];
-
-// TODO: Display already submitted values when month is selected or too much to do?
 
 // Search for measure that was input by the user, when found display attributes
 selM.onclick = function () {
     const index = this.selectedIndex;
     const inputText = this.children[index].innerHTML.trim();
 
+    // Somehow we can get stuck in the next for loop, need this additional condition
+    let isFound = false;
+
     // Loop through measure known to the system
-    for (i = 0; i < measureArray.length; i++) {
+    for (i = 0; i < measureArray.length && !isFound; i++) {
         const measure = measureArray[i].split(',').filter(Boolean);
 
         if (measure[0] === inputText) {
+            isFound = true;
+
             // Clear any existing fields
             selYear.innerHTML = "";
             fieldContainer.innerHTML = "";
@@ -78,6 +79,8 @@ selM.onclick = function () {
 
             // Create text fields for all measure attributes
             for (i = 2; i < measure.length - 1; i++) {
+                // console.log('creating attributes');
+
                 if (measure[i] !== 'quarterly') {
                     var div = document.createElement("div");
                     var text = document.createElement("input");
@@ -98,10 +101,20 @@ selM.onclick = function () {
 }
 
 // Automatically reselect last item that was entered
-for (var i, j = 0; i = selM.options[j]; j++) {
+for (let i, j = 0; i = selM.options[j]; j++) {
     if (i.value === lastMeasure) {
         selM.selectedIndex = j;
         selM.onclick();
+        break;
+    }
+}
+
+// Automatically reselect last item that was entered, maybe we should also select the month
+for (let i, j = 0; i = selYear.options[j]; j++) {
+    const date = lastMonth + lastYear;
+
+    if (i.value == date) {
+        selYear.selectedIndex = j;
         break;
     }
 }

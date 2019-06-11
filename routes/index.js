@@ -68,7 +68,7 @@ module.exports = function (app) {
     // Show selection menu with multiple measures for report creation
     app.get('/measureReport', GetHelpers.reportHelper);
 
-    // TODO: create and comments
+    // Display measure and options to add a new attribute to them
     app.get('/changeMeasure', GetHelpers.changeHelper);
 
     // Return error message if requested page doesn't exist
@@ -91,7 +91,7 @@ module.exports = function (app) {
     // Post action for deleting a user, if user exists he is deleted from the database
     app.post('/deleteUser', PostHelpers.deleteUserHelper);
 
-    // Post 
+    // Post action for deleting a measure
     app.post('/deleteMeasure', PostHelpers.deleteHelper);
 
     // Loads request data from database and renders it with a new visual page 
@@ -106,6 +106,6 @@ module.exports = function (app) {
     // Handles creation of reports
     app.post('/report', PostHelpers.reportHelper);
 
-    // TODO: implement 
-    app.post('/change', PostHelpers.postChangeHelper);
+    // Handles insertion of new attribute into existing measure
+    app.post('/change', PostHelpers.changeMeasureHelper);
 }

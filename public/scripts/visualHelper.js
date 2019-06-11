@@ -42,7 +42,6 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-// TODO: automatically add numbers together for year value
 
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
@@ -217,9 +216,10 @@ selM.onclick = function () {
                         // Saves data for graphs
                         let dataBuilder = [];
                         for (k = j + 1; k < columns.length; k += columnCount) {
-                            // Remove everything from data that isn't a number or decimal point, TODO: comments
+                            // Remove everything from data that isn't a number or decimal point
                             let cellData;
 
+                            // We only need the second part of the data for the table
                             if (columns[k].split(':')[1].slice(0, 2) === '-1') {
                                 cellData = 'n/a';
                             } else {
@@ -230,10 +230,12 @@ selM.onclick = function () {
                             let cell = row.insertCell(-1);
                             cell.innerHTML = cellData;
 
+                            // Just add a zero if we don't have the data
                             if (cellData === 'n/a') {
                                 cellData = 0;
                             }
 
+                            // Push data to arrays for graph visualization
                             if (k != j + 1) {
                                 dataBuilder.push(cellData);
                                 // Special case for yearly measures, in monthly and quarterly measures the year is left out
@@ -319,7 +321,7 @@ selGraph.onchange = function (e) {
             }
         });
     } else if (svalue === 'radar') {
-        // Nice to have, but maybe a bit useless here, can't be zoomed/panned either
+        // Nice to have, but maybe a bit useless here, can't be zoomed/panned either, maybe add more options later here
         currentChart = new Chart(document.getElementById("chart"), {
             type: 'radar',
             data: {

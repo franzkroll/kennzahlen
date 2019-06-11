@@ -236,6 +236,8 @@ const submitHelper = function (request, response) {
                 user: request.session.username,
                 text: '',
                 measure: '',
+                lastYear: '',
+                lastMonth: '',
                 measureListData: measureList
             });
             // Catch file IO errors

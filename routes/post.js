@@ -177,6 +177,8 @@ const submitDataHelper = async (request, response) => {
         console.log(error);
     }
 
+    // TODO: automatically add numbers together for year value if new values are entered
+
     // Save index, because for keeps running while reading from disk
     let indexSave = -1;
 
@@ -253,12 +255,16 @@ const submitDataHelper = async (request, response) => {
                 // Remove last comma
                 query = query.slice(0, query.length - 1) + ');';
 
+                month = date.slice(0, date.length - 4);
+
                 // And insert them into the database
                 SQL.measureDataRequest(query).then(function () {
                     response.render('pages/submit', {
                         text: "Daten erfolgreich eingetragen!",
                         user: request.session.username,
                         measure: request.body.measure,
+                        lastYear: year,
+                        lastMonth: month,
                         measureListData: measureList
                     });
                     // Catch sql errors
@@ -268,6 +274,8 @@ const submitDataHelper = async (request, response) => {
                         user: request.session.username,
                         text: "Fehler beim Eintragen der Daten!",
                         measure: request.body.measure,
+                        lastYear: year,
+                        lastMonth: month,
                         measureListData: measureList
                     });
                 });
@@ -279,6 +287,8 @@ const submitDataHelper = async (request, response) => {
                         text: "Dafür besitzen Sie nicht die nötigen Rechte!",
                         user: request.session.username,
                         measure: request.body.measure,
+                        lastYear: year,
+                        lastMonth: month,
                         measureListData: measureListNew
                     });
                 });
@@ -610,8 +620,8 @@ const reportHelper = async (request, response) => {
     });
 }
 
-const postChangeHelper = async (request, response) => {
-    // TODO:
+const changeMeasureHelper = async (request, response) => {
+    // TODO: needs implementation    
 }
 
 /**
@@ -643,9 +653,6 @@ function loadNameFromSQL(name, year) {
                     reject(error);
                 });
             }
-            /*else {
-                           reject(error);
-                       }*/
 
             // Catch errors while loading and pass them upwards
         }).catch(function (error) {
@@ -695,5 +702,5 @@ module.exports = {
     createMeasureHelper: createMeasureHelper,
     deleteHelper: deleteHelper,
     reportHelper: reportHelper,
-    postChangeHelper: postChangeHelper
+    changeMeasureHelper: changeMeasureHelper
 }

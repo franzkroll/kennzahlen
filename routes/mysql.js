@@ -204,6 +204,19 @@ function deleteUserFromDB(id) {
 }
 
 /**
+ * TODO: comments and implementation
+ * @param {*} data 
+ */
+function addColumnToDB(data) {
+    return new Promise(function (resolve, reject) {
+        connectionLogin.query('', function (err) {
+            if (err) return reject(err);
+            resolve();
+        })
+    });
+}
+
+/**
  * Check if entered password is a safe password, used when a new user is created.
  * @param {Password to be checked.} password 
  */
