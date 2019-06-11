@@ -3,6 +3,7 @@ const measureArray = measureData.split(';');
 const selM = document.getElementById('measure');
 const selYear = document.getElementById('duration');
 const fieldContainer = document.getElementById("container");
+const entryListSplit = entryList.split(';');
 
 
 // Fill leftmost select with items so that they are selectable
@@ -14,7 +15,7 @@ for (i = 0; i < measureArray.length - 1; i++) {
     selM.appendChild(opt);
 }
 
-// TODO: Different background colors for entries that have data
+// TODO: Color background only works in Chromium
 
 // Needed for converting month number to text
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -33,8 +34,6 @@ selM.onclick = function () {
         const measure = measureArray[i].split(',').filter(Boolean);
 
         if (measure[0] === inputText) {
-            isFound = true;
-
             // Clear any existing fields
             selYear.innerHTML = "";
             fieldContainer.innerHTML = "";
@@ -46,6 +45,9 @@ selM.onclick = function () {
                 for (k = 0; k < years.length; k++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(years[k]));
+                    if (entryListSplit[i].includes(years[k])) {
+                        opt.style.backgroundColor = '#90EE90';
+                    }
                     opt.value = years[k];
                     selYear.appendChild(opt);
 
@@ -54,6 +56,9 @@ selM.onclick = function () {
                         for (l = 0; l < quarters.length; l++) {
                             let opt = document.createElement('option');
                             opt.appendChild(document.createTextNode(quarters[l] + ' ' + years[k]));
+                            if (entryListSplit[i].includes(l + years[k])) {
+                                opt.style.backgroundColor = '#90EE90';
+                            }
                             opt.value = quarters[l] + years[k];
                             selYear.appendChild(opt);
                         }
@@ -62,6 +67,9 @@ selM.onclick = function () {
                         for (l = 0; l < months.length; l++) {
                             let opt = document.createElement('option');
                             opt.appendChild(document.createTextNode(months[l] + ' ' + years[k]));
+                            if (entryListSplit[i].includes(l + years[k])) {
+                                opt.style.backgroundColor = '#90EE90';
+                            }
                             opt.value = months[l] + years[k];
                             selYear.appendChild(opt);
                         }
@@ -72,6 +80,9 @@ selM.onclick = function () {
                 for (l = currentYear - 10; l <= currentYear + 10; l++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(l));
+                    if (entryListSplit[i].includes(l)) {
+                        opt.style.backgroundColor = '#90EE90';
+                    }
                     opt.value = l;
                     selYear.appendChild(opt);
                 }

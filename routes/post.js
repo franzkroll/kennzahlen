@@ -162,7 +162,7 @@ const visualPostHelper = async (request, response) => {
  * @param {Sends new submit page back to the user, either with error or success text.} response 
  */
 const submitDataHelper = async (request, response) => {
-    let roleList, measureList, result;
+    let roleList, measureList, entryList, result;
 
     // Used to convert month to month number
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -173,6 +173,7 @@ const submitDataHelper = async (request, response) => {
     try {
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
+        entryList = await IO.loadTextFile('entries');
     } catch (error) {
         console.log(error);
     }
@@ -186,6 +187,8 @@ const submitDataHelper = async (request, response) => {
     for (i = 0; i < roleList.length; i++) {
         if (request.body.measure === roleList[i][0]) {
             indexSave = i;
+            let quarterly = false;
+            let yearly = false;
 
             // If measure is found, check if saved role equals current role and admin/user
             try {
@@ -195,9 +198,7 @@ const submitDataHelper = async (request, response) => {
                 console.log(error);
             }
 
-            found = true;
-
-            // Check roles if measure is found in access table, TODO: build different queries depending on yearly/quarterly
+            // Check roles if measure is found in access table
             if (result) {
                 let tableName;
 
@@ -212,7 +213,7 @@ const submitDataHelper = async (request, response) => {
                 // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
                 const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
 
-                // Get just the year, TODO: do we need to escape the year here?
+                // Get just the year, TODO: sql injection escape needed here?
                 const year = date.slice(date.length - 4, date.length);
 
                 // Build sql string
@@ -221,10 +222,14 @@ const submitDataHelper = async (request, response) => {
                 // Different cases for different kinds of measures, yearly, quarterly and monthly
                 if (measureList[indexSave][1] === 'yearly') {
                     // Needed for yearly measures
+                    yearly = true;
+
                     query += '_yearly` () values (' + mysql.escape(year) + ',';
                 } else if (measureList[indexSave][2] === 'quarterly') {
                     // Add year to tablename
                     query += '_' + year + '` () values (';
+
+                    quarterly = true;
 
                     // First case handles the year entry, second case entries with quarter
                     if (date.length === 4) {
@@ -235,6 +240,7 @@ const submitDataHelper = async (request, response) => {
                 } else {
                     // Add year to tablename
                     query += '_' + year + '` () values (';
+
 
                     // First case handles the year entry, second case entries with months
                     if (date.length === 4) {
@@ -252,10 +258,74 @@ const submitDataHelper = async (request, response) => {
                     }
                 }
 
-                // Remove last comma
                 query = query.slice(0, query.length - 1) + ');';
 
+                // Month for automatic reselection
                 month = date.slice(0, date.length - 4);
+
+
+                let quarterNumber = -1;
+                let monthNumber = -1;
+
+                // Slice again for later use
+                if (quarterly) {
+                    quarterNumber = quarters.indexOf(date.slice(0, date.length - 4));
+                } else {
+                    monthNumber = months.indexOf(date.slice(0, date.length - 4));
+                }
+
+                let found = false;
+                let entry;
+
+                // Find correct entry in list of entries
+                for (k = 0; k < entryList.length; k++) {
+                    if (entryList[k][0] === request.body.measure) {
+                        found = true;
+                        entry = entryList[k];
+                    }
+                }
+
+                // TODO: comments
+                if (monthNumber == '-1') {
+                    monthNumber = '';
+                }
+
+                if (quarterNumber == -1) {
+                    quarterNumber = '';
+                }
+
+                if (!found) {
+                    if (quarterly) {
+                        entryList.push([request.body.measure, quarterNumber + year + ';']);
+                    } else if (yearly) {
+                        entryList.push([request.body.measure, year + ';']);
+                    } else {
+                        entryList.push([request.body.measure, monthNumber + year + ';']);
+                    }
+                } else {
+
+                    if (quarterly) {
+                        if (!entry.includes(quarterNumber + year) && !entry.includes(quarterNumber + year + ';')) {
+                            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+                            entry.push(quarterNumber + year + ';');
+                        }
+                    } else if (yearly) {
+                        if (!entry.includes(year) && !entry.includes(year + ';')) {
+                            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+                            entry.push(year + ';');
+                        }
+                    } else {
+                        if (!entry.includes(monthNumber + year) && !entry.includes(monthNumber + year + ';')) {
+                            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+                            entry.push(monthNumber + year + ';');
+                        }
+                    }
+                }
+
+
+                // Sort and write to disk if there was no sql error
+                entryList = await sort2DArray(entryList);
+                IO.arrayToTxt('entries', entryList);
 
                 // And insert them into the database
                 SQL.measureDataRequest(query).then(function () {
@@ -264,6 +334,7 @@ const submitDataHelper = async (request, response) => {
                         user: request.session.username,
                         measure: request.body.measure,
                         lastYear: year,
+                        entries: entryList,
                         lastMonth: month,
                         measureListData: measureList
                     });
@@ -275,6 +346,7 @@ const submitDataHelper = async (request, response) => {
                         text: "Fehler beim Eintragen der Daten!",
                         measure: request.body.measure,
                         lastYear: year,
+                        entries: entryList,
                         lastMonth: month,
                         measureListData: measureList
                     });
@@ -481,6 +553,7 @@ const deleteHelper = async (request, response) => {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
+        entryList = await IO.loadTextFile('entries');
     } catch (error) {
         console.log(error);
     }
@@ -506,6 +579,7 @@ const deleteHelper = async (request, response) => {
                     roleList.splice(i, 1);
                     measureList.splice(i, 1);
                     measureDescriptions.splice(i, 1);
+                    entryList.splice(i, 1); // TODO: delete just the year of the entry
                 }
             } else {
                 let newYears = '';
@@ -529,11 +603,14 @@ const deleteHelper = async (request, response) => {
                 measureDescriptions = await sort2DArray(measureDescriptions);
                 // Sort measure descriptions, so they are ordered the same
                 roleList = await sort2DArray(roleList);
+                // Sort measure descriptions, so they are ordered the same
+                entryList = await sort2DArray(entryList);
             } catch (error) {
                 console.log(error);
             }
 
             // Write new arrays to txt file
+            IO.arrayToTxt('entries', entryList);
             IO.arrayToTxt('roles', roleList);
             IO.arrayToTxt('tables', measureList);
             IO.arrayToTxt('desc', measureDescriptions);
@@ -681,6 +758,18 @@ const sort2DArray = function (array) {
         } catch (error) {
             reject(error);
         }
+    });
+}
+
+const removeDuplicates = function (array) {
+    return new Promise(function (resolve, reject) {
+        let unique = {};
+        array.forEach(function (i) {
+            if (!unique[i]) {
+                unique[i] = true;
+            }
+        });
+        resolve(Object.keys(unique));
     });
 }
 

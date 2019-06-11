@@ -228,8 +228,15 @@ const helpFunction = async (request, response) => {
  * @param {Used for login and role check.} request 
  * @param {Sends back submit page with table info.} response 
  */
-const submitHelper = function (request, response) {
-    // Check if user is logged in 
+const submitHelper = async (request, response) => {
+    // Check if user is logged in, TODO: better formatting
+    let entryList;
+    try {
+        entryList = await IO.loadTextFile('entries');
+    } catch (error) {
+        console.log(error);
+    }
+
     if (request.session.loggedin) {
         IO.loadTextFile('tables').then(function (measureList) {
             response.render('pages/submit', {
@@ -237,6 +244,7 @@ const submitHelper = function (request, response) {
                 text: '',
                 measure: '',
                 lastYear: '',
+                entries: entryList,
                 lastMonth: '',
                 measureListData: measureList
             });
