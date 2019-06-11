@@ -322,6 +322,25 @@ const reportHelper = function (request, response) {
     }
 }
 
+/**
+ * TODO: implement
+ * @param {} request 
+ * @param {*} response 
+ */
+const changeHelper = function (request, response) {
+    if (request.session.loggedin) {
+        IO.loadTextFile('tables').then(function (measureList) {
+            response.render('pages/changeMeasure', {
+                user: request.session.username,
+                text: "",
+                measureList: measureList
+            }); // Catch errors while loading from disk
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+}
+
 // Export all functions
 module.exports = {
     homeHelper: homeHelper,
@@ -336,5 +355,6 @@ module.exports = {
     createHelper: createHelper,
     adminHelper: adminHelper,
     helpFunction: helpFunction,
-    reportHelper: reportHelper
+    reportHelper: reportHelper,
+    changeHelper: changeHelper
 }

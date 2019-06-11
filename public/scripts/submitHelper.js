@@ -13,6 +13,9 @@ for (i = 0; i < measureArray.length - 1; i++) {
     selM.appendChild(opt);
 }
 
+// TODO: automatically reselect item after submitting
+// TODO: color filled values differently
+
 // Needed for converting month number to text
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['1. Quartal', '2. Quartal', '3. Quartal', '4. Quartal'];

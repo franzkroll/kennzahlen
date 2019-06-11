@@ -151,7 +151,7 @@ function measureDataRequest(query) {
  */
 function deleteMeasureFromDB(tableName) {
     return new Promise(function (resolve, reject) {
-        connectionData.query('DROP TABLE ' + tableName, function (err) {
+        connectionData.query('DROP TABLE `' + tableName + '`', function (err) {
             if (err) return reject(err);
             resolve();
         });

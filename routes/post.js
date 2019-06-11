@@ -292,6 +292,10 @@ const submitDataHelper = async (request, response) => {
  * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
 const createMeasureHelper = async (request, response) => {
+    // TODO: comma in descriptions and names, also brackets
+    // TODO: times
+    // TODO: 
+
     let measureDescriptions, measureList, roleList;
 
     try {
@@ -574,14 +578,13 @@ const reportHelper = async (request, response) => {
 
     // Query all the data from the database
     for (i = 0; i < yearArray.length; i++) {
-        console.log(i);
+        console.log(measureArray[i] + ' : ' + yearArray[i]);
         promises.push(loadNameFromSQL(measureArray[i], yearArray[i]));
-        console.log('need to print data');
     }
 
     console.log(promises);
 
-    Promise.all(promises).then(results => {
+    Promise.all(promises).then(function (results) {
         data.push(results);
     });
 
@@ -602,6 +605,10 @@ const reportHelper = async (request, response) => {
     }).catch(function (error) {
         console.log(error);
     });
+}
+
+const postChangeHelper = async (request, response) => {
+    // TODO:
 }
 
 /**
@@ -632,9 +639,10 @@ function loadNameFromSQL(name, year) {
                 }).catch(function (error) {
                     reject(error);
                 });
-            } else {
-                reject(error);
             }
+            /*else {
+                           reject(error);
+                       }*/
 
             // Catch errors while loading and pass them upwards
         }).catch(function (error) {
@@ -683,5 +691,6 @@ module.exports = {
     submitDataHelper: submitDataHelper,
     createMeasureHelper: createMeasureHelper,
     deleteHelper: deleteHelper,
-    reportHelper: reportHelper
+    reportHelper: reportHelper,
+    postChangeHelper: postChangeHelper
 }

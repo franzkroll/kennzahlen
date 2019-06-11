@@ -68,6 +68,9 @@ module.exports = function (app) {
     // Show selection menu with multiple measures for report creation
     app.get('/measureReport', GetHelpers.reportHelper);
 
+    // TODO: create and comments
+    app.get('/changeMeasure', GetHelpers.changeHelper);
+
     // Return error message if requested page doesn't exist
     app.get('*', function (request, response) {
         response.render('pages/errors/error404');
@@ -102,4 +105,7 @@ module.exports = function (app) {
 
     // Handles creation of reports
     app.post('/report', PostHelpers.reportHelper);
+
+    // TODO: implement 
+    app.post('/change', PostHelpers.postChangeHelper);
 }
