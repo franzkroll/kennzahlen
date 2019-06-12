@@ -204,17 +204,44 @@ function deleteUserFromDB(id) {
 }
 
 /**
- * TODO: comments and implementation
- * @param {*} data 
+ * Adds new column(s) to already existing table in database.
+ * @param {All the tables to which to columns are supposed to be added.} tableData 
+ * @param {New attributes (=columns) that we want to add to the previously passed tables.} attributeData 
  */
-function addColumnToDB(data) {
+function addColumnToDB(tableData, attributeData) {
+    console.log(tableData);
+    console.log(attributeData);
+
+    let queries = [];
+
+    // Replace whitespaces before insertion into database
+    for (i = 0; i < attributeData.length; i++) {
+        attributeData[i] = attributeData[i].replaceAll(' ', '_');
+    }
+
+    for (i = 0; i < tableData.length; i++) {
+        queries.push(tableData[i]);
+    }
+
+    // TODO: how to execute multiple queries?
+
     return new Promise(function (resolve, reject) {
-        connectionLogin.query('', function (err) {
+        connectionData.query('', function (err) {
             if (err) return reject(err);
             resolve();
         })
     });
 }
+
+
+/**
+ * Replaces all occurrences of search with replacement in the string that it was called from.
+ */
+String.prototype.replaceAll = function (search, replacement) {
+    let target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 
 /**
  * Check if entered password is a safe password, used when a new user is created.
@@ -259,5 +286,6 @@ module.exports = {
     deleteMeasureFromDB: deleteMeasureFromDB,
     insertUserIntoDB: insertUserIntoDB,
     deleteUserFromDB: deleteUserFromDB,
-    getUserFromDB: getUserFromDB
+    getUserFromDB: getUserFromDB,
+    addColumnToDB: addColumnToDB
 }

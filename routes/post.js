@@ -215,7 +215,7 @@ const submitDataHelper = async (request, response) => {
                 // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
                 const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
 
-                // Get just the year, TODO: sql injection escape needed here?
+                // Get just the year
                 const year = date.slice(date.length - 4, date.length);
 
                 // Build sql string
@@ -374,7 +374,6 @@ const submitDataHelper = async (request, response) => {
  */
 const createMeasureHelper = async (request, response) => {
     // TODO: comma in descriptions and names, also brackets
-    // TODO: times
 
     let measureDescriptions, measureList, roleList;
 
@@ -468,9 +467,10 @@ const createMeasureHelper = async (request, response) => {
 
         let sql;
 
-        // Format name correctly for mysql and add the year
+        // Format name correctly for mysql and add the year, TODO: tablename needs sql escape?
         let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
 
+        // Build string here with correct attributes
         if (quarterly) {
             // Create table and data for measures that are measured quarterly, they are still stored in the default format
             table.push(request.body.year);
@@ -479,11 +479,8 @@ const createMeasureHelper = async (request, response) => {
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (monthly) {
             table.push(request.body.year);
-            // Build sql string for table creation, TODO: prevent sql injection
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
-            // Create table without year for measures that are measured once a year
         } else {
-            // Build sql string for table creation, TODO: prevent sql injection
             table.push(request.body.cycle);
             sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
         }
@@ -589,7 +586,7 @@ const deleteHelper = async (request, response) => {
                     roleList.splice(i, 1);
                     measureList.splice(i, 1);
                     measureDescriptions.splice(i, 1);
-                    entryList.splice(i, 1); // TODO: delete just the year of the entry
+                    entryList.splice(i, 1);
                 }
             } else {
                 let newYears = '';
@@ -726,8 +723,94 @@ const reportHelper = async (request, response) => {
     });
 }
 
+/**
+ * Receives post requests from changeMeasure page, collects all the necessary info and passes it to 
+ * the database as request. If everything goes well the column is added to the correct table in the database
+ * @param {Request from the user page, contains all the data needed for creation of new column.} request 
+ * @param {Sends back new page with success/error text.} response 
+ */
 const changeMeasureHelper = async (request, response) => {
-    // TODO: needs implementation    
+    let measureDescriptions, measureList;
+
+    // Try to load data about tables from disk
+    try {
+        measureDescriptions = await IO.loadTextFile('desc');
+        measureList = await IO.loadTextFile('tables');
+    } catch (error) {
+        console.log(error);
+    }
+
+    // Different helper arrays used later for storing the data
+    let tableNames = [];
+    let descData = [];
+    let attributeData = [];
+    let foundIndex = -1;
+    let tableName;
+
+    // Cycle through measures known to the system and look for entered measure
+    for (i = 0; i < measureList.length; i++) {
+        if (measureList[i][0] === request.body.measure) {
+            // Format tablename correctly here
+            tableName = measureList[i][measureList[i].length - 1].slice(0, measureList[i][measureList[i].length - 1].length - 1) + '_';
+            // Store index here for later, should be the same for all
+            foundIndex = i;
+
+            // Split years of the measure
+            const years = measureList[i][1].split(':');
+
+            // Cycle through years of the measure and add them all to the tablename, store them in tableNames
+            for (j = 0; j < years.length; j++) {
+                tableNames.push(tableName + years[j]);
+            }
+        }
+    }
+
+    // Get stuff from request and save in corresponding arrays
+    for (let key in request.body) {
+        // Save found stuff for later, for now only one value in each, but could be easily converted to multiple values
+        if (key.includes('var')) {
+            attributeData.push(request.body[key]);
+        } else if (key.includes('desc')) {
+            descData.push(request.body[key] + ';');
+        }
+    }
+
+    // Make sure we have the correct entry and start adding values
+    if (measureList[foundIndex][0] === request.body.measure) {
+        // Add descData to correct place in description array
+        // Add new attributes to correct place in tables array
+        for (j = 0; j < descData.length; j++) {
+            // Remove the last semicolon so we don't get confused later
+            const entry = measureDescriptions[foundIndex];
+            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+
+            measureDescriptions[foundIndex].push(descData[j]);
+            // Insert it into measureList, but before the last element
+            measureList[foundIndex].splice(measureList[foundIndex].length - 1, 0, attributeData[j]);
+        }
+    }
+
+    // Write new arrays to txt file, sorting isn't necessary here
+    //IO.arrayToTxt('tables', measureList);
+    //IO.arrayToTxt('desc', measureDescriptions);
+
+    // Delete entry from the database and render page again with status information
+    SQL.addColumnToDB(tableNames, attributeData).then(function () {
+        // Render page again with information text
+        response.render('pages/changeMeasure', {
+            user: request.session.username,
+            text: "Neue Attribute erfolgreich hinzugefügt.",
+            measureList: measureList
+        });
+        // Or catch mysql error and show user corresponding error
+    }).catch(function (error) {
+        //console.log(error);
+        response.render('pages/changeMeasure', {
+            user: request.session.username,
+            text: "Fehler beim Hinzufügen des neuen Attributs!",
+            measureList: measureList
+        });
+    });
 }
 
 /**
