@@ -125,7 +125,8 @@ const visualPostHelper = async (request, response) => {
                             user: request.session.username,
                             measureData: JSON.stringify(result[1]),
                             loadedTable: result[0],
-                            text: "Daten erfolgreich geladen!",
+                            text: 'Daten erfolgreich geladen!',
+                            lastSelected: request.body.measure,
                             measureListData: measureList
                         });
                         // Show error if data query failed
@@ -133,18 +134,19 @@ const visualPostHelper = async (request, response) => {
                         console.log(error);
                         response.render('pages/visual', {
                             user: request.session.username,
-                            measureData: "",
-                            loadedTable: "",
-                            text: "Datensatz nicht vorhanden!",
+                            measureData: '',
+                            loadedTable: '',
+                            lastSelected: '',
+                            text: 'Datensatz nicht vorhanden!',
                             measureListData: measureList
                         });
                     });
                 } else {
                     response.render('pages/visual', {
                         user: request.session.username,
-                        measureData: "",
-                        loadedTable: "",
-                        text: "Dafür besitzen Se nicht die nötigen Rechte!",
+                        measureData: '',
+                        loadedTable: '',
+                        text: 'Dafür besitzen Se nicht die nötigen Rechte!',
                         measureListData: measureList
                     });
                 }
@@ -263,15 +265,15 @@ const submitDataHelper = async (request, response) => {
                 // Month for automatic reselection
                 month = date.slice(0, date.length - 4);
 
-
+                // Contain month or quarter number if it exists, else it is -1
                 let quarterNumber = -1;
                 let monthNumber = -1;
 
-                // Slice again for later use
+                // Get indexes of month or quarters
                 if (quarterly) {
-                    quarterNumber = quarters.indexOf(date.slice(0, date.length - 4));
+                    quarterNumber = quarters.indexOf(month);
                 } else {
-                    monthNumber = months.indexOf(date.slice(0, date.length - 4));
+                    monthNumber = months.indexOf(month);
                 }
 
                 let found = false;
@@ -285,25 +287,17 @@ const submitDataHelper = async (request, response) => {
                     }
                 }
 
-                // TODO: comments
+                // Empty numbers for string if they aren't there
                 if (monthNumber == '-1') {
                     monthNumber = '';
                 }
-
                 if (quarterNumber == -1) {
                     quarterNumber = '';
                 }
 
-                if (!found) {
-                    if (quarterly) {
-                        entryList.push([request.body.measure, quarterNumber + year + ';']);
-                    } else if (yearly) {
-                        entryList.push([request.body.measure, year + ';']);
-                    } else {
-                        entryList.push([request.body.measure, monthNumber + year + ';']);
-                    }
-                } else {
-
+                // Push completely new entry if the measure wasn't present before
+                if (found) {
+                    // If not slice out the comma and add the new number to it, also check before to make sure we don't have a duplicate entry
                     if (quarterly) {
                         if (!entry.includes(quarterNumber + year) && !entry.includes(quarterNumber + year + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
@@ -320,8 +314,10 @@ const submitDataHelper = async (request, response) => {
                             entry.push(monthNumber + year + ';');
                         }
                     }
+                    // We should never reach this except user messes with files he shouldn't
+                } else {
+                    console.log('ERROR: Tried entering data for measure that doesn\'t exist.')
                 }
-
 
                 // Sort and write to disk if there was no sql error
                 entryList = await sort2DArray(entryList);
@@ -379,7 +375,6 @@ const submitDataHelper = async (request, response) => {
 const createMeasureHelper = async (request, response) => {
     // TODO: comma in descriptions and names, also brackets
     // TODO: times
-    // TODO: 
 
     let measureDescriptions, measureList, roleList;
 
@@ -387,6 +382,7 @@ const createMeasureHelper = async (request, response) => {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
+        entryList = await IO.loadTextFile('entries');
     } catch (error) {
         console.log(error);
     }
@@ -451,10 +447,24 @@ const createMeasureHelper = async (request, response) => {
             roleList.push([request.body.name, request.body.role + ';']);
         }
 
+        let notExists = true;
+
         // Trim any remaining white spaces and push to lists
         desc.push(request.body.name.trim());
         desc.push(request.body.mainDesc);
         table.push(request.body.name.trim());
+
+        // Check if entry existed before
+        for (l = 0; l < entryList.length; l++) {
+            if (entryList[l].includes(request.body.name)) {
+                notExists = false;
+            }
+        }
+
+        // Push if it didn't exist before
+        if (notExists) {
+            entryList.push([request.body.name, 'dummy;']);
+        }
 
         let sql;
 
@@ -477,8 +487,6 @@ const createMeasureHelper = async (request, response) => {
             table.push(request.body.cycle);
             sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
         }
-
-        console.log(sql);
 
         // Add attribute names and descriptions, should always be same number of items
         for (let key in request.body) {
@@ -504,7 +512,6 @@ const createMeasureHelper = async (request, response) => {
             measureDescriptions.push(desc);
         }
 
-
         // Insert into database
         SQL.measureDataRequest(sql).then(async () => {
             try {
@@ -514,6 +521,8 @@ const createMeasureHelper = async (request, response) => {
                 measureDescriptions = await sort2DArray(measureDescriptions);
                 // Sort measure descriptions, so they are ordered the same
                 roleList = await sort2DArray(roleList);
+                // Sort entry descriptions, so they are ordered the same
+                entryList = await sort2DArray(entryList);
             } catch (error) {
                 console.log(error);
             }
@@ -522,6 +531,7 @@ const createMeasureHelper = async (request, response) => {
             IO.arrayToTxt('roles', roleList);
             IO.arrayToTxt('tables', measureList);
             IO.arrayToTxt('desc', measureDescriptions);
+            IO.arrayToTxt('entries', entryList);
 
             response.render('pages/createMeasure', {
                 text: "Kennzahl erfolgreich erstellt!",
@@ -590,6 +600,25 @@ const deleteHelper = async (request, response) => {
                     }
                 }
                 found = true;
+
+
+                // Find corresponding entry in entryList, remove all values in that entry that contain the deleted year
+                for (k = 0; k < entryList.length; k++) {
+                    // Need to make sure it exists, otherwise we might delete some other entry
+                    if (entryList[i][0] === request.body.measureSelect) {
+                        let newEntryList = [];
+                        // Loop through years, create new array with every value that isn't supposed to be deleted
+                        for (l = 0; l < entryList[i].length; l++) {
+                            if (!entryList[i][l].includes(request.body.yearSelect)) {
+                                newEntryList.push(entryList[i][l]);
+                            }
+                        }
+                        // Overwrite old values
+                        entryList[i] = newEntryList;
+                    } else {
+                        console.log('Measure without entries deleted.')
+                    }
+                }
 
                 // Remove last :
                 measureList[i][1] = newYears.slice(0, newYears.length - 1);
@@ -739,7 +768,7 @@ function loadNameFromSQL(name, year) {
 }
 
 /**
- * Sorts a two-dimensional array by the value of the first entry in every array.
+ * Sorts a two-dimensional array by the value of the first entry in every array. Maybe needs more comments.
  * @param {Array to be sorted.} array 
  */
 const sort2DArray = function (array) {
@@ -758,18 +787,6 @@ const sort2DArray = function (array) {
         } catch (error) {
             reject(error);
         }
-    });
-}
-
-const removeDuplicates = function (array) {
-    return new Promise(function (resolve, reject) {
-        let unique = {};
-        array.forEach(function (i) {
-            if (!unique[i]) {
-                unique[i] = true;
-            }
-        });
-        resolve(Object.keys(unique));
     });
 }
 

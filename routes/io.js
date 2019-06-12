@@ -1,5 +1,5 @@
 // Imports
-const fs = require('fs');
+const fs = require('fs-extra');
 
 /**
  * Loads tables from disk txt file and converts them to an array.
@@ -10,9 +10,13 @@ function loadTextFile(name) {
     return new Promise(function (resolve, reject) {
         let array = [];
         let text;
+        const path = './files/' + name + '.txt';
+
         // Try to read file from page into text string
         try {
-            text = fs.readFileSync('./' + name + '.txt').toString('utf-8');
+            fs.ensureFileSync(path)
+
+            text = fs.readFileSync(path).toString('utf-8');
             // Split at line breaks and put it into array
             if (text != '') {
                 const textByLine = text.split("\n")
@@ -23,7 +27,7 @@ function loadTextFile(name) {
             resolve(array);
             console.log('Read from file.');
         } catch (error) {
-            reject(err);
+            reject(error);
         }
     });
 }
@@ -37,11 +41,17 @@ function loadTextFile(name) {
 const arrayToTxt = function (name, array) {
     // Try to write array to disk, overwrites existing file
     try {
-        let file = fs.createWriteStream(name + '.txt');
+        const path = 'files/' + name + '.txt';
+
+        // Make sure the file exists
+        fs.ensureFileSync(path)
+
+        let file = fs.createWriteStream(path);
 
         file.on('error', function (err) {
             console.log(err);
         });
+
         // Append each array element to file
         array.forEach(function (v) {
             if (v != '') {

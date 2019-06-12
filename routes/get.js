@@ -36,9 +36,10 @@ const visualHelper = function (request, response) {
         IO.loadTextFile('tables').then(function (measureList) {
             response.render('pages/visual', {
                 user: request.session.username,
-                measureData: "",
-                loadedTable: "",
-                text: "",
+                measureData: '',
+                loadedTable: '',
+                text: '',
+                lastSelected: '',
                 measureListData: measureList
             });
             // Catch errors while loading from disk
@@ -229,7 +230,6 @@ const helpFunction = async (request, response) => {
  * @param {Sends back submit page with table info.} response 
  */
 const submitHelper = async (request, response) => {
-    // Check if user is logged in, TODO: better formatting
     let entryList;
     try {
         entryList = await IO.loadTextFile('entries');
@@ -334,9 +334,9 @@ const reportHelper = function (request, response) {
 }
 
 /**
- * TODO: implement
- * @param {} request 
- * @param {*} response 
+ * Loads page for changing a measure, which means adding an attribute to an existing measure.
+ * @param {Request from the user, used for checking if user is logged in.} request 
+ * @param {Response sent back, renders new page with measure data.} response 
  */
 const changeHelper = function (request, response) {
     if (request.session.loggedin) {

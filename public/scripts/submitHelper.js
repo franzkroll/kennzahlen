@@ -45,7 +45,8 @@ selM.onclick = function () {
                 for (k = 0; k < years.length; k++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(years[k]));
-                    if (entryListSplit[i].includes(years[k])) {
+                    // Color existing entries green
+                    if (entryListSplit[i].includes(',' + years[k])) {
                         opt.style.backgroundColor = '#90EE90';
                     }
                     opt.value = years[k];
@@ -56,6 +57,7 @@ selM.onclick = function () {
                         for (l = 0; l < quarters.length; l++) {
                             let opt = document.createElement('option');
                             opt.appendChild(document.createTextNode(quarters[l] + ' ' + years[k]));
+                            // Color existing entries green
                             if (entryListSplit[i].includes(l + years[k])) {
                                 opt.style.backgroundColor = '#90EE90';
                             }
@@ -67,6 +69,7 @@ selM.onclick = function () {
                         for (l = 0; l < months.length; l++) {
                             let opt = document.createElement('option');
                             opt.appendChild(document.createTextNode(months[l] + ' ' + years[k]));
+                            // Color existing entries green
                             if (entryListSplit[i].includes(l + years[k])) {
                                 opt.style.backgroundColor = '#90EE90';
                             }
@@ -80,6 +83,7 @@ selM.onclick = function () {
                 for (l = currentYear - 10; l <= currentYear + 10; l++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(l));
+                    // Color existing entries green
                     if (entryListSplit[i].includes(l)) {
                         opt.style.backgroundColor = '#90EE90';
                     }

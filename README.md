@@ -19,15 +19,7 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in [routes/mysql.js](routes/mysql.js), im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten.
-
-Weiterhin müssen drei Dateien im Hauptordner angelegt werden:
-
-```sh
-touch desc.txt
-touch tables.txt
-touch roles.txt
-```
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in [routes/mysql.js](routes/mysql.js), im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahlen Informationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner files eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen.)
 
 ### Datenfelder die an lokale MySQL-Zugangsdaten angepasst werden müssen:
 
@@ -84,6 +76,7 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 ### Benutzerdatenbank
 
 Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Will man mehrere Rollen festlegen müssen diese durch einen Unterstrich getrennt werden. Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
+Möchten man Benutzer neu erstellen muss man auf ein sicheres Passwort achten. Es mussen zwischen 8 und 100 Zeichen lang sein, Groß- und Kleinbuchstaben enthalten, sowie mindestens eine Zahl und keine Leerzeichen. Sehr offentsichtliche Passwörter sind ebenfalls gesperrt.
 
 #### Beispiel
 
@@ -121,7 +114,7 @@ Punkte werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
 
 Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte Visualisieren und Daten zu bestehenden Kennzahlen eintragen.
 
-Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich.
+Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich. Ebenso lassen sich Eigenschaften zu Kennzahlen hinzufügen und ein Report über mehrere Kennzahlen erstellen.
 
 Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer und das Löschen von Kennzahlen.
 Neu erstellte Benutzer müssen einen eindeutigen Namen sowie E-Mail Adresse haben. Das Passwort wird automatisch auf gute Sicherheit überprüft.
@@ -130,7 +123,7 @@ Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen 
 
 ## Bisher noch fehlende Funktionen
 
-* Darstellung von bereits erfassten Werten beim Eintragen von neuen Werten
+* TODO: Update bei Projektende
 * Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
 * Erstellung von Reports (Druck oder PDF) von mehreren Kennzahlen gleichzeitig
 * Mandate für die Verwendung in mehrere Leitstellen gleichzeitg / es ist eventuell möglich dies über Rollen zu lösen

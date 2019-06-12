@@ -8,10 +8,6 @@ const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
 const button = document.getElementById('button');
 
-button.onclick = function () {
-    console.log('button pressed');
-}
-
 // Used for creating table headers with months and quarters
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
@@ -372,4 +368,13 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+// Automatically reselect last item that was entered, this in turn loads the table already
+for (let i, j = 0; i = selM.options[j]; j++) {
+    if (i.value === lastSelected.slice(0, lastSelected.length - 1)) {
+        selM.selectedIndex = j;
+        selM.onclick();
+        break;
+    }
 }
