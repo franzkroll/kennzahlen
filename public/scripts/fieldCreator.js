@@ -31,4 +31,15 @@ window.addEventListener('load', function () {
         // Increment i for every added field, so every field has unique name
         i++;
     });
+
+    document.getElementById('delete').addEventListener('click', function () {
+        // Remove last added elements
+        var forms = document.getElementById('container');
+        if (i > 2) {
+            for (j = 0; j < 2; j++) {
+                forms.removeChild(forms.lastChild);
+            }
+            i--;
+        }
+    });
 });

@@ -674,6 +674,7 @@ const deleteHelper = async (request, response) => {
 const reportHelper = async (request, response) => {
     let yearArray = [];
     let measureArray = [];
+    let graphArray = [];
 
     // Split data in the body in the correct arrays for later processing
     for (let key in request.body) {
@@ -681,6 +682,8 @@ const reportHelper = async (request, response) => {
             measureArray = request.body[key];
         } else if (key === 'year') {
             yearArray = request.body[key];
+        } else if (key === 'graph') {
+            graphArray = request.body[key];
         } else {
             console.log('Error while parsing data.')
         }
@@ -690,25 +693,26 @@ const reportHelper = async (request, response) => {
 
     console.log('length: ' + measureArray.length);
 
-    // Query all the data from the database
-    for (i = 0; i < measureArray.length; i++) {
-        console.log('i: ' + i);
-        try {
-            if (Array.isArray(measureArray)) {
+    // Query all the data from the database 
+    try {
+        if (Array.isArray(measureArray)) {
+            for (i = 0; i < measureArray.length; i++) {
+                console.log('i: ' + i);
                 data.push(await loadNameFromSQL(measureArray[i], yearArray[i]));
-            } else {
-                data.push(await loadNameFromSQL(measureArray, yearArray));
             }
-        } catch (error) {
-            console.log(error);
+        } else {
+            data.push(await loadNameFromSQL(measureArray, yearArray));
         }
+    } catch (error) {
+        console.log(error);
     }
 
     console.log('data: ' + data.length);
 
     for (i = 0; i < data.length; i++) {
         console.log(data[i]);
-        // createPDFFromMeasure...
+        // create pdf report here
+        createPDFFromMeasure(data[i], graphType[i]);
     }
 
     // Show error if something goes wrong
@@ -724,6 +728,8 @@ const reportHelper = async (request, response) => {
 }
 
 function createPDFFromMeasure(data, graphType) {
+    console.log(data);
+    console.log(graphType);
     return new Promise(function (resolve, reject) {
         if (err) reject(err);
     });

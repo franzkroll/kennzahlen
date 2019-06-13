@@ -21,9 +21,11 @@ selM.addEventListener('click', eventFunc, false);
 window.addEventListener('load', function () {
     let i = 0;
     document.getElementById('addBtn').addEventListener('click', function () {
+
         // Get original elements
         let original = document.getElementById('measure' + i);
         let originalY = document.getElementById('year' + i);
+        let originalG = document.getElementById('graph' + i);
 
         // Increment i, because ids of elements can only exist once
         i++;
@@ -38,6 +40,25 @@ window.addEventListener('load', function () {
         let cloneY = originalY.cloneNode(true);
         cloneY.id = 'year' + i;
         document.getElementById('addDiv').appendChild(cloneY);
+
+
+        let cloneG = originalG.cloneNode(true);
+        cloneG.id = 'graph' + i;
+        document.getElementById('addDiv').appendChild(cloneG);
+
+        console.log(i);
+
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', function () {
+        // Remove last element
+        var forms = document.getElementById('addDiv');
+        if (i > 0) {
+            for (j = 0; j < 3; j++) {
+                forms.removeChild(forms.lastChild);
+            }
+            i--;
+        }
     });
 });
 
