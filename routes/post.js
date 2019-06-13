@@ -465,7 +465,7 @@ const createMeasureHelper = async (request, response) => {
 
         let sql;
 
-        // Format name correctly for mysql and add the year, TODO: tablename needs sql escape?
+        // Format name correctly for mysql and add the year, backticks handle sql injection escape
         let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
 
         // Build string here with correct attributes
@@ -674,7 +674,6 @@ const deleteHelper = async (request, response) => {
 const reportHelper = async (request, response) => {
     let yearArray = [];
     let measureArray = [];
-    const rowPacketArray = [];
 
     // Split data in the body in the correct arrays for later processing
     for (let key in request.body) {
@@ -687,27 +686,30 @@ const reportHelper = async (request, response) => {
         }
     }
 
-    let promises = [];
     let data = [];
 
+    console.log('length: ' + measureArray.length);
+
     // Query all the data from the database
-    for (i = 0; i < yearArray.length; i++) {
-        console.log(measureArray[i] + ' : ' + yearArray[i]);
-        promises.push(loadNameFromSQL(measureArray[i], yearArray[i]));
+    for (i = 0; i < measureArray.length; i++) {
+        console.log('i: ' + i);
+        try {
+            if (Array.isArray(measureArray)) {
+                data.push(await loadNameFromSQL(measureArray[i], yearArray[i]));
+            } else {
+                data.push(await loadNameFromSQL(measureArray, yearArray));
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-    console.log(promises);
+    console.log('data: ' + data.length);
 
-    Promise.all(promises).then(function (results) {
-        data.push(results);
-    });
-
-    console.log(data);
-
-    // Create pdf report
-
-    // And send it back to the user
-
+    for (i = 0; i < data.length; i++) {
+        console.log(data[i]);
+        // createPDFFromMeasure...
+    }
 
     // Show error if something goes wrong
     IO.loadTextFile('tables').then(function (measureList) {
@@ -718,6 +720,12 @@ const reportHelper = async (request, response) => {
         });
     }).catch(function (error) {
         console.log(error);
+    });
+}
+
+function createPDFFromMeasure(data, graphType) {
+    return new Promise(function (resolve, reject) {
+        if (err) reject(err);
     });
 }
 

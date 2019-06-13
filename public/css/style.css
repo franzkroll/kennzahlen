@@ -501,7 +501,10 @@ and also iPads specifically.
 
     /* TODO: why doesn't it work? */
     .print_canvas {
+        box-sizing: border-box;
         text-align: center;
-        width: 95%;
+        border-collapse: collapse;
+        margin: 50px auto;
+        width: 100%;
     }
 }

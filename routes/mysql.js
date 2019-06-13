@@ -218,7 +218,7 @@ function addColumnToDB(tableData, attributeData) {
         // Cycle through possible table names and add the attribute to them, needs to be modified 
         // with second loop if we later want to add multiple attributes at once
         for (i = 0; i < tableData.length; i++) {
-            // Build query here because it doesn't work otherwise, TODO: need to escape values
+            // Build query here because it doesn't work otherwise
             const query = 'ALTER TABLE ' + mysql.escapeId(tableData[i]) + ' ADD ' + mysql.escapeId(attributeData[0]) + ' FLOAT DEFAULT NULL;'
             // Query database with prebuilt query
             connectionData.query(query, function (err) {
