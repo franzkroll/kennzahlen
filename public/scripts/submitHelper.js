@@ -97,6 +97,9 @@ selM.onclick = function () {
                 // console.log('creating attributes');
 
                 if (measure[i] !== 'quarterly') {
+                    measure[i] = measure[i].replace(']]', '');
+                    measure[i] = measure[i].replace('[[', '');
+
                     var div = document.createElement("div");
                     var text = document.createElement("input");
                     text.setAttribute("type", "number");
@@ -104,7 +107,7 @@ selM.onclick = function () {
                     text.setAttribute("name", "var" + (i - 2));
                     text.setAttribute("id", "id" + (i - 2));
                     text.setAttribute("placeholder", measure[i]);
-                    text.setAttribute("required", "required");
+                    // TODO: add measure description instead here
                     text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein. Falls der Wert nicht vorhanden ist geben Sie bitte -1 ein.");
                     // ... and add it to the container
                     div.appendChild(text);

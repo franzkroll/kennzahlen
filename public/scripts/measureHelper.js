@@ -40,6 +40,8 @@ selM.onclick = function () {
                 if (measure[j] != 'quarterly') {
                     // Add Button collapsible for every attribute
                     const button = document.createElement('button');
+                    measure[j] = measure[j].replace(']]', '');
+                    measure[j] = measure[j].replace('[[', '');
                     button.innerHTML = measure[j];
                     button.setAttribute('class', 'collapsible');
                     col.appendChild(button);

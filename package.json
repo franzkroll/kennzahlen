@@ -29,5 +29,7 @@
     "serve-favicon": "2.5.0",
     "tabulator-tables": "4.2.7"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "pdfmake": "0.1.57"
+  }
 }

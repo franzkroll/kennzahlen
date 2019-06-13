@@ -8,6 +8,8 @@ const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
 const button = document.getElementById('button');
 
+let percentValues = [];
+
 // Used for creating table headers with months and quarters
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
@@ -198,6 +200,21 @@ selM.onclick = function () {
 
                     // Save attributes of measure, location of them starts in the third array cell
                     measureAttr.push(measure[j + 2]);
+
+                    // Look for percent entry syntax
+                    if (measure[j + 2].includes('[[')) {
+                        // And slice out the percent value
+                        const percentEntry = measure[j + 2];
+
+                        // Add graph data for complete graph at percent value
+                        const percentValue = percentEntry.slice(percentEntry.indexOf('[[') + 2, percentEntry.indexOf(']]') - 1);
+                        percentValues.push(percentValue);
+
+                        measure[j + 2] = measure[j + 2].replace(']]', '');
+                        measure[j + 2] = measure[j + 2].replace('[[', '');
+                    } else {
+                        percentValues.push(0);
+                    }
 
                     // TODO: why is the 'y' here? needs fix, otherwise no measure can't contain ' y'
                     // Append data to table if there is any to add and if we got the right data already
@@ -422,6 +439,10 @@ selGraph.onchange = function (e) {
 
         let newDataSet;
 
+        // Remove [] => correct format
+        measureAttr[i] = measureAttr[i].replace(']]', '');
+        measureAttr[i] = measureAttr[i].replace('[[', '');
+
         // Create the new dataset
         if (svalue === 'mixed') {
             newDataSet = {
@@ -456,6 +477,12 @@ selGraph.onchange = function (e) {
                 fill: true
             }
         } else {
+            let percentData = [];
+
+            for (k = 0; k < dataGraph[i].length; k++) {
+                percentData.push(percentValues[i]);
+            }
+
             newDataSet = {
                 label: measureAttr[i],
                 data: dataGraph[i],
@@ -463,6 +490,20 @@ selGraph.onchange = function (e) {
                 fill: false,
                 borderColor: color,
                 backgroundColor: color
+            }
+
+            if (svalue !== 'bar') {
+                const bgColor = hexToRgb(color);
+
+                compareLine = {
+                    label: measureAttr[i] + ' Soll',
+                    data: percentData,
+                    pointRadius: 0,
+                    fill: false,
+                    borderColor: 'rgba(' + bgColor.r + ',' + bgColor.g + ',' + bgColor.b + ',0.6)',
+                    backgroundColor: 'rgba(' + bgColor.r + ',' + bgColor.g + ',' + bgColor.b + ',0.6)',
+                }
+                currentChart.data.datasets.push(compareLine);
             }
         }
         // And append it to the chart
@@ -496,6 +537,11 @@ for (let i, j = 0; i = selM.options[j]; j++) {
     if (i.value === lastSelected.slice(0, lastSelected.length - 1)) {
         selM.selectedIndex = j;
         selM.onclick();
+
+        // Default graph is bar graph
+        selGraph.selectedIndex = 0;
+        selGraph.onchange();
+
         break;
     }
 }

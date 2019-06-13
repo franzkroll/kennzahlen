@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
+const pdfMake = require('pdfmake');
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -678,6 +679,7 @@ const reportHelper = async (request, response) => {
 
     // Split data in the body in the correct arrays for later processing
     for (let key in request.body) {
+        console.log(request.body[key]);
         if (key === 'measure') {
             measureArray = request.body[key];
         } else if (key === 'year') {
@@ -690,8 +692,6 @@ const reportHelper = async (request, response) => {
     }
 
     let data = [];
-
-    console.log('length: ' + measureArray.length);
 
     // Query all the data from the database 
     try {
@@ -707,33 +707,31 @@ const reportHelper = async (request, response) => {
         console.log(error);
     }
 
-    console.log('data: ' + data.length);
-
-    for (i = 0; i < data.length; i++) {
-        console.log(data[i]);
+    // TODO: bad code here, needs reworking
+    /*for (i = 0; i < data.length; i++) {
         // create pdf report here
-        createPDFFromMeasure(data[i], graphType[i]);
-    }
+        if (Array.isArray(graphArray)) {
+            createPDFFromMeasure(data[i], graphArray[i]);
+        } else {
+            createPDFFromMeasure(data[i], graphArray);
+        }
+    }*/
 
     // Show error if something goes wrong
     IO.loadTextFile('tables').then(function (measureList) {
+        response.render('pages/reportCreatorPDF', {
+            user: request.session.username
+        });
+    }).catch(function (error) {
+        console.log(error);
         response.render('pages/reportCreator', {
             user: request.session.username,
             text: 'Fehler beim Laden der Daten!',
             measureList: measureList
         });
-    }).catch(function (error) {
-        console.log(error);
     });
 }
 
-function createPDFFromMeasure(data, graphType) {
-    console.log(data);
-    console.log(graphType);
-    return new Promise(function (resolve, reject) {
-        if (err) reject(err);
-    });
-}
 
 /**
  * Receives post requests from changeMeasure page, collects all the necessary info and passes it to 
