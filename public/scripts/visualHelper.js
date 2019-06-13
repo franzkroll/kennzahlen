@@ -492,7 +492,7 @@ selGraph.onchange = function (e) {
                 backgroundColor: color
             }
 
-            if (svalue !== 'bar') {
+            if (svalue !== 'bar' && svalue !== 'horizontalBar') {
                 const bgColor = hexToRgb(color);
 
                 compareLine = {
