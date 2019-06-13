@@ -3,8 +3,6 @@ Loads available measures and shows table, if data isn't present it has to be loa
 in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
 -->
 
-<!--TODO: comparison over multiple years? -->
-
 <head>
     <% include ../partials/head %>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
@@ -50,8 +48,10 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         <div style="text-align: center">
             <select id="graph" class="dropdownS">
                 <option value="bar">Balkendiagramm</option>
+                <option value="horizontalBar">Balkendiagramm horizontal</option>
                 <option value="line">Liniendiagramm</option>
-                <option value="radar">Radardiagramm</option>
+                <option value="mixed">Gemischt</option>
+                <option value="radar">Radar</option>
             </select>
         </div>
         <span style="display:block; height: 10px;"></span>

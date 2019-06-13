@@ -300,6 +300,12 @@ selGraph.onchange = function (e) {
                 title: {
                     display: true,
                 },
+                elements: {
+                    // Smooth curves a bit
+                    line: {
+                        tension: 0.2
+                    }
+                },
                 responsive: true,
                 plugins: {
                     zoom: {
@@ -329,6 +335,75 @@ selGraph.onchange = function (e) {
                     display: false,
                 },
                 responsive: true,
+                elements: {
+                    // Smooth curves a bit
+                    line: {
+                        tension: 0.15
+                    }
+                },
+                fill: true
+            }
+        });
+    } else if (svalue === 'horizontalBar') {
+        currentChart = new Chart(document.getElementById('chart'), {
+            type: 'horizontalBar',
+            // Basic labels, data gets added later
+            data: {
+                labels: labels,
+                datasets: []
+            },
+            options: {
+                // Display title
+                title: {
+                    display: true
+                },
+                // Make chart resize to canvas
+                responsive: true,
+                // Make it possible to zoom and pan the chart
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy',
+                        },
+                        zoom: {
+                            enabled: true,
+                            mode: 'xy',
+                            speed: 0.1,
+                        }
+                    }
+                }
+            }
+        });
+    } else if (svalue === 'mixed') {
+        currentChart = new Chart(document.getElementById('chart'), {
+            type: 'bar',
+            // Basic labels, data gets added later
+            data: {
+                labels: labels,
+                datasets: []
+            },
+            options: {
+                // Display title
+                title: {
+                    display: true
+                },
+                // Make chart resize to canvas
+                responsive: true,
+                // Make it possible to zoom and pan the chart
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy',
+                        },
+                        zoom: {
+                            enabled: true,
+                            mode: 'xy',
+                            speed: 0.1,
+                        }
+                    }
+                }
             }
         });
     }
@@ -344,20 +419,66 @@ selGraph.onchange = function (e) {
         } else {
             color = colors[i];
         }
+
+        let newDataSet;
+
         // Create the new dataset
-        const newDataSet = {
-            label: measureAttr[i],
-            data: dataGraph[i],
-            pointRadius: 5,
-            fill: false,
-            borderColor: color,
-            backgroundColor: color
+        if (svalue === 'mixed') {
+            newDataSet = {
+                label: measureAttr[i],
+                data: dataGraph[i],
+                pointRadius: 5,
+                fill: false,
+                type: 'line',
+                borderColor: color,
+                backgroundColor: color
+            }
+            const newDataSetBar = {
+                label: measureAttr[i],
+                data: dataGraph[i],
+                pointRadius: 5,
+                fill: false,
+                type: 'bar',
+                backgroundColor: 'rgba(0,0,0,0.2)',
+            }
+            currentChart.data.datasets.push(newDataSetBar);
+        } else if (svalue === 'radar') {
+            // Convert to RGB
+            const bgColor = hexToRgb(color);
+            newDataSet = {
+                label: measureAttr[i],
+                data: dataGraph[i],
+                pointRadius: 5,
+                fill: false,
+                borderColor: color,
+                // Somehow this needs a string, maybe there's an easier way?
+                backgroundColor: 'rgba(' + bgColor.r + ',' + bgColor.g + ',' + bgColor.b + ',0.3)',
+                fill: true
+            }
+        } else {
+            newDataSet = {
+                label: measureAttr[i],
+                data: dataGraph[i],
+                pointRadius: 5,
+                fill: false,
+                borderColor: color,
+                backgroundColor: color
+            }
         }
         // And append it to the chart
         currentChart.data.datasets.push(newDataSet);
     }
     // Update the chart, otherwise the data isn't visible
     currentChart.update();
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
 }
 
 // Function for creating random colors, used if we run out of default colors in array

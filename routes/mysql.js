@@ -209,27 +209,25 @@ function deleteUserFromDB(id) {
  * @param {New attributes (=columns) that we want to add to the previously passed tables.} attributeData 
  */
 function addColumnToDB(tableData, attributeData) {
-    console.log(tableData);
-    console.log(attributeData);
-
-    let queries = [];
-
-    // Replace whitespaces before insertion into database
-    for (i = 0; i < attributeData.length; i++) {
-        attributeData[i] = attributeData[i].replaceAll(' ', '_');
-    }
-
-    for (i = 0; i < tableData.length; i++) {
-        queries.push(tableData[i]);
-    }
-
-    // TODO: how to execute multiple queries?
-
     return new Promise(function (resolve, reject) {
-        connectionData.query('', function (err) {
-            if (err) return reject(err);
-            resolve();
-        })
+        // Replace whitespaces before insertion into database
+        for (i = 0; i < attributeData.length; i++) {
+            attributeData[i] = attributeData[i].replaceAll(' ', '_');
+        }
+
+        // Cycle through possible table names and add the attribute to them, needs to be modified 
+        // with second loop if we later want to add multiple attributes at once
+        for (i = 0; i < tableData.length; i++) {
+            // Build query here because it doesn't work otherwise, TODO: need to escape values
+            const query = 'ALTER TABLE ' + mysql.escapeId(tableData[i]) + ' ADD ' + mysql.escapeId(attributeData[0]) + ' FLOAT DEFAULT NULL;'
+            // Query database with prebuilt query
+            connectionData.query(query, function (err) {
+                if (err) return reject(err);
+            });
+        }
+
+        // Resolve if we got no errors before
+        resolve();
     });
 }
 

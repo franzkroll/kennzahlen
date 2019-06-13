@@ -373,8 +373,6 @@ const submitDataHelper = async (request, response) => {
  * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
 const createMeasureHelper = async (request, response) => {
-    // TODO: comma in descriptions and names, also brackets
-
     let measureDescriptions, measureList, roleList;
 
     try {
@@ -791,8 +789,8 @@ const changeMeasureHelper = async (request, response) => {
     }
 
     // Write new arrays to txt file, sorting isn't necessary here
-    //IO.arrayToTxt('tables', measureList);
-    //IO.arrayToTxt('desc', measureDescriptions);
+    IO.arrayToTxt('tables', measureList);
+    IO.arrayToTxt('desc', measureDescriptions);
 
     // Delete entry from the database and render page again with status information
     SQL.addColumnToDB(tableNames, attributeData).then(function () {
@@ -804,7 +802,7 @@ const changeMeasureHelper = async (request, response) => {
         });
         // Or catch mysql error and show user corresponding error
     }).catch(function (error) {
-        //console.log(error);
+        console.log(error);
         response.render('pages/changeMeasure', {
             user: request.session.username,
             text: "Fehler beim Hinzufügen des neuen Attributs!",
