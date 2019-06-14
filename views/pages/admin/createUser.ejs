@@ -13,15 +13,22 @@
     <!-- Add mandate here. -->
 
     <main>
-        <span style="display:block; height: 15px;"></span>
+        <span style="display:block; height: 10px;"></span>
+        <div class="misc-text">
+            <%- text %>
+        </div>
+        <span style="display:block; height: 17px;"></span>
         <!-- Form for entering new user data, submit sends request to server. -->
         <div class="login-formS">
             <form action="createUser" method="POST">
                 <input type="text" name="username" placeholder="Benutzername"
                     title="Geben Sie hier den Benutzernamen ein, Benutzernamen dürfen nur einmal im System vorkommen."
                     required>
-                <input type="text" name="password" placeholder="Passwort"
+                <input type="password" name="password" placeholder="Passwort"
                     title="Geben Sie hier das Passwort für den Benutzer ein, es muss mindestens 8 Zeichen lang sein, einen Großbuchstaben und eine Zahl enthalten."
+                    required>
+                <input type="password" name="password2" placeholder="Passwort erneut eingeben"
+                    title="Bitte geben Sie hier das Passwort hier erneut ein. Beide Passwörter müssen übereinstimmen."
                     required>
                 <input type="email" name="mail" placeholder="E-Mail"
                     title="Legen Sie hier eine gültige E-Mail Adresse fest, Adressen dürfen nicht doppelt vorkommen."

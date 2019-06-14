@@ -62,13 +62,14 @@ const createUserHelper = function (request, response) {
         let responseText;
         // Show corresponding error messages if password is unsafe or user already exists, user names have to be unique
         if (error === 'pw') {
-            console.log(error);
             responseText = 'Fehler bei der Erstellung des Benutzers! Passwort zu unsicher.';
+        } else if (error === 'pwSame') {
+            responseText = 'Fehler bei der Erstellung des Benutzers! Passwörter stimmen nicht überein.'
         } else if (error) {
             console.log(error);
             responseText = 'Fehler bei der Erstellung des Benutzers! Benutzer bereits vorhanden.';
         }
-        response.render('pages/admin/admin', {
+        response.render('pages/admin/createUser', {
             user: request.session.username,
             text: responseText
         });

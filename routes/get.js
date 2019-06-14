@@ -183,6 +183,7 @@ const createUser = function (request, response) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
             if (result) {
                 response.render('pages/admin/createUser', {
+                    text: '',
                     user: request.session.username
                 });
             } else {

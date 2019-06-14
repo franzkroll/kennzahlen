@@ -166,7 +166,12 @@ function deleteMeasureFromDB(tableName) {
 function insertUserIntoDB(request) {
     return new Promise(function (resolve, reject) {
         // Check password strength
-        if (pwCheck(request.body.password)) {
+        console.log(request.body.password + ':' + request.body.password2);
+        if (request.body.password !== request.body.password2) {
+            err = "pwSame";
+            console.log('passwords are not the same');
+            reject(err);
+        } else if (pwCheck(request.body.password)) {
             // Hash insert password
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
@@ -184,7 +189,7 @@ function insertUserIntoDB(request) {
         } else {
             err = "pw";
             console.log("password check failed");
-            return reject(err);
+            reject(err);
         }
     });
 }
