@@ -7,7 +7,6 @@ const bcrypt = require('bcrypt');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
-const pdfMake = require('pdfmake');
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -109,52 +108,60 @@ const visualPostHelper = async (request, response) => {
     let measureList, roleList;
 
     try {
+        mandateList = await IO.loadTextFile('mandates');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
     } catch (error) {
         console.log(error);
     }
 
+    let result, resultMandate;
+
     for (i = 0; i < roleList.length; i++) {
         // If measure is found, check if saved role equals current role and admin/user
         if (request.body.measure === roleList[i][0]) {
             // Check roles if measure is found in access table
-            SQL.checkRolePermissions(roleList[i][1], request).then(function (result) {
-                if (result) {
-                    loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
-                        // Render page with newly acquired data
-                        response.render('pages/visual', {
-                            user: request.session.username,
-                            measureData: JSON.stringify(result[1]),
-                            loadedTable: result[0],
-                            text: 'Daten erfolgreich geladen!',
-                            lastSelected: request.body.measure,
-                            measureListData: measureList
-                        });
-                        // Show error if data query failed
-                    }).catch(function (error) {
-                        console.log(error);
-                        response.render('pages/visual', {
-                            user: request.session.username,
-                            measureData: '',
-                            loadedTable: '',
-                            lastSelected: '',
-                            text: 'Datensatz nicht vorhanden!',
-                            measureListData: measureList
-                        });
-                    });
-                } else {
-                    response.render('pages/visual', {
-                        user: request.session.username,
-                        measureData: '',
-                        loadedTable: '',
-                        text: 'Dafür besitzen Se nicht die nötigen Rechte!',
-                        measureListData: measureList
-                    });
-                }
-                // Show error page if rights check failed.
+            try {
+                result = await SQL.checkRolePermissions(roleList[i][1], request);
+                resultMandate = await SQL.checkMandatePermissions(mandateList[i][1], request);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        // Only access when user has correct role and mandate
+        if (result && resultMandate) {
+            loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
+                // Render page with newly acquired data
+                response.render('pages/visual', {
+                    user: request.session.username,
+                    measureData: JSON.stringify(result[1]),
+                    loadedTable: result[0],
+                    text: 'Daten erfolgreich geladen!',
+                    lastSelected: request.body.measure,
+                    measureListData: measureList
+                });
+                // Show error if data query failed
             }).catch(function (error) {
                 console.log(error);
+                response.render('pages/visual', {
+                    user: request.session.username,
+                    measureData: '',
+                    loadedTable: '',
+                    lastSelected: '',
+                    text: 'Datensatz nicht vorhanden!',
+                    measureListData: measureList
+                });
+            });
+            // Show error if user has wrong rights
+        } else {
+            response.render('pages/visual', {
+                user: request.session.username,
+                measureData: '',
+                loadedTable: '',
+                lastSelected: '',
+                text: 'Dafür besitzen Se nicht die nötigen Rechte!',
+                measureListData: measureList
             });
         }
     }
@@ -166,7 +173,7 @@ const visualPostHelper = async (request, response) => {
  * @param {Sends new submit page back to the user, either with error or success text.} response 
  */
 const submitDataHelper = async (request, response) => {
-    let roleList, measureList, entryList, result;
+    let roleList, measureList, entryList, result, mandateList;
 
     // Used to convert month to month number
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -175,6 +182,7 @@ const submitDataHelper = async (request, response) => {
 
     // Load table data from disk
     try {
+        mandateList = await IO.loadTextFile('mandate');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
@@ -194,16 +202,17 @@ const submitDataHelper = async (request, response) => {
             let quarterly = false;
             let yearly = false;
 
-            // If measure is found, check if saved role equals current role and admin/user
+            // If measure is found, check if saved role equals current role and admin/user, TODO: also check if user has correct mandate
             try {
                 // Can only get it here because we need i
                 result = await SQL.checkRolePermissions(roleList[i][1], request);
+                resultMandate = await SQL.checkMandatePermissions(mandateList[i][1], request);
             } catch (error) {
                 console.log(error);
             }
 
             // Check roles if measure is found in access table
-            if (result) {
+            if (result && resultMandate) {
                 let tableName;
 
                 // Check if entered table really exists, get concrete table name in database
@@ -375,13 +384,14 @@ const submitDataHelper = async (request, response) => {
  * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
 const createMeasureHelper = async (request, response) => {
-    let measureDescriptions, measureList, roleList;
+    let measureDescriptions, measureList, roleList, entryList, mandateList;
 
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
+        mandateList = await IO.loadTextFile('mandates');
     } catch (error) {
         console.log(error);
     }
@@ -403,9 +413,7 @@ const createMeasureHelper = async (request, response) => {
         quarterly = true;
     } else if (request.body.cycle === 'monthly' && request.body.year) {
         monthly = true;
-    } else if (request.body.cycle === 'yearly') {
-        // nothing to do here yet
-    } else {
+    } else if (request.body.cycle !== 'yearly') {
         // Something went wrong
         error = true;
         // Show error if year is missing
@@ -444,6 +452,8 @@ const createMeasureHelper = async (request, response) => {
         // Need to add role to list if the measure doesn't exist
         if (!measureExists) {
             roleList.push([request.body.name, request.body.role + ';']);
+            // And also push to mandate list
+            mandateList.push([request.body.name, request.body.mandate + ';']);
         }
 
         let notExists = true;
@@ -512,19 +522,18 @@ const createMeasureHelper = async (request, response) => {
         // Insert into database
         SQL.measureDataRequest(sql).then(async () => {
             try {
-                // Sort list of measures alphabetically by measure name
+                // Sort all lists by the first entry, so they are all ordered the same
                 measureList = await sort2DArray(measureList);
-                // Sort measure descriptions, so they are ordered the same
                 measureDescriptions = await sort2DArray(measureDescriptions);
-                // Sort measure descriptions, so they are ordered the same
                 roleList = await sort2DArray(roleList);
-                // Sort entry descriptions, so they are ordered the same
                 entryList = await sort2DArray(entryList);
+                mandateList = await sort2DArray(mandateList);
             } catch (error) {
                 console.log(error);
             }
 
             // Write new arrays to txt file
+            IO.arrayToTxt('mandates', mandateList);
             IO.arrayToTxt('roles', roleList);
             IO.arrayToTxt('tables', measureList);
             IO.arrayToTxt('desc', measureDescriptions);
@@ -561,6 +570,7 @@ const deleteHelper = async (request, response) => {
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
+        mandateList = await IO.loadTextFile('mandates');
     } catch (error) {
         console.log(error);
     }
@@ -587,6 +597,7 @@ const deleteHelper = async (request, response) => {
                     measureList.splice(i, 1);
                     measureDescriptions.splice(i, 1);
                     entryList.splice(i, 1);
+                    mandateList.splice(i, 1);
                 }
             } else {
                 let newYears = '';
@@ -623,19 +634,18 @@ const deleteHelper = async (request, response) => {
 
             // Try to sort arrays, print error if it fails
             try {
-                // Sort list of measures alphabetically by measure name
+                // Sort all lists so they are ordered the same, this saves time later
                 measureList = await sort2DArray(measureList);
-                // Sort measure descriptions, so they are ordered the same
                 measureDescriptions = await sort2DArray(measureDescriptions);
-                // Sort measure descriptions, so they are ordered the same
                 roleList = await sort2DArray(roleList);
-                // Sort measure descriptions, so they are ordered the same
                 entryList = await sort2DArray(entryList);
+                mandateList = await sort2DArray(mandateList);
             } catch (error) {
                 console.log(error);
             }
 
             // Write new arrays to txt file
+            IO.arrayToTxt('mandates', mandateList);
             IO.arrayToTxt('entries', entryList);
             IO.arrayToTxt('roles', roleList);
             IO.arrayToTxt('tables', measureList);

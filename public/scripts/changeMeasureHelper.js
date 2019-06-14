@@ -3,6 +3,9 @@ const measureArray = measureData.split(';');
 const selM = document.getElementById('measure');
 const selYear = document.getElementById('duration');
 
+// TODO: add fields for chaning attributes, gotta decide how to do the gui
+console.log(measureArray);
+
 // Fill leftmost select with items so that they are selectable
 for (i = 0; i < measureArray.length - 1; i++) {
     const measure = measureArray[i].split(',').filter(Boolean);

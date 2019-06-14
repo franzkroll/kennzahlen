@@ -114,6 +114,52 @@ function checkRolePermissions(role, request) {
 }
 
 /**
+ * Queries database for the logged in user. Checks if the passed mandate equals the user mandate. Also returns true if user mandate
+ * is '*'. This means the user has access to all mandates.
+ * @param {Needed mandate to access this function.} mandate 
+ * @param {Request from the user, used for easy access to username.} request 
+ */
+function checkMandatePermissions(mandate, request) {
+    return new Promise(function (resolve, reject) {
+        let result = [];
+        let allowed = false;
+
+        // Query database for user
+        connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', request.session.username, function (err, res) {
+            if (err) {
+                return reject(err);
+            } else {
+                if (res.length) {
+                    for (let i = 0; i < res.length; i++) {
+                        result.push(res[i]);
+                    }
+                }
+
+                userRoles = result[0].mandate.split('_');
+                measureRoles = mandate.split('_');
+
+                // Always allow admin access, don't need for loop for simple cases
+                for (i = 0; i < userRoles.length; i++) {
+                    for (j = 0; j < measureRoles.length; j++) {
+                        // Remove semicolon, why is it even there?
+                        if (measureRoles[j].includes(";")) {
+                            measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
+                        }
+
+                        // Just split for visibility
+                        if (userRoles[i] === measureRoles[j] || userRoles[i] === '*') {
+                            allowed = true;
+                        }
+                    }
+                }
+                resolve(allowed);
+            }
+        });
+    });
+}
+
+
+/**
  * Queries database for a complete measure, no sql injection prevention needed because tableName is taken from predefined list.
  * @param {Tablename that is to be queried from the database.} tableName 
  * @param {Returns error if query fails.} callback 
@@ -280,9 +326,10 @@ function pwCheck(password) {
     }
 }
 
-// Export functions so they can be used elsewhere
+// Export functions so they can be used in importing module
 module.exports = {
     checkRolePermissions: checkRolePermissions,
+    checkMandatePermissions: checkMandatePermissions,
     getAllUsersFromDB: getAllUsersFromDB,
     getMeasureFromDB: getMeasureFromDB,
     measureDataRequest: measureDataRequest,

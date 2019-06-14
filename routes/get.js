@@ -341,14 +341,20 @@ const reportHelper = function (request, response) {
  */
 const changeHelper = function (request, response) {
     if (request.session.loggedin) {
-        IO.loadTextFile('tables').then(function (measureList) {
-            response.render('pages/changeMeasure', {
-                user: request.session.username,
-                text: "",
-                measureList: measureList
-            }); // Catch errors while loading from disk
-        }).catch(function (error) {
-            console.log(error);
+        SQL.checkRolePermissions('user', request).then(function (result) {
+            if (result) {
+                IO.loadTextFile('tables').then(function (measureList) {
+                    response.render('pages/changeMeasure', {
+                        user: request.session.username,
+                        text: "",
+                        measureList: measureList
+                    }); // Catch errors while loading from disk
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            } else {
+                response.render('pages/errors/loginError');
+            }
         });
     }
 }
