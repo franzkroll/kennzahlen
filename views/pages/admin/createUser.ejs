@@ -10,6 +10,8 @@
         <% include ../../partials/header %>
     </header>
 
+    <!-- Add mandate here. -->
+
     <main>
         <span style="display:block; height: 15px;"></span>
         <!-- Form for entering new user data, submit sends request to server. -->
@@ -26,6 +28,9 @@
                     required>
                 <input type="text" name="role" placeholder="Rolle"
                     title="Legen Sie hier eine Rolle für den Benutzer fest. Mehrere Rollen müssen durch einen Unterstrich getrennt werden."
+                    required>
+                <input type="text" name="mandate" placeholder="Mandat"
+                    title="Legen Sie hier ein Mandat für den Benutzer fest. * gibt Zugriff auf alle Bereiche. Mehrere Mandate müssen durch einen Unterstrich getrennt werden."
                     required>
                 <span style=" display:block; height: 15px;"></span>
                 <input type="submit" value="Benutzer anlegen">

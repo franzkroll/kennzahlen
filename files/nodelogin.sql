@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `nodelogin`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `nodelogin` /*!40100 DEFAULT CHARACTER SET utf8 */;
-
-USE `nodelogin`;
-
---
 -- Table structure for table `accounts`
 --
 
@@ -36,10 +28,11 @@ CREATE TABLE `accounts` (
   `password` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `role` varchar(50) NOT NULL,
+  `mandate` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `AK_UniqueEmail` (`email`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,7 +41,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (35,'admin','$2b$10$LqN6a4YUqH.3zhcrIiNQwuVWDc5fji/QovOllpIkz3TSZFp09ET7y','franz.kroll@b-tu.de','admin');
+INSERT INTO `accounts` VALUES (1,'admin','$2b$10$LqN6a4YUqH.3zhcrIiNQwuVWDc5fji/QovOllpIkz3TSZFp09ET7y','franz.kroll@b-tu.de','admin','*');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -61,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-27 16:20:41
+-- Dump completed on 2019-06-14  9:42:01

@@ -114,7 +114,7 @@ const showUserHelper = function (request, response) {
 
                     // Convert json object to string for sending via ejs
                     for (i = 0; i < result.length; i++) {
-                        sendString += result[i].id + ":" + result[i].username + ":" + result[i].role + ":" + result[i].email + ":";
+                        sendString += result[i].id + ':' + result[i].username + ':' + result[i].role + ':' + result[i].mandate + ':' + result[i].email + ':';
                     }
 
                     // Render page with user data
@@ -128,7 +128,7 @@ const showUserHelper = function (request, response) {
                 // Display error page if user had insufficient rights
             } else {
                 response.render('pages/errors/adminError');
-                console.log(request.session.username + " tried accessing admin functionalities. Denying access.");
+                console.log(request.session.username + ' tried accessing admin functionalities. Denying access.');
             }
             // Mysql errors are caught here.
         }).catch(function (error) {

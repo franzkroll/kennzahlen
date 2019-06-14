@@ -171,8 +171,8 @@ function insertUserIntoDB(request) {
             bcrypt.hash(request.body.password, saltRounds, function (err, hash) {
                 if (!err) {
                     // Insert the user into database
-                    const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`) VALUES (?, ?, ?, ?)';
-                    connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role], function (err) {
+                    const sql = 'INSERT INTO `accounts` (`username`, `password`, `email`,`role`,`mandate`) VALUES (?, ?, ?, ?, ?)';
+                    connectionLogin.query(sql, [request.body.username, hash, request.body.mail, request.body.role, request.body.mandate], function (err) {
                         if (err) return reject(err);
                         resolve();
                     });
