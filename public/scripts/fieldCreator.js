@@ -20,7 +20,7 @@ window.addEventListener('load', function () {
         var text2 = document.createElement('input');
         text2.setAttribute('type', 'text');
         text2.setAttribute('name', 'desc' + i);
-        text2.setAttribute('required', 'required');
+        text2.setAttribute('value', 'Keine Beschreibung vorhanden');
         text2.setAttribute('placeholder', 'Beschreibung von Eigenschaft ' + i);
         text2.setAttribute('title', 'Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein.');
 

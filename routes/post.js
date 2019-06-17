@@ -128,11 +128,6 @@ const visualPostHelper = async (request, response) => {
 
             // Check roles if measure is found in access table
             try {
-                console.log(roleList[i][1]);
-                console.log(mandateList[i][1]);
-
-                console.log(i);
-
                 result = await SQL.checkRolePermissions(roleList[indexSave][1], request);
                 resultMandate = await SQL.checkMandatePermissions(mandateList[indexSave][1], request);
             } catch (error) {
@@ -202,8 +197,6 @@ const submitDataHelper = async (request, response) => {
         console.log(error);
     }
 
-    // TODO: automatically add numbers together for year value if new values are entered
-
     // Save index, because for keeps running while reading from disk
     let indexSave = -1;
     let found = false;
@@ -219,8 +212,8 @@ const submitDataHelper = async (request, response) => {
             // If measure is found, check if saved role equals current role and admin/user
             try {
                 // Can only get it here because we need i
-                result = await SQL.checkRolePermissions(roleList[i][1], request);
-                resultMandate = await SQL.checkMandatePermissions(mandateList[i][1], request);
+                result = await SQL.checkRolePermissions(roleList[indexSave][1], request);
+                resultMandate = await SQL.checkMandatePermissions(mandateList[indexSave][1], request);
             } catch (error) {
                 console.log(error);
             }
@@ -236,6 +229,9 @@ const submitDataHelper = async (request, response) => {
                         tableName = (entry[entry.length - 1]).slice(0, (entry[entry.length - 1]).length - 1);
                     }
                 }
+
+                let indexCut = tableName.indexOf('~');
+                tableName = tableName.slice(0, indexCut);
 
                 // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
                 const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
@@ -522,7 +518,7 @@ const createMeasureHelper = async (request, response) => {
         sql += ' constraint pk_1 primary key(Monat));';
 
         // Add semicolon, later needed for identification
-        tableName += ';';
+        tableName += '~' + request.body.sumCalc + ';';
         table.push(tableName);
         desc[desc.length - 1] = desc[desc.length - 1] + ';';
 
@@ -665,6 +661,9 @@ const deleteHelper = async (request, response) => {
             IO.arrayToTxt('desc', measureDescriptions);
         }
     }
+
+    let indexCut = tableName.indexOf('~');
+    tableName = tableName.slice(0, indexCut);
 
     // Add the year to the tablename, vulnerable to sql injection, but in admin section, should be safe
     if (request.body.yearSelect) {
@@ -866,6 +865,9 @@ function loadNameFromSQL(name, year) {
                     tableName = (measureList[i][measureList[i].length - 1]).slice(0, (measureList[i][measureList[i].length - 1]).length - 1);
                 }
             }
+
+            let indexCut = tableName.indexOf('~');
+            tableName = tableName.slice(0, indexCut);
 
             // If user has entered a year we can add it and query the database
             if (year) {

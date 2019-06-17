@@ -42,6 +42,18 @@
                 <input type="text" name="mainDesc" placeholder="Beschreibung der Kennzahl"
                     title="Legen Sie hier eine Beschreibung für die Kennzahl fest." required>
 
+                <p>Wie soll der Jahreswert berechnet werden?</p>
+                <fieldset name="calc">
+                    <input type="radio" id="sum" name="sumCalc" value="sum">
+                    <label for="sum"> Summierung</label>
+                    <input type="radio" id="median" name="sumCalc" value="median">
+                    <label for="median"> Durchschnitt</label>
+                    <input type="radio" id="self" name="sumCalc" value="self">
+                    <label for="median"> Manuell</label>
+                </fieldset>
+
+                <span style="display:block; height: 10px;"></span>
+
                 <!-- Field for setting roles of the measure. -->
                 <input type="text" name="role" placeholder="Rolle"
                     title="Geben Sie eine Rolle ein, die die Kennzahl bearbeiten darf. Wollen Sie mehrere Rollen festlegen müssen Sie diese mit einem Unterstrich trennen."
@@ -68,14 +80,15 @@
                     <input type="text" name="var1" placeholder="Eigenschaft 1"
                         title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein." required>
                     <input type="text" name="desc1" placeholder="Beschreibung von Eigenschaft 1"
-                        title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
+                        title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein."
+                        value="Keine Beschreibung vorhanden">
                 </div>
 
                 <!-- Buttons for adding and deleting text fields. -->
                 <div>
-                    <input style="width:46%;margin-right:20px" class="button" type="button" value="Feld hinzufügen"
+                    <input style="width:45%;margin-right:20px" class="button" type="button" value="Feld hinzufügen"
                         id="add" />
-                    <input style="width:46%" class="button" type="button" value="Feld löschen" id="delete" />
+                    <input style="width:45%" class="button" type="button" value="Feld löschen" id="delete" />
                 </div>
 
                 <span style="display:block; height: 20px;"></span>

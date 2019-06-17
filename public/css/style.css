@@ -34,7 +34,11 @@
     color: red;
 }
 
+/* Make selected thing bold. */
 
+label {
+    font-weight: normal;
+}
 
 /* Footer */
 

@@ -99,9 +99,6 @@ function checkRolePermissions(role, request) {
                             measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
                         }
 
-                        console.log(userRoles[i] + ':' + measureRoles[j]);
-
-
                         // Just split for visibility
                         if (userRoles[i] === 'admin' || (userRoles[i] === 'user' && measureRoles[j] !== 'admin')) {
                             allowed = true;
@@ -127,8 +124,6 @@ function checkMandatePermissions(mandate, request) {
         let result = [];
         let allowed = false;
 
-        console.log(mandate);
-
         // Query database for user
         connectionLogin.query('SELECT * FROM accounts WHERE username = ?;', request.session.username, function (err, res) {
             if (err) {
@@ -150,8 +145,6 @@ function checkMandatePermissions(mandate, request) {
                         if (measureRoles[j].includes(";")) {
                             measureRoles[j] = measureRoles[j].slice(0, measureRoles[j].length - 1);
                         }
-
-                        console.log(userRoles[i] + ':' + measureRoles[j]);
 
                         // Just split for visibility
                         if (userRoles[i] === measureRoles[j] || userRoles[i] === '*') {
