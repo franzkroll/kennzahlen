@@ -792,7 +792,9 @@ const changeMeasureHelper = async (request, response) => {
 
             // Cycle through years of the measure and add them all to the tablename, store them in tableNames
             for (j = 0; j < years.length; j++) {
-                tableNames.push(tableName + years[j]);
+                let indexCut = tableName.indexOf('~');
+                tableName = tableName.slice(0, indexCut);
+                tableNames.push(tableName + '_' + years[j]);
             }
         }
     }
