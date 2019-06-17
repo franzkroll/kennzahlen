@@ -107,5 +107,11 @@ module.exports = function (app) {
     app.post('/report', PostHelpers.reportHelper);
 
     // Handles insertion of new attribute into existing measure
-    app.post('/change', PostHelpers.changeMeasureHelper);
+    app.post('/addAttr', PostHelpers.addAttributeHelper);
+
+    // Handles deletion of existing attribute from existing measure
+    app.post('/deleteAttr', PostHelpers.deleteAttributeHelper);
+
+    // Handles changing of existing attribute from existing measure
+    app.post('/changeAttr', PostHelpers.changeAttributeHelper);
 }

@@ -17,6 +17,7 @@ Page for changing already created measures., TODO:
         <div class="misc-text">
             Wählen Sie hier eine bereits bestehende Kennzahl aus. Danach ist es Ihnen möglich eine neue Eigenschaft zu
             dieser hinzuzufügen. Name der Eigenschaft und Beschreibung dürfen kein Komma enthalten.
+            Achtung: Das Löschen von Attributen löscht die dazugehörigen Werte permanent!
         </div>
         <span style="display:block; height: 10px;"></span>
         <div class="misc-text">
@@ -24,24 +25,45 @@ Page for changing already created measures., TODO:
         </div>
         <span style="display:block; height: 10px;"></span>
 
-        <div class="login-formS">
-            <form action="change" method="POST">
-                <!-- Selection menu for measure and year/month. -->
-                <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
-                    <select id="measure" style="width:90%" name="measure" class="dropdownS" required></select>
+        <!-- Deletion of attributes is handled here. -->
+        <div class="login-formA">
+            <form action="deleteAttr" style="text-align: center" method="POST">
+                <select id="measure" style="width:90%" name="measure" class="dropdownS" required></select>
+
+                <!-- Selection menu for individual attributes. -->
+                <div style=" text-align:center;margin-bottom: 15px">
+                    <select id="measure" style="width:90%" name="attribute" class="dropdownS" required></select>
                 </div>
 
-                <span style="display:block; height: 10px"></span>
+                <input type="submit" style="width:50%" value="Attribut löschen">
+            </form>
+            <form action="changeAttr" style="text-align: center" method="POST">
+                <!-- Measure attribute that the user wants to add gets entered here. -->
+                <input type="text" name="var" title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein."
+                    required>
+                <input type="text" name="desc"
+                    title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
 
+                <span style="display:block; height: 12px;"></span>
+
+                <input type="submit" style="width:50%" value="Attribut ändern">
+            </form>
+        </div>
+
+        <span style="display:block; height: 20px;"></span>
+
+        <!-- Adding of attributes here. -->
+        <div class="login-formA">
+            <form action="addAttr" style="text-align: center" method="POST">
                 <!-- Measure attribute that the user wants to add gets entered here. -->
                 <input type="text" name="var" placeholder="Neue Eigenschaft für Kennzahl"
                     title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein." required>
                 <input type="text" name="desc" placeholder="Beschreibung der Eigenschaft"
                     title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
 
-                <span style="display:block; height: 15px;"></span>
+                <span style="display:block; height: 12px;"></span>
 
-                <input type="submit" value="Attribut hinzufügen">
+                <input type="submit" style="width:50%" value="Attribut hinzufügen">
             </form>
         </div>
     </main>

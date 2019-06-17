@@ -761,7 +761,7 @@ const reportHelper = async (request, response) => {
  * @param {Request from the user page, contains all the data needed for creation of new column.} request 
  * @param {Sends back new page with success/error text.} response 
  */
-const changeMeasureHelper = async (request, response) => {
+const addAttributeHelper = async (request, response) => {
     let measureDescriptions, measureList;
 
     // Try to load data about tables from disk
@@ -848,6 +848,20 @@ const changeMeasureHelper = async (request, response) => {
 }
 
 /**
+ * Changes the specified attribute of the measure. Reloads the page again.
+ * @param {Request from the user. Contains the attribute to be changed.} request 
+ * @param {Response with success/failure text. Also sends new page to the user.} response 
+ */
+const changeAttributeHelper = async (request, response) => {}
+
+/**
+ * Deletes the specified attribute of the measure. Reloads the page again.
+ * @param {Request from the user. Contains the attribute to be deleted.} request 
+ * @param {Response with success/failure text. Also sends new page to the user.} response 
+ */
+const deleteAttributeHelper = async (request, response) => {}
+
+/**
  * Receives name and year, converts it to corresponding name in sql database and queries
  * the database for this measure, converts it to a string and passes it upwards. All errors
  * are also passed upwards.
@@ -928,5 +942,7 @@ module.exports = {
     createMeasureHelper: createMeasureHelper,
     deleteHelper: deleteHelper,
     reportHelper: reportHelper,
-    changeMeasureHelper: changeMeasureHelper
+    addAttributeHelper: addAttributeHelper,
+    changeAttributeHelper: changeAttributeHelper,
+    deleteAttributeHelper: deleteAttributeHelper
 }

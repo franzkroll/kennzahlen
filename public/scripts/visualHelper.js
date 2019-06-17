@@ -259,9 +259,9 @@ selM.onclick = function () {
                             // Add to year sum here
                             if (k !== j + 1) {
                                 if (!sumArray[j]) {
-                                    sumArray.push(parseInt(cellData));
+                                    sumArray.push(parseFloat(cellData));
                                 } else {
-                                    sumArray[j] = sumArray[j] + parseInt(cellData);
+                                    sumArray[j] = sumArray[j] + parseFloat(cellData);
                                 }
                             }
 
