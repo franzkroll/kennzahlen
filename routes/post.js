@@ -117,52 +117,64 @@ const visualPostHelper = async (request, response) => {
 
     let result, resultMandate;
 
-    for (i = 0; i < roleList.length; i++) {
+    let found = false;
+    let indexSave = -1;
+
+    for (i = 0; i < roleList.length && !found; i++) {
         // If measure is found, check if saved role equals current role and admin/user
         if (request.body.measure === roleList[i][0]) {
+            found = true;
+            indexSave = i;
+
             // Check roles if measure is found in access table
             try {
-                result = await SQL.checkRolePermissions(roleList[i][1], request);
-                resultMandate = await SQL.checkMandatePermissions(mandateList[i][1], request);
+                console.log(roleList[i][1]);
+                console.log(mandateList[i][1]);
+
+                console.log(i);
+
+                result = await SQL.checkRolePermissions(roleList[indexSave][1], request);
+                resultMandate = await SQL.checkMandatePermissions(mandateList[indexSave][1], request);
             } catch (error) {
                 console.log(error);
             }
-        }
 
-        // Only access when user has correct role and mandate
-        if (result && resultMandate) {
-            loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
-                // Render page with newly acquired data
-                response.render('pages/visual', {
-                    user: request.session.username,
-                    measureData: JSON.stringify(result[1]),
-                    loadedTable: result[0],
-                    text: 'Daten erfolgreich geladen!',
-                    lastSelected: request.body.measure,
-                    measureListData: measureList
+            // Only access when user has correct role and mandate
+            if (result && resultMandate) {
+                loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
+                    // Render page with newly acquired data
+                    response.render('pages/visual', {
+                        user: request.session.username,
+                        measureData: JSON.stringify(result[1]),
+                        loadedTable: result[0],
+                        text: 'Daten erfolgreich geladen!',
+                        lastSelected: request.body.measure,
+                        measureListData: measureList
+                    });
+                    // Show error if data query failed
+                }).catch(function (error) {
+                    console.log(error);
+                    response.render('pages/visual', {
+                        user: request.session.username,
+                        measureData: '',
+                        loadedTable: '',
+                        lastSelected: '',
+                        text: 'Datensatz nicht vorhanden!',
+                        measureListData: measureList
+                    });
                 });
-                // Show error if data query failed
-            }).catch(function (error) {
-                console.log(error);
+                // Show error if user has wrong rights
+            } else {
+                console.log('Permission error')
                 response.render('pages/visual', {
                     user: request.session.username,
                     measureData: '',
                     loadedTable: '',
                     lastSelected: '',
-                    text: 'Datensatz nicht vorhanden!',
+                    text: 'Dafür besitzen Se nicht die nötigen Rechte!',
                     measureListData: measureList
                 });
-            });
-            // Show error if user has wrong rights
-        } else {
-            response.render('pages/visual', {
-                user: request.session.username,
-                measureData: '',
-                loadedTable: '',
-                lastSelected: '',
-                text: 'Dafür besitzen Se nicht die nötigen Rechte!',
-                measureListData: measureList
-            });
+            }
         }
     }
 }
@@ -182,7 +194,7 @@ const submitDataHelper = async (request, response) => {
 
     // Load table data from disk
     try {
-        mandateList = await IO.loadTextFile('mandate');
+        mandateList = await IO.loadTextFile('mandates');
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
@@ -194,15 +206,17 @@ const submitDataHelper = async (request, response) => {
 
     // Save index, because for keeps running while reading from disk
     let indexSave = -1;
+    let found = false;
 
     // Search for measure in role list, start building query if found
-    for (i = 0; i < roleList.length; i++) {
+    for (i = 0; i < roleList.length && !found; i++) {
         if (request.body.measure === roleList[i][0]) {
             indexSave = i;
             let quarterly = false;
             let yearly = false;
+            found = true;
 
-            // If measure is found, check if saved role equals current role and admin/user, TODO: also check if user has correct mandate
+            // If measure is found, check if saved role equals current role and admin/user
             try {
                 // Can only get it here because we need i
                 result = await SQL.checkRolePermissions(roleList[i][1], request);
@@ -361,15 +375,14 @@ const submitDataHelper = async (request, response) => {
             } else {
                 // Displayed when user has insufficient rights
                 console.log(request.body.username + ' tried accessing measure without correct rights.');
-                IO.loadTextFile('tables', function (measureListNew) {
-                    response.render('pages/submit', {
-                        text: "Dafür besitzen Sie nicht die nötigen Rechte!",
-                        user: request.session.username,
-                        measure: request.body.measure,
-                        lastYear: year,
-                        lastMonth: month,
-                        measureListData: measureListNew
-                    });
+                response.render('pages/submit', {
+                    text: "Dafür besitzen Sie nicht die nötigen Rechte!",
+                    user: request.session.username,
+                    measure: request.body.measure,
+                    lastYear: '',
+                    lastMonth: '',
+                    entries: entryList,
+                    measureListData: measureList
                 });
             }
         }
