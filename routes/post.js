@@ -633,7 +633,7 @@ const deleteHelper = async (request, response) => {
                         // Overwrite old values
                         entryList[i] = newEntryList;
                     } else {
-                        console.log('Measure without entries deleted.')
+                        console.log('ERROR: Measure without entries deleted.')
                     }
                 }
 
@@ -710,7 +710,7 @@ const reportHelper = async (request, response) => {
         } else if (key === 'graph') {
             graphArray = request.body[key];
         } else {
-            console.log('Error while parsing data.')
+            console.log('ERROR: Error while parsing data.')
         }
     }
 
@@ -720,7 +720,6 @@ const reportHelper = async (request, response) => {
     try {
         if (Array.isArray(measureArray)) {
             for (i = 0; i < measureArray.length; i++) {
-                console.log('i: ' + i);
                 data.push(await loadNameFromSQL(measureArray[i], yearArray[i]));
             }
         } else {

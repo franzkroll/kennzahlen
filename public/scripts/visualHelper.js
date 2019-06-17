@@ -62,8 +62,8 @@ selM.onclick = function () {
     let yearHead = false;
     let quarterHead = false;
 
-    // TODO: cleaner way
-    let sumArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    // Saves type of sum and sum values
+    let sumArray = [];
     let sumCalc;
 
     // Loop through received array data
@@ -190,6 +190,7 @@ selM.onclick = function () {
 
                         measure.splice(2, 1);
                         insertedHead = true;
+
                     }
                 }
 
@@ -257,7 +258,11 @@ selM.onclick = function () {
 
                             // Add to year sum here
                             if (k !== j + 1) {
-                                sumArray[j] = sumArray[j] + parseInt(cellData);
+                                if (!sumArray[j]) {
+                                    sumArray.push(parseInt(cellData));
+                                } else {
+                                    sumArray[j] = sumArray[j] + parseInt(cellData);
+                                }
                             }
 
                             // Push data to arrays for graph visualization
@@ -433,14 +438,6 @@ selGraph.onchange = function (e) {
                 title: {
                     display: true
                 },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false
-                },
-                hover: {
-                    mode: 'index',
-                    intersect: false
-                },
                 // Make chart resize to canvas
                 responsive: true,
                 // Make it possible to zoom and pan the chart
@@ -535,6 +532,7 @@ selGraph.onchange = function (e) {
             // Add second data set if we want to display percent line
             if (svalue !== 'bar' && svalue !== 'horizontalBar' && percentData[0] != 0) {
                 const bgColor = hexToRgb(color);
+                console.log(percentData);
                 compareLine = {
                     label: measureAttr[i] + ' Soll',
                     data: percentData,
