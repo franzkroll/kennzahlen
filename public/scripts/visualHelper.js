@@ -44,7 +44,7 @@ String.prototype.replaceAll = function (search, replacement) {
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
-    const tableName = loadedTableName.slice(4, loadedTableName.length - 5).replaceAll('_', ' ');
+    let tableName2; // = loadedTableName.slice(4, loadedTableName.length - 5).replaceAll('_', ' ');
 
     const columns = measureData.split(',');
 
@@ -78,6 +78,10 @@ selM.onclick = function () {
                     filled = true;
 
                     let tableName = measure[measure.length - 1];
+
+                    // Second tablename, used later
+                    tableName2 = tableName.slice(tableName.indexOf('_') + 1, tableName.indexOf('~'));
+
                     let index = tableName.indexOf('~');
                     sumCalc = tableName.slice(index + 1, tableName.length);
 
@@ -223,9 +227,8 @@ selM.onclick = function () {
                         percentValues.push(0);
                     }
 
-                    // TODO: why is the 'y' here? needs fix, otherwise no measure can't contain ' y'
                     // Append data to table if there is any to add and if we got the right data already
-                    if ((inputText === (tableName.replace(/[0-9]/g, '').replace(' y', '')))) {
+                    if ((inputText === (tableName2.replace(/[0-9]/g, '').replaceAll('_', ' ')))) {
                         // Fill first column of the table with the attributes of the measure
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];
@@ -265,7 +268,10 @@ selM.onclick = function () {
                             if (!sumArray[j]) {
                                 sumArray.push(parseFloat(cellData));
                             } else {
-                                sumArray[j] = sumArray[j] + parseFloat(cellData);
+                                // Prevents adding of NaN
+                                if (cellData) {
+                                    sumArray[j] = sumArray[j] + parseFloat(cellData);
+                                }
                             }
 
                             // Special case for yearly measures, in monthly and quarterly measures the year is left out
@@ -280,8 +286,11 @@ selM.onclick = function () {
     }
     // Change here to added year values
     for (l = 1; l < table.rows.length; l++) {
+        if (sumArray[l - 1] == 'NaN' || !sumArray[l - 1]) {
+            sumArray[l - 1] = 0;
+        }
         if (sumCalc === 'sum') {
-            console.log('test');
+            // Replace year value with calculated sum
             table.rows[l].cells[1].innerHTML = sumArray[l - 1];
         } else if (sumCalc === 'median') {
             table.rows[l].cells[1].innerHTML = (sumArray[l - 1] / dataGraph[0].length).toFixed(2);

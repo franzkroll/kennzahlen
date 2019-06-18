@@ -40,7 +40,7 @@ selM.onclick = function () {
                 if (measure[i] !== 'quarterly') {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(measure[i]));
-                    opt.value = measure[0];
+                    opt.value = measure[i];
                     selA.appendChild(opt);
                 }
             }

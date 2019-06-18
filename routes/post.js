@@ -842,7 +842,8 @@ const addAttributeHelper = async (request, response) => {
         response.render('pages/changeMeasure', {
             user: request.session.username,
             text: "Neue Attribute erfolgreich hinzugefügt.",
-            measureList: measureList
+            measureList: measureList,
+            descriptionList: measureDescriptions
         });
         // Or catch mysql error and show user corresponding error
     }).catch(function (error) {
@@ -850,7 +851,8 @@ const addAttributeHelper = async (request, response) => {
         response.render('pages/changeMeasure', {
             user: request.session.username,
             text: "Fehler beim Hinzufügen des neuen Attributs!",
-            measureList: measureList
+            measureList: measureList,
+            descriptionList: measureDescriptions
         });
     });
 }
@@ -860,14 +862,90 @@ const addAttributeHelper = async (request, response) => {
  * @param {Request from the user. Contains the attribute to be changed.} request 
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
-const changeAttributeHelper = async (request, response) => {}
+const changeAttributeHelper = async (request, response) => {
+    console.log('changing called');
+    console.log(request.body.measure);
+    console.log(request.body.attribute);
+
+    console.log(request.body.changeDesc);
+    console.log(request.body.changeVar);
+}
 
 /**
  * Deletes the specified attribute of the measure. Reloads the page again.
  * @param {Request from the user. Contains the attribute to be deleted.} request 
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
-const deleteAttributeHelper = async (request, response) => {}
+const deleteAttributeHelper = async (request, response) => {
+    let measureDescriptions, measureList;
+    let tableNames = [];
+
+    // Try to load data about tables from disk
+    try {
+        measureDescriptions = await IO.loadTextFile('desc');
+        measureList = await IO.loadTextFile('tables');
+    } catch (error) {
+        console.log(error);
+    }
+
+    // Loop through known measures and look for measure input by the user
+    for (i = 0; i < measureList.length; i++) {
+        if (measureList[i][0] === request.body.measure) {
+            // Look for index of attribute in list entry
+            const index = measureList[i].indexOf(request.body.attribute);
+            if (index !== -1) {
+                // Delete entry
+                measureList[i].splice(index, 1);
+                measureDescriptions[i].splice(index, 1);
+
+                // Format tablename correctly here
+                tableName = measureList[i][measureList[i].length - 1].slice(0, measureList[i][measureList[i].length - 1].length - 1) + '_';
+                // Store index here for later, should be the same for all
+                foundIndex = i;
+
+                // Split years of the measure
+                const years = measureList[i][1].split(':');
+
+                // Cycle through years of the measure and add them all to the tablename, store them in tableNames
+                for (j = 0; j < years.length; j++) {
+                    let indexCut = tableName.indexOf('~');
+                    if (indexCut !== -1) {
+                        tableName = tableName.slice(0, indexCut);
+                    }
+                    tableNames.push(tableName + '_' + years[j]);
+                }
+            } else {
+                console.log('ERROR: Couldn\'t find attribute.');
+                // TODO: render error page here
+            }
+        }
+    }
+
+    let attributeData = request.body.attribute.replaceAll(' ', '_');
+
+    // Write new arrays to txt file, sorting isn't needed here
+    IO.arrayToTxt('tables', measureList);
+    IO.arrayToTxt('desc', measureDescriptions);
+
+    // Remove column from mysql database
+    SQL.deleteColumnFromDB(tableNames, attributeData).then(function () {
+        response.render('pages/changeMeasure', {
+            user: request.session.username,
+            text: "Attribut erfolgreich gelöscht.",
+            measureList: measureList,
+            descriptionList: measureDescriptions
+        });
+        // Catch possible errors
+    }).catch(function (error) {
+        console.log(error);
+        response.render('pages/changeMeasure', {
+            user: request.session.username,
+            text: "Fehler beim Löschen des Attributs.",
+            measureList: measureList,
+            descriptionList: measureDescriptions
+        });
+    });
+}
 
 /**
  * Receives name and year, converts it to corresponding name in sql database and queries
