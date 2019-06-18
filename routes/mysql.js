@@ -282,6 +282,30 @@ function addColumnToDB(tableData, attributeData) {
     });
 }
 
+
+/**
+ * Changes column name of specified table.
+ * @param {Tables with column to be changed.} tableData 
+ * @param {Old name of attribute (=column).} attributeDataOld 
+ * @param {New name of column.} attributeData 
+ */
+function changeTableColumn(tableData, attributeDataOld, attributeData) {
+    return new Promise(function (resolve, reject) {
+        // Cycle through possible table names and add the attribute to them, needs to be modified 
+        // with second loop if we later want to add multiple attributes at once
+        for (i = 0; i < tableData.length; i++) {
+            // Build query here because it doesn't work otherwise
+            const query = 'ALTER TABLE ' + mysql.escapeId(tableData[i]) + ' CHANGE COLUMN ' + mysql.escapeId(attributeDataOld) + ' ' + mysql.escapeId(attributeData) +
+                'FLOAT;';
+            // Query database with prebuilt query
+            connectionData.query(query, function (err) {
+                if (err) return reject(err);
+            });
+        }
+        resolve();
+    });
+}
+
 /**
  * Delete column from already existing table.
  * @param {All the tables from which columns are supposed to be deleted.} tableData 
@@ -363,5 +387,6 @@ module.exports = {
     deleteUserFromDB: deleteUserFromDB,
     getUserFromDB: getUserFromDB,
     addColumnToDB: addColumnToDB,
-    deleteColumnFromDB: deleteColumnFromDB
+    deleteColumnFromDB: deleteColumnFromDB,
+    changeTableColumn: changeTableColumn
 }

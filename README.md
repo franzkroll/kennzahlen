@@ -125,8 +125,10 @@ Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen 
 
 * TODO: Update bei Projektende
 * Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
+* Täglich erfasste Kennzahlen
+* Auswahlliste für Mandata/Rollen
 * Erstellung von Reports (Druck oder PDF) von mehreren Kennzahlen gleichzeitig
-* Mandate für die Verwendung in mehrere Leitstellen gleichzeitg / es ist eventuell möglich dies über Rollen zu lösen
+
 
 ## Kontakt
 

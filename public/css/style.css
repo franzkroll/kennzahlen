@@ -162,6 +162,8 @@ li a:hover:not(.active) {
     width: 20%;
     margin-bottom: 10px;
     margin: 10px;
+    -moz-appearance: none;
+    appearance: none;
     -webkit-appearance: none;
     border: none;
     background-image: url("https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png");

@@ -286,15 +286,16 @@ selM.onclick = function () {
     }
     // Change here to added year values
     for (l = 1; l < table.rows.length; l++) {
-        if (sumArray[l - 1] == 'NaN' || !sumArray[l - 1]) {
+        if (sumArray[l - 1] === 'NaN' || !sumArray[l - 1]) {
             sumArray[l - 1] = 0;
+        } else {
+            if (sumCalc === 'sum') {
+                // Replace year value with calculated sum
+                table.rows[l].cells[1].innerHTML = sumArray[l - 1];
+            } else if (sumCalc === 'median') {
+                table.rows[l].cells[1].innerHTML = (sumArray[l - 1] / dataGraph[0].length).toFixed(2);
+            } // We don't have to do anything for self
         }
-        if (sumCalc === 'sum') {
-            // Replace year value with calculated sum
-            table.rows[l].cells[1].innerHTML = sumArray[l - 1];
-        } else if (sumCalc === 'median') {
-            table.rows[l].cells[1].innerHTML = (sumArray[l - 1] / dataGraph[0].length).toFixed(2);
-        } // We don't have to do anything for self
     }
 }
 
