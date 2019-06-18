@@ -294,7 +294,7 @@ const adminHelper = function (request, response) {
     if (request.session.loggedin) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
             if (result) {
-                response.render('pages/admin/admin', {
+                response.render('pages/admin/adminIndex', {
                     user: request.session.username,
                     text: ""
                 });
@@ -339,23 +339,33 @@ const reportHelper = function (request, response) {
  * @param {Request from the user, used for checking if user is logged in.} request 
  * @param {Response sent back, renders new page with measure data.} response 
  */
-const changeHelper = function (request, response) {
+const changeHelper = async (request, response) => {
     if (request.session.loggedin) {
+        // Load lists from disk
+        let measureList, descriptionList;
+        try {
+            measureList = await IO.loadTextFile('tables');
+            descriptionList = await IO.loadTextFile('desc');
+            // Catch errors while loading from disk
+        } catch (error) {
+            console.log(error);
+        }
+
         SQL.checkRolePermissions('user', request).then(function (result) {
             if (result) {
-                IO.loadTextFile('tables').then(function (measureList) {
-                    response.render('pages/changeMeasure', {
-                        user: request.session.username,
-                        text: "",
-                        measureList: measureList
-                    }); // Catch errors while loading from disk
-                }).catch(function (error) {
-                    console.log(error);
+                // Render new page with information
+                response.render('pages/changeMeasure', {
+                    user: request.session.username,
+                    text: "",
+                    measureList: measureList,
+                    descriptionList: descriptionList
                 });
             } else {
                 response.render('pages/errors/loginError');
             }
         });
+    } else {
+        response.render('pages/errors/loginError');
     }
 }
 

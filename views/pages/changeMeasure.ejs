@@ -14,15 +14,19 @@ Page for changing already created measures.
 
     <main>
         <span style="display:block; height: 10px;"></span>
+
         <div class="misc-text">
             Wählen Sie hier eine bereits bestehende Kennzahl aus. Danach ist es Ihnen möglich eine neue Eigenschaft zu
             dieser hinzuzufügen. Name der Eigenschaft und Beschreibung dürfen kein Komma enthalten.
             Achtung: Das Löschen von Attributen löscht die dazugehörigen Werte permanent!
         </div>
+
         <span style="display:block; height: 10px;"></span>
+
         <div class="misc-text">
             <%- text %>
         </div>
+
         <span style="display:block; height: 10px;"></span>
 
         <!-- Deletion of attributes is handled here. -->
@@ -32,16 +36,16 @@ Page for changing already created measures.
 
                 <!-- Selection menu for individual attributes. -->
                 <div style=" text-align:center;margin-bottom: 15px">
-                    <select id="measure" style="width:90%" name="attribute" class="dropdownS" required></select>
+                    <select id="attribute" style="width:90%" name="attribute" class="dropdownS" required></select>
                 </div>
 
                 <input type="submit" style="width:50%" value="Attribut löschen">
             </form>
             <form action="changeAttr" style="text-align: center" method="POST">
                 <!-- Measure attribute that the user wants to add gets entered here. -->
-                <input type="text" name="var" title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein."
-                    required>
-                <input type="text" name="desc"
+                <input type="text" name="varChange" id="varChange"
+                    title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein." required>
+                <input type="text" name="descChange" id="descChange"
                     title="Geben Sie hier eine Beschreibung für die Eigenschaft der Kennzahl ein." required>
 
                 <span style="display:block; height: 12px;"></span>
@@ -70,11 +74,12 @@ Page for changing already created measures.
 
     <script>
         const measureData = '<%- measureList %>';
+        const descriptionData = '<%- descriptionList %>';
     </script>
 
     <script src="/scripts/changeMeasureHelper.js"></script>
 
-    <!-- Load footer, every page has this. -->
+    <!-- Load footer -->
     <footer>
         <% include ../partials/footer %>
     </footer>
