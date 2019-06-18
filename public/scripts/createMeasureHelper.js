@@ -43,3 +43,15 @@ window.addEventListener('load', function () {
         }
     });
 });
+
+// Automatically select correct adding method when user selects yearly measure
+let cycle = document.getElementById('cycle');
+
+cycle.onclick = function () {
+    const index = this.selectedIndex;
+    const inputText = this.children[index].innerHTML.trim();
+
+    if (inputText === 'jährlich') {
+        document.getElementById('self').checked = true;
+    }
+}

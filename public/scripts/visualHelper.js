@@ -230,6 +230,11 @@ selM.onclick = function () {
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];
 
+                        if (!yearHead) {
+                            let cell2 = row.insertCell(-1);
+                            cell2.innerHTML = 0;
+                        }
+
                         // Counts data columns
                         var columnCount = measure.length - 2;
 
@@ -257,21 +262,14 @@ selM.onclick = function () {
                             }
 
                             // Add to year sum here
-                            if (k !== j + 1) {
-                                if (!sumArray[j]) {
-                                    sumArray.push(parseFloat(cellData));
-                                } else {
-                                    sumArray[j] = sumArray[j] + parseFloat(cellData);
-                                }
+                            if (!sumArray[j]) {
+                                sumArray.push(parseFloat(cellData));
+                            } else {
+                                sumArray[j] = sumArray[j] + parseFloat(cellData);
                             }
 
-                            // Push data to arrays for graph visualization
-                            if (k != j + 1) {
-                                dataBuilder.push(cellData);
-                                // Special case for yearly measures, in monthly and quarterly measures the year is left out
-                            } else if (yearHead) {
-                                dataBuilder.push(cellData);
-                            }
+                            // Special case for yearly measures, in monthly and quarterly measures the year is left out
+                            dataBuilder.push(cellData);
                         }
                         // Push data to array for graphs
                         dataGraph.push(dataBuilder);
@@ -283,6 +281,7 @@ selM.onclick = function () {
     // Change here to added year values
     for (l = 1; l < table.rows.length; l++) {
         if (sumCalc === 'sum') {
+            console.log('test');
             table.rows[l].cells[1].innerHTML = sumArray[l - 1];
         } else if (sumCalc === 'median') {
             table.rows[l].cells[1].innerHTML = (sumArray[l - 1] / dataGraph[0].length).toFixed(2);
