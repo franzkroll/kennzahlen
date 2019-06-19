@@ -17,7 +17,7 @@ const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 });
 const log_stdout = process.stdout;
 
-// Load https certificates, TODO: How to get certificate that isn't self signed?
+// Load https certificates, just self signed ones, should be okay with internal use
 const options = {
 	key: fs.readFileSync('keys/server.key'),
 	cert: fs.readFileSync('keys/server.cert')

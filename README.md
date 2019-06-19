@@ -44,7 +44,7 @@ const connectionData = mysql.createConnection({
     database: 'measures'
 });
 ```
-Die Anwendung ist nun über [localhost:5000](http://localhost:5000/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
+Die Anwendung ist nun über [localhost:5000](https://localhost:5000/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
 
 ```sh
 port:4444 node server.js
@@ -114,7 +114,7 @@ Punkte werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
 
 Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte Visualisieren und Daten zu bestehenden Kennzahlen eintragen.
 
-Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich. Ebenso lassen sich Eigenschaften zu Kennzahlen hinzufügen und ein Report über mehrere Kennzahlen erstellen.
+Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung, ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden, danach ist die Eingabe über die erzeugten Textfelder möglich. Ebenso lassen sich Kennzahlen bearbeiten und ein Report über mehrere Kennzahlen erstellen. Alle Funktionen sind genauer unter Hilfe im Menü der Website erklärt.
 
 Benutzer mit der Rolle 'admin' haben ebenso die Möglichkeit über die Navigationsleiste oben rechts auf den Admin Bereich zuzugreifen. Dort ist eine Anzeige von Statistiken des Servers möglich, sowie die Verwaltung der Benutzer und das Löschen von Kennzahlen.
 Neu erstellte Benutzer müssen einen eindeutigen Namen sowie E-Mail Adresse haben. Das Passwort wird automatisch auf gute Sicherheit überprüft.

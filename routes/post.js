@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
+const fs = require('fs');
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -698,13 +699,13 @@ const deleteHelper = async (request, response) => {
 const reportHelper = async (request, response) => {
     let yearArray = [];
     let measureArray = [];
-    let graphArray = [];
+    let measures = [];
 
     // Split data in the body in the correct arrays for later processing
     for (let key in request.body) {
-        console.log(request.body[key]);
         if (key === 'measure') {
             measureArray = request.body[key];
+            measures.push(request.body[key]);
         } else if (key === 'year') {
             yearArray = request.body[key];
         } else if (key === 'graph') {
@@ -714,33 +715,30 @@ const reportHelper = async (request, response) => {
         }
     }
 
+    // Data containing the results
     let data = [];
 
-    // Query all the data from the database 
+    // Query all the data from the database, TODO: why does it only work once?
     try {
         if (Array.isArray(measureArray)) {
             for (i = 0; i < measureArray.length; i++) {
-                data.push(await loadNameFromSQL(measureArray[i], yearArray[i]));
+                const table = await loadNameFromSQL(measureArray[i], yearArray[i]);
+                data.push(table);
             }
         } else {
-            data.push(await loadNameFromSQL(measureArray, yearArray));
+            const table = await loadNameFromSQL(measureArray, yearArray);
+            data.push(table);
         }
     } catch (error) {
         console.log(error);
     }
 
-    // Show error if something goes wrong
-    IO.loadTextFile('tables').then(function (measureList) {
-        response.render('pages/reportCreatorPDF', {
-            user: request.session.username
-        });
+    // Creates pdf from data and saves it to disk
+    IO.generatePDF(measures, data, response).then(function () {
+        // Send completed pdf file to the user for viewing/download
     }).catch(function (error) {
         console.log(error);
-        response.render('pages/reportCreator', {
-            user: request.session.username,
-            text: 'Fehler beim Laden der Daten!',
-            measureList: measureList
-        });
+        // TODO: Render new page with error message
     });
 }
 
@@ -845,7 +843,6 @@ const addAttributeHelper = async (request, response) => {
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
 const changeAttributeHelper = async (request, response) => {
-    console.log('changing called');
     let measureDescriptions, measureList;
     let tableNames = [];
 
@@ -923,7 +920,7 @@ const changeAttributeHelper = async (request, response) => {
 /**
  * Deletes the specified attribute of the measure. Reloads the page again.
  * TODO: Also delete entries from entries list if we delete the last attribute of the measure. 
- * But rare edge case, should happen almost never.
+ * But rare edge case, should almost never happen.
  * @param {Request from the user. Contains the attribute to be deleted.} request 
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */

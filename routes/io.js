@@ -1,5 +1,6 @@
 // Imports
 const fs = require('fs-extra');
+const pdf = require('pdfkit');
 
 /**
  * Loads tables from disk txt file and converts them to an array.
@@ -65,8 +66,61 @@ const arrayToTxt = function (name, array) {
     }
 }
 
+/**
+ * TODO: Finish pdf creation
+ * Generates a PDF from previously queried data from the database. PDF contains the specified measures 
+ * with table and specified graph type. PDF gets saved in files folder.
+ * @param {Data contains all data cells from the database} data
+ * @param {Graph types in order for the different measures.} graphTypes 
+ */
+function generatePDF(measures, data, response) {
+    console.log(data);
+    return new Promise(function (resolve, reject) {
+        try {
+            console.log(data.length);
+
+            // Create new document and save it to standard path
+            const doc = new pdf({
+                compress: false
+            });
+            doc.pipe(fs.createWriteStream('./files/Report.pdf'));
+            doc.pipe(response)
+
+
+            // Insert measure name for each measure
+            for (i = 0; i < measures.length; i++) {
+                doc.text(measures[i]);
+                doc.moveDown();
+            }
+
+            // Add data to pdf here from every graph
+            for (i = 0; i < data.length; i++) {
+                // TODO: Format table correctly
+                /*doc.text(data[i][1]);
+                console.log(data[i].length);*/
+            }
+
+            // TODO: somehow generate graphs
+
+            // Finalize the pdf and end the stream
+            doc.end();
+            // Catch errors that occur while creating the document
+        } catch (error) {
+            reject(error);
+        }
+        // Resolve if nothing went wrong
+        resolve();
+    });
+}
+
+String.prototype.replaceAll = function (search, replacement) {
+    let target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 // Export function so they can be used elsewhere
 module.exports = {
     loadTextFile: loadTextFile,
-    arrayToTxt: arrayToTxt
+    arrayToTxt: arrayToTxt,
+    generatePDF: generatePDF
 }
