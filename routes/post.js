@@ -769,14 +769,6 @@ const addAttributeHelper = async (request, response) => {
     let foundIndex = -1;
     let tableName;
 
-    console.log(request.body.measure);
-    // Get stuff from request and save in corresponding arrays
-    for (let key in request.body) {
-        // Save found stuff for later, for now only one value in each, but could be easily converted to multiple values
-        console.log(key);
-        console.log(request.body[key]);
-    }
-
     // Cycle through measures known to the system and look for entered measure
     for (i = 0; i < measureList.length; i++) {
         if (measureList[i][0] === request.body.measure) {

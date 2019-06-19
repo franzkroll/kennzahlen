@@ -212,10 +212,8 @@ function deleteMeasureFromDB(tableName) {
 function insertUserIntoDB(request) {
     return new Promise(function (resolve, reject) {
         // Check password strength
-        console.log(request.body.password + ':' + request.body.password2);
         if (request.body.password !== request.body.password2) {
             err = "pwSame";
-            console.log('passwords are not the same');
             reject(err);
         } else if (pwCheck(request.body.password)) {
             // Hash insert password
@@ -234,7 +232,6 @@ function insertUserIntoDB(request) {
             // Return error if test failed
         } else {
             err = "pw";
-            console.log("password check failed");
             reject(err);
         }
     });
@@ -314,13 +311,11 @@ function changeTableColumn(tableData, attributeDataOld, attributeData) {
 function deleteColumnFromDB(tableData, attributeData) {
     return new Promise(function (resolve, reject) {
 
-        // Cycle through possible table names and add the attribute to them, needs to be modified 
-        // with second loop if we later want to add multiple attributes at once
+        // Cycle through possible table names and add the attribute to them
         for (i = 0; i < tableData.length; i++) {
             // Build query here because it doesn't work otherwise
             const query = 'ALTER TABLE ' + mysql.escapeId(tableData[i]) + ' DROP ' + mysql.escapeId(attributeData) + ';'
 
-            console.log(query);
             // Query database with prebuilt query
             connectionData.query(query, function (err) {
                 if (err) return reject(err);
