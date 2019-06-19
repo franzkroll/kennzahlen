@@ -1,6 +1,5 @@
 // Imports
 const fs = require('fs-extra');
-const pdfMake = require('pdfmake');
 
 /**
  * Loads tables from disk txt file and converts them to an array.

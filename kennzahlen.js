@@ -8,15 +8,20 @@ const fs = require('fs');
 const compression = require('compression');
 const util = require('util');
 const favicon = require('serve-favicon');
-const Ddos = require('ddos')
-
-//feuerwehr\fw137902
+const Ddos = require('ddos');
+const https = require('https');
 
 // Overwrite default console log and write into debug.log instead..
 const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 	flags: 'w'
 });
 const log_stdout = process.stdout;
+
+// Load https certificates, TODO: How to get certificate that isn't self signed?
+const options = {
+	key: fs.readFileSync('keys/server.key'),
+	cert: fs.readFileSync('keys/server.cert')
+};
 
 // Get current time and date, add them to every printed debug
 console.log = function (d) {
@@ -42,6 +47,8 @@ const ddos = new Ddos({
 	testmode: false,
 	whitelist: []
 });
+
+// DDos prevention
 app.use(ddos.express)
 
 // Set ejs as view engine for serving pages
@@ -87,7 +94,7 @@ app.use(bodyParser.json());
 routes(app);
 
 // Start server on port that was previously defined
-const server = app.listen(port, function () {
+const server = https.createServer(options, app).listen(port, function () {
 	console.log('Server listening on port ' + port + ' …');
 });
 

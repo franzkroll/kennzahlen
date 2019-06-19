@@ -56,14 +56,14 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         </div>
         <span style="display:block; height: 10px;"></span>
 
-        <div class="print_canvas">
-            <canvas id="chart" width="500" height="400"></canvas>
+        <div>
+            <canvas class="chart_canvas" id="chart" width="500" height="400"></canvas>
         </div>
 
         <span style="display:block; height: 10px;"></span>
 
         <!-- Button for creating print. No need for Ctrl + P. -->
-        <!-- TODO: Format correctly and why doesn't it work with Firefox? -->
+        <!-- TODO: Why doesn't it work with firefox? -->
         <div style="text-align: center"><button type="submit" onclick="window.print()" class="button">Druck der Daten
                 abrufen</button></div>
     </main>

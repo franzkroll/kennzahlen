@@ -747,7 +747,7 @@ const reportHelper = async (request, response) => {
 
 /**
  * Receives post requests from changeMeasure page, collects all the necessary info and passes it to 
- * the database as request. If everything goes well the column is added to the correct table in the database
+ * the database as request. If everything goes well the column is added to the correct table in the database.
  * @param {Request from the user page, contains all the data needed for creation of new column.} request 
  * @param {Sends back new page with success/error text.} response 
  */
@@ -922,6 +922,8 @@ const changeAttributeHelper = async (request, response) => {
 
 /**
  * Deletes the specified attribute of the measure. Reloads the page again.
+ * TODO: Also delete entries from entries list if we delete the last attribute of the measure. 
+ * But rare edge case, should happen almost never.
  * @param {Request from the user. Contains the attribute to be deleted.} request 
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
