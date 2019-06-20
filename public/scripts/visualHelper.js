@@ -652,10 +652,7 @@ document.getElementById('download').onclick = function () {
     for (let key in sessionStorage) {
         if (!isNaN(key)) {
             const image = window.sessionStorage.getObject(key);
-            doc.text(20, 20, 'Report');
-            doc.text(20, 20, '20. Juni 2019')
-            doc.addPage();
-            doc.addImage(image, 'JPEG', 0, 0, width * 0.95, height * 0.7, '', 'SLOW');
+            doc.addImage(image, 'PNG', 0, 0, width, height * 0.8, '', 'SLOW');
             doc.addPage();
         }
     }
