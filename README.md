@@ -51,6 +51,13 @@ port:4444 node server.js
 ```
 (Beispiel mit Port 4444)
 
+Ebenso ist ein Start über eine feste IP-Adresse möglich, dies ist wieder über die Startoptionen möglich, oder eine Anpassung der ip-Variable in [kennzahlen.js](routes/kennzahlen.js).
+
+```sh
+ip:192.168.2.1 node server.js
+```
+(Beispiel mit IP 192.168.2.1)
+
 Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2). Diese sorgt für einen automatischen Neustart bei Absturz der App. Installation, Starten, bzw. stoppen erfolgt dann mit folgenden befehlen:
 
 ```sh

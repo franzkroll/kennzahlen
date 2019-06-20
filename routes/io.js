@@ -86,7 +86,6 @@ function generatePDF(measures, data, response) {
             doc.pipe(fs.createWriteStream('./files/Report.pdf'));
             doc.pipe(response)
 
-
             // Insert measure name for each measure
             for (i = 0; i < measures.length; i++) {
                 doc.text(measures[i]);
@@ -113,6 +112,7 @@ function generatePDF(measures, data, response) {
     });
 }
 
+// TODO: move to own class and import, this is used everywhere
 String.prototype.replaceAll = function (search, replacement) {
     let target = this;
     return target.replace(new RegExp(search, 'g'), replacement);

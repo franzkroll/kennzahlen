@@ -31,8 +31,10 @@ console.log = function (d) {
 	log_stdout.write(dateString[0] + ': ' + util.format(d) + '\n');
 };
 
-// start server on Port 4000 if no other port is specified
+// Start server on Port 4000 if no other port is specified
 const port = process.env.PORT || 5000;
+// Start server on localhost if no other ip is specified
+const ip = process.env.IP || '127.0.0.1';
 
 // link routes 
 const routes = require('./routes/index.js');
@@ -94,8 +96,8 @@ app.use(bodyParser.json());
 routes(app);
 
 // Start server on port that was previously defined
-const server = https.createServer(options, app).listen(port, function () {
-	console.log('Server listening on port ' + port + ' …');
+const server = https.createServer(options, app).listen(port, ip, function () {
+	console.log('Server listening on port ' + ip + ':' + port + ' …');
 });
 
 // Logs Current Connections
