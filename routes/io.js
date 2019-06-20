@@ -74,11 +74,8 @@ const arrayToTxt = function (name, array) {
  * @param {Graph types in order for the different measures.} graphTypes 
  */
 function generatePDF(measures, data, response) {
-    console.log(data);
     return new Promise(function (resolve, reject) {
         try {
-            console.log(data.length);
-
             // Create new document and save it to standard path
             const doc = new pdf({
                 compress: false
@@ -95,8 +92,8 @@ function generatePDF(measures, data, response) {
             // Add data to pdf here from every graph
             for (i = 0; i < data.length; i++) {
                 // TODO: Format table correctly
-                /*doc.text(data[i][1]);
-                console.log(data[i].length);*/
+                doc.text(data[i]);
+                console.log(data[i]);
             }
 
             // TODO: somehow generate graphs

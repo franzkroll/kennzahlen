@@ -312,29 +312,6 @@ const adminHelper = function (request, response) {
 }
 
 /**
- * Loads list of measures and sends it to the user, together with reportCreator page. User can select 
- * values and create a report with the selected data.
- * @param {Received request, just used for checking if a user is logged in.} request 
- * @param {Contains new page with needed data, username and list of measures.} response 
- */
-const reportHelper = function (request, response) {
-    if (request.session.loggedin) {
-        // Load list with measures and send it to the user
-        IO.loadTextFile('tables').then(function (measureList) {
-            response.render('pages/reportCreator', {
-                user: request.session.username,
-                text: "",
-                measureList: measureList
-            }); // Catch errors while loading from disk
-        }).catch(function (error) {
-            console.log(error);
-        });
-    } else {
-        response.render('pages/errors/loginError');
-    }
-}
-
-/**
  * Loads page for changing a measure, which means adding an attribute to an existing measure.
  * @param {Request from the user, used for checking if user is logged in.} request 
  * @param {Response sent back, renders new page with measure data.} response 
@@ -383,6 +360,5 @@ module.exports = {
     createHelper: createHelper,
     adminHelper: adminHelper,
     helpFunction: helpFunction,
-    reportHelper: reportHelper,
     changeHelper: changeHelper
 }

@@ -65,9 +65,6 @@ module.exports = function (app) {
     // Logout user and delete the session object
     app.get('/logout', GetHelpers.logoutHelper);
 
-    // Show selection menu with multiple measures for report creation
-    app.get('/measureReport', GetHelpers.reportHelper);
-
     // Display measure and options to add a new attribute to them
     app.get('/changeMeasure', GetHelpers.changeHelper);
 
@@ -102,9 +99,6 @@ module.exports = function (app) {
 
     // Handles submitted data when user created a new measure, writes info into local files and creates table
     app.post('/createMeasure', PostHelpers.createMeasureHelper);
-
-    // Handles creation of reports
-    app.post('/report', PostHelpers.reportHelper);
 
     // Handles insertion of new attribute into existing measure
     app.post('/addAttr', PostHelpers.addAttributeHelper);

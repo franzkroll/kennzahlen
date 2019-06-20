@@ -691,59 +691,6 @@ const deleteHelper = async (request, response) => {
 }
 
 /**
- * Gets all the elements from the client, the requested measures and corresponding time intervals. 
- * Load them from sql library, format the results correctly and send pdf page back to the user.
- * @param {Request from the client. Contains all the requested measures.} request 
- * @param {Sends back new page with, contains pdf with all the formatted measures.} response 
- */
-const reportHelper = async (request, response) => {
-    let yearArray = [];
-    let measureArray = [];
-    let measures = [];
-
-    // Split data in the body in the correct arrays for later processing
-    for (let key in request.body) {
-        if (key === 'measure') {
-            measureArray = request.body[key];
-            measures.push(request.body[key]);
-        } else if (key === 'year') {
-            yearArray = request.body[key];
-        } else if (key === 'graph') {
-            graphArray = request.body[key];
-        } else {
-            console.log('ERROR: Error while parsing data.')
-        }
-    }
-
-    // Data containing the results
-    let data = [];
-
-    // Query all the data from the database, TODO: why does it only work once?
-    try {
-        if (Array.isArray(measureArray)) {
-            for (i = 0; i < measureArray.length; i++) {
-                const table = await loadNameFromSQL(measureArray[i], yearArray[i]);
-                data.push(table);
-            }
-        } else {
-            const table = await loadNameFromSQL(measureArray, yearArray);
-            data.push(table);
-        }
-    } catch (error) {
-        console.log(error);
-    }
-
-    // Creates pdf from data and saves it to disk
-    IO.generatePDF(measures, data, response).then(function () {
-        // Send completed pdf file to the user for viewing/download
-    }).catch(function (error) {
-        console.log(error);
-        // TODO: Render new page with error message
-    });
-}
-
-
-/**
  * Receives post requests from changeMeasure page, collects all the necessary info and passes it to 
  * the database as request. If everything goes well the column is added to the correct table in the database.
  * @param {Request from the user page, contains all the data needed for creation of new column.} request 
@@ -964,7 +911,12 @@ const deleteAttributeHelper = async (request, response) => {
                 }
             } else {
                 console.log('ERROR: Couldn\'t find attribute.');
-                // TODO: render error page here, but shouldn't happen
+                response.render('pages/changeMeasure', {
+                    user: request.session.username,
+                    text: "Fehler beim Löschen des Attributs. Attribut konnte nicht gefunden werden.",
+                    measureList: measureList,
+                    descriptionList: measureDescriptions
+                });
             }
         }
     }
@@ -1075,7 +1027,6 @@ module.exports = {
     submitDataHelper: submitDataHelper,
     createMeasureHelper: createMeasureHelper,
     deleteHelper: deleteHelper,
-    reportHelper: reportHelper,
     addAttributeHelper: addAttributeHelper,
     changeAttributeHelper: changeAttributeHelper,
     deleteAttributeHelper: deleteAttributeHelper

@@ -44,14 +44,14 @@ const connectionData = mysql.createConnection({
     database: 'measures'
 });
 ```
-Die Anwendung ist nun über [localhost:5000](https://localhost:5000/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
+Die Anwendung ist nun über [localhost:8080](https://localhost:8080/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
 
 ```sh
 port:4444 node server.js
 ```
 (Beispiel mit Port 4444)
 
-Ebenso ist ein Start über eine feste IP-Adresse möglich, dies ist wieder über die Startoptionen möglich, oder eine Anpassung der ip-Variable in [kennzahlen.js](routes/kennzahlen.js).
+Ebenso ist ein Start über eine feste IP-Adresse möglich, dies ist wieder über die Startoptionen möglich, oder eine Anpassung der ip-Variable in [kennzahlen.js](routes/kennzahlen.js). (Standardmäßig startet der Server über localhost.)
 
 ```sh
 ip:192.168.2.1 node server.js
@@ -133,9 +133,7 @@ Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen 
 * TODO: Update bei Projektende
 * Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
 * Täglich erfasste Kennzahlen
-* Auswahlliste für Mandata/Rollen
-* Erstellung von Reports (Druck oder PDF) von mehreren Kennzahlen gleichzeitig
-
+* Auswahlliste für Mandate/Rollen
 
 ## Kontakt
 

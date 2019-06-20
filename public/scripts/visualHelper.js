@@ -40,12 +40,11 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+let tableName2 = lastSelected.slice(0, lastSelected.length - 1);
 
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
-    let tableName2; // = loadedTableName.slice(4, loadedTableName.length - 5).replaceAll('_', ' ');
-
     const columns = measureData.split(',');
 
     // Get selected measure
@@ -78,9 +77,6 @@ selM.onclick = function () {
                     filled = true;
 
                     let tableName = measure[measure.length - 1];
-
-                    // Second tablename, used later
-                    tableName2 = tableName.slice(tableName.indexOf('_') + 1, tableName.indexOf('~'));
 
                     let index = tableName.indexOf('~');
                     sumCalc = tableName.slice(index + 1, tableName.length);
@@ -574,6 +570,19 @@ function hexToRgb(hex) {
 }
 
 /**
+ */
+Storage.prototype.setObject = function (key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+/**
+ */
+Storage.prototype.getObject = function (key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
+}
+
+/**
  * Generates a random hexadecimal color.
  */
 function getRandomColor() {
@@ -597,4 +606,76 @@ for (let i, j = 0; i = selM.options[j]; j++) {
 
         break;
     }
+}
+
+/**
+ * Helper method for storing objects in session storage.
+ */
+Storage.prototype.setObject = function (key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+/**
+ * Helper method for retrieving objects from session storage.
+ */
+Storage.prototype.getObject = function (key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
+}
+
+/**
+ * Adds current html page with exceptions, to image. Image gets saved in session storage.
+ */
+document.getElementById('report').onclick = function () {
+    html2canvas(document.body, {
+        onrendered: function (canvas) {
+            // Convert image to dataURL
+            const image = canvas.toDataURL("image/png");
+            // Save dataURL in session storage
+            window.sessionStorage.setObject(new Date().getTime(), image);
+        }
+    });
+}
+
+/**
+ * Creates new pdf document from all previously stored measure in the session storage
+ */
+document.getElementById('download').onclick = function () {
+    // Create new document
+    let doc = new jsPDF('p', 'mm', 'a4');
+
+    // Set image width to a4
+    const width = doc.internal.pageSize.getWidth();
+    const height = doc.internal.pageSize.getHeight();
+
+    // Get all images from local storage and add them to the pdf
+    for (let key in sessionStorage) {
+        if (!isNaN(key)) {
+            const image = window.sessionStorage.getObject(key);
+            doc.text(20, 20, 'Report');
+            doc.text(20, 20, '20. Juni 2019')
+            doc.addPage();
+            doc.addImage(image, 'JPEG', 0, 0, width * 0.95, height * 0.7, '', 'SLOW');
+            doc.addPage();
+        }
+    }
+
+    // Remove last blank page
+    doc.deletePage(doc.internal.getNumberOfPages());
+
+    // Used for creating unique random filename
+    var array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+
+    // And download it
+    document.getElementById('status').innerHTML = "Download wird vorbereitet."
+    doc.save('Report_' + userName + '_' + array[0] + '.pdf');
+}
+
+/**
+ * Clears all previously stored data from the local storage.
+ */
+document.getElementById('delete').onclick = function () {
+    document.getElementById('status').innerHTML = "Bestehender Report gelöscht."
+    window.sessionStorage.clear();
 }

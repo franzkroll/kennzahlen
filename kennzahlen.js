@@ -31,8 +31,8 @@ console.log = function (d) {
 	log_stdout.write(dateString[0] + ': ' + util.format(d) + '\n');
 };
 
-// Start server on Port 4000 if no other port is specified
-const port = process.env.PORT || 5000;
+// Start server on Port 8080 if no other port is specified
+const port = process.env.PORT || 8080;
 // Start server on localhost if no other ip is specified
 const ip = process.env.IP || '127.0.0.1';
 
@@ -97,7 +97,7 @@ routes(app);
 
 // Start server on port that was previously defined
 const server = https.createServer(options, app).listen(port, ip, function () {
-	console.log('Server listening on port ' + ip + ':' + port + ' …');
+	console.log('Server listening on ' + ip + ':' + port + ' …');
 });
 
 // Logs Current Connections
