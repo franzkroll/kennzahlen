@@ -570,19 +570,6 @@ function hexToRgb(hex) {
 }
 
 /**
- */
-Storage.prototype.setObject = function (key, value) {
-    this.setItem(key, JSON.stringify(value));
-}
-
-/**
- */
-Storage.prototype.getObject = function (key) {
-    var value = this.getItem(key);
-    return value && JSON.parse(value);
-}
-
-/**
  * Generates a random hexadecimal color.
  */
 function getRandomColor() {
@@ -592,6 +579,22 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+
+/**
+ * Helper for placing objects in session storage.
+ */
+Storage.prototype.setObject = function (key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+/**
+ *  Helper for retrieving objects from session storage.
+ */
+Storage.prototype.getObject = function (key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
 }
 
 // Automatically reselect last item that was entered, this in turn loads the table already
@@ -628,6 +631,8 @@ Storage.prototype.getObject = function (key) {
  */
 document.getElementById('report').onclick = function () {
     html2canvas(document.body, {
+        scale: 5,
+        dpi: 400,
         onrendered: function (canvas) {
             // Convert image to dataURL
             const image = canvas.toDataURL("image/png");
@@ -652,7 +657,7 @@ document.getElementById('download').onclick = function () {
     for (let key in sessionStorage) {
         if (!isNaN(key)) {
             const image = window.sessionStorage.getObject(key);
-            doc.addImage(image, 'PNG', 0, 0, width, height * 0.8, '', 'SLOW');
+            doc.addImage(image, 'PNG', 0, 0, width, height, '', 'SLOW');
             doc.addPage();
         }
     }

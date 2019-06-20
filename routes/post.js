@@ -7,7 +7,6 @@ const bcrypt = require('bcrypt');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
-const fs = require('fs');
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -1009,14 +1008,6 @@ const sort2DArray = function (array) {
         }
     });
 }
-
-/**
- * Replaces all occurrences of search with replacement in the string that it was called from.
- */
-String.prototype.replaceAll = function (search, replacement) {
-    let target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
 
 // Export all functions
 module.exports = {

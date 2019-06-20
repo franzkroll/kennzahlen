@@ -6,6 +6,7 @@
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const passwordValidator = require('password-validator');
+const IO = require('./io.js');
 
 // Salt rounds for password encryption
 const saltRounds = 10;
@@ -325,15 +326,6 @@ function deleteColumnFromDB(tableData, attributeData) {
         resolve();
     });
 }
-
-
-/**
- * Replaces all occurrences of search with replacement in the string that it was called from.
- */
-String.prototype.replaceAll = function (search, replacement) {
-    let target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
 
 
 /**
