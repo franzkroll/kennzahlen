@@ -1,5 +1,7 @@
 /**
- * Contains all the functions used in get routes.
+ * Contains all the functions used in get routes. Used in index.js. Every method checks if the user 
+ * is logged in to prevent access to users that aren't logged in. Loads some files from disk, 
+ * mostly lists of system-data and presents them to the user together with the new page.
  */
 
 // Imports..
@@ -182,6 +184,7 @@ const createUser = function (request, response) {
     // Check if user is logged in and is admin
     if (request.session.loggedin) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
+            // Render admin page if user has correct roles or error page if not
             if (result) {
                 response.render('pages/admin/createUser', {
                     text: '',
@@ -206,8 +209,10 @@ const createUser = function (request, response) {
  * @param {Sends back correct help page for the user.} response 
  */
 const helpFunction = async (request, response) => {
+    // Check if user is logged in and has the correct rights.
     if (request.session.loggedin) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
+            // Render correct page or error message if it fails
             if (result) {
                 response.render('pages/admin/adminHelp', {
                     user: request.session.username
@@ -232,6 +237,7 @@ const helpFunction = async (request, response) => {
  * @param {Sends back submit page with table info.} response 
  */
 const submitHelper = async (request, response) => {
+    // Load list with current entries
     let entryList;
     try {
         entryList = await IO.loadTextFile('entries');
@@ -239,6 +245,7 @@ const submitHelper = async (request, response) => {
         console.log(error);
     }
 
+    // If user is logged in render correct page
     if (request.session.loggedin) {
         IO.loadTextFile('tables').then(function (measureList) {
             response.render('pages/submit', {
@@ -294,6 +301,7 @@ const adminHelper = function (request, response) {
     // Check if user is logged in and is admin
     if (request.session.loggedin) {
         SQL.checkRolePermissions('admin', request).then(function (result) {
+            // Render correct page or error page depending on outcome for rights check
             if (result) {
                 response.render('pages/admin/adminIndex', {
                     user: request.session.username,

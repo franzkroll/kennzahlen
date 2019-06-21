@@ -1,3 +1,8 @@
+/**
+ * Used in admin section for displaying all users currently in the system. 
+ * Fills table with user values. Select with ids for deletion
+ */
+
 // Get elements from the document
 var sel = document.getElementById('userDelete');
 const table = document.getElementById("userTable");

@@ -1,3 +1,8 @@
+/**
+ * Handles all routing. Takes all possible route arguments and passes them to the corresponding handlers 
+ * in get.js and post.js. Also handles status-monitor under /status.
+ */
+
 module.exports = function (app) {
     // Imports ...
     const statusMonitor = require('express-status-monitor')();
@@ -12,7 +17,7 @@ module.exports = function (app) {
 
     /**
      * 
-     * GET REQUESTS FOLLOW HERE
+     * GET REQUESTS
      * 
      */
 
@@ -75,7 +80,7 @@ module.exports = function (app) {
 
     /**
      * 
-     * POST REQUESTS FOLLOW HERE
+     * POST REQUESTS
      * 
      */
 

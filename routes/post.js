@@ -1,5 +1,8 @@
 /**
- * Contains all the functions used in post routes.
+ * Contains all the functions used in post routes. Called from index.js. Handles all requests 
+ * after a user submitted a form, e.g. login, submitting or retrieving of data. Information is 
+ * retrieved from the request element, formatted correctly and then passed along into corresponding 
+ * data or as query into mysql.
  */
 
 // Import needed functions

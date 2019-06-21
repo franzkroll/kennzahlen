@@ -1,3 +1,9 @@
+/**
+ * Used in submit-page. Listens for changes in selects and adds all attributes for submitting of
+ * values of the selected measure. If a year or month or quarter already has values it is coloured green.
+ * After reloading of the page after submitting the last entered measure and timeframe get selected again.
+ */
+
 // Get elements from html page
 const measureArray = measureData.split(';');
 const selM = document.getElementById('measure');

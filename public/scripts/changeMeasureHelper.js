@@ -1,3 +1,9 @@
+/**
+ * Handles building of gui elements for page for changing measures. Fills select-elements with measures
+ * and attributes. Displays text fields for selected attribute, so the user can change the existing texts.
+ * Also displays two text fields for adding a new attribute.
+ */
+
 // Get elements from html page
 const measureArray = measureData.split(';');
 const descriptionArray = descriptionData.split(';');

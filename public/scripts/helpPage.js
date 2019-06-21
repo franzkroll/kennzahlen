@@ -1,6 +1,8 @@
-// Simple helper script for displaying elements in the help page of the system
-var coll = document.getElementsByClassName("collapsible");
-var i;
+/**
+ *Simple helper script for displaying elements in the help page of the system
+ */
+const coll = document.getElementsByClassName("collapsible");
+let i;
 
 // Add collapsing function for every element in collapsible class
 for (i = 0; i < coll.length; i++) {

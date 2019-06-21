@@ -1,3 +1,15 @@
+/**
+ * Used in visual-page. Fills select with all available measures and their corresponding times.
+ * After user queries the system for data and the page receives data the table is filled.
+ * While filling the table the data gets automatically added to the data for graphs. By default a 
+ * bar-graph is loaded. Graphs are built with chart-js. The user then has the ability to select different
+ * visualization options.
+ * Finally the user can add the current page to a report. All the added pages get saved in HTML5-sessionStorage.
+ * The user has than the option to download the report or clear all existing data from the report, which clears
+ * the sessionStorage. The number of pages is limited by the browser and how much space it gives to the sessionStorage.
+ * It should be at least 5mb, which allows for a minimum of 10-15 pages.
+ */
+
 // Split data that was received into an array
 const measureArray = measureListData.split(';');
 
@@ -8,6 +20,7 @@ const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
 const button = document.getElementById('button');
 
+// Saves values in double brackets from measure attributes => the percent lines to be displayed in the graph
 let percentValues = [];
 
 // Used for creating table headers with months and quarters

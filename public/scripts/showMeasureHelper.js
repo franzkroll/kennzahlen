@@ -1,3 +1,7 @@
+/**
+ * Used in admin-section for simple display of measures in the system, so they can be deleted by the admin.
+ */
+
 // Split received data into array
 const measureArray = measures.split(';');
 

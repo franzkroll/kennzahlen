@@ -1,4 +1,4 @@
-/* Misc */
+/* Button style and text fields. */
 
 .button {
     width: 300px;
@@ -156,7 +156,7 @@ li a:hover:not(.active) {
     background-color: #4169E1;
 }
 
-/* Submit */
+/* Submit forms and dropdown menus. */
 
 .dropdownS {
     width: 20%;
@@ -249,7 +249,7 @@ li a:hover:not(.active) {
     color: #ffffff;
 }
 
-/* 404 and Login Error */
+/* 404 and Login Error Animation. */
 
 body {
     background-color: #FFF;
@@ -485,7 +485,7 @@ and also iPads specifically.
 }
 
 
-/* Printing style sheet, remove everything thats unnecessary. */
+/* Printing style sheet, remove everything thats unnecessary. Bug: Table isn't displayed in Firefox. */
 
 @media screen {
     .misc-text-title {
@@ -507,6 +507,8 @@ and also iPads specifically.
     .footer p {
         display: none;
     }
+
+    /* Format canvas so it fits an a4 page. */
 
     @media print {
         .chart_canvas {

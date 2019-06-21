@@ -1,5 +1,7 @@
 /**
- * Contains all mysql functions
+ * Contains all mysql functions. All calls to these functions are from post-handlers.
+ * Information gets passed to these functions from which the queries are built. Also handles most
+ * of the prevention of sql-injections.
  */
 
 //Imports 

@@ -1,3 +1,7 @@
+/**
+ * Duplicates text fields when user wants to add more than one attribute to a new measure.
+ */
+
 // Used in the creation of new measures, creates a new field for an attribute every time the add field button is pressed
 window.addEventListener('load', function () {
     let i = 2;
@@ -47,6 +51,7 @@ window.addEventListener('load', function () {
 // Automatically select correct adding method when user selects yearly measure
 let cycle = document.getElementById('cycle');
 
+// Automatically select manual for yearly measures, because we don't need automatic summation for yearly measures
 cycle.onclick = function () {
     const index = this.selectedIndex;
     const inputText = this.children[index].innerHTML.trim();

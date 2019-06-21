@@ -1,3 +1,8 @@
+/**
+ * Used for displaying descriptions of the measures. Loads all measures for selection in select elements.
+ * Builds collapsible for every attribute after user has selected an item.
+ */
+
 // Get needed items from document
 const selM = document.getElementById('measure');
 const main = document.getElementById('mainDesc');

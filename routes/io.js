@@ -1,3 +1,7 @@
+/**
+ * Handles writing to disk and reading from disk. 
+ */
+
 // Imports
 const fs = require('fs-extra');
 
