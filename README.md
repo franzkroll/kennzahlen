@@ -1,10 +1,10 @@
 # Kennzahlen-System der Leitstelle Lausitz
 
-System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen.
+System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, chart.js.)
 
 ## Features
 
-Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, beziehungsweise auch neue Kennzahlen anzulegen. Es ist möglich Nutzern verschiedene Bereiche zum Zugriff auf verschiedenen Kennzahlen zuzuweisen. Ein Admin hat die Möglichkeit Serverstatistiken einzusehen, sowie Nutzer zu erstellen und zu verwalten.
+Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, beziehungsweise auch neue Kennzahlen anzulegen. Es ist möglich Nutzern verschiedene Bereiche zum Zugriff auf verschiedenen Kennzahlen und Leitstellen zuzuweisen. Ein Admin hat die Möglichkeit Serverstatistiken einzusehen, sowie Nutzer und Kennzahlen zu erstellen und zu verwalten. (Das über die Website erreichbare Hilfe-Menü gibt genauere Auskunft zu allen Funktionen.)
 
 ## Installation und Start einer eigenen Instanz des Servers
 
@@ -64,6 +64,7 @@ Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2). D
 npm install pm2
 pm2 start kennzahlen
 pm2 stop kennzahlen
+pm2 restart kennzahlen
 ```
 
 Folgende Befehle geben Statusinformation über die Anwendung:
@@ -73,8 +74,7 @@ pm2 ls
 pm2 monit
 ```
 
-Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben.
-
+Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben. Möchte man eigene SSL-Zertifikate verwenden können diese im Ordner [keys](keys/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
 
@@ -82,7 +82,8 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 
 ### Benutzerdatenbank
 
-Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Will man mehrere Rollen festlegen müssen diese durch einen Unterstrich getrennt werden. Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
+Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzer gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt werden und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Will man mehrere Rollen festlegen müssen diese durch einen Unterstrich getrennt werden. Ebenso besitzen Benutzer Mandate. Diese signalisieren die Zugehörigkeit zu einer bestimmten Rettungsstelle. Benutzer mit dem Mandat '*' besitzen Zugriff auf alle Mandate. Möchte man mehrere Rollen oder Mandate für einen Benutzer festlegen sollten diese durch eine Unterstrich getrennt werden.
+Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
 Möchten man Benutzer neu erstellen muss man auf ein sicheres Passwort achten. Es mussen zwischen 8 und 100 Zeichen lang sein, Groß- und Kleinbuchstaben enthalten, sowie mindestens eine Zahl und keine Leerzeichen. Sehr offentsichtliche Passwörter sind ebenfalls gesperrt.
 
 #### Beispiel
@@ -97,7 +98,7 @@ Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche
 ### Kennzahlendatenbank
 
 Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Spalten speichern jeweils die Eigenschaften der Kennzahlen. Die Zeilen stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Zeitabschnitt und Kennzahl-Eigenschaft. Pro Jahr und Kennzahl wird eine neue Tabelle erstellt. Möchten für ein neues Jahr neue Kennzahlendaten eingetragen werden muss eine neue Tabelle erstellet werde.
-Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt. Werden Kennzahl erstellt werden Metainformationen im Ordner [files](files/), diese dienen zur einfacheren Zuordnung der Kennzahlen zu den Tabllen. Ebenso muss zum Füllen der GUI-Elemente in vielen Fällen nicht auf die Datenbank zugegriffen werden.
+Erstellt ein Benutzer neue Kennzahlen wird dynamische eine neue Tabelle angelegt. Der Ordner [files](files/) enthält Metainformationen der Kennzahlen, diese dienen zur einfacheren Zuordnung der Kennzahlen zu den Tabllen. Ebenso muss zum Füllen der GUI-Elemente in vielen Fällen nicht auf die Datenbank zugegriffen werden.
 Standardmäßig werden die MySQL Tabellen nach den Namen der Kennzahlen benannt.
 
 #### Beispiel
@@ -128,6 +129,18 @@ Neu erstellte Benutzer müssen einen eindeutigen Namen sowie E-Mail Adresse habe
 
 Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen über das Web-Interface. About zeigt Kontaktinformationen.
 
+## Screenshots
+
+TODO: Screenshots einfügen
+
+### Hauptmenü
+
+### Eingabeformular
+
+### Erstellungsformular
+
+### Visualiserung
+
 ## Bisher noch fehlende Funktionen
 
 * TODO: Update bei Projektende
@@ -142,8 +155,6 @@ franz.kroll@b-tu.de
 
 ## Lizenz
 
-TODO: Überprüfen ob richtige Lizenzen
-  
 Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php), Inhalt lizenziert unter CC BY NC SA 4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ## Disclaimer 
