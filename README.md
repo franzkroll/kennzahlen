@@ -10,7 +10,7 @@ Verschiedene Nutzer haben die Möglichkeit Kennzahlen einzusehen, einzutragen, b
 
 Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt. 
 
-Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die npm benötigten packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
+Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die benötigten npm-packages installiert werden, danach lässt sich die Anwendung mit Hilfe von Node starten.
 
 ```sh
 git clone https://github.com/franzkroll/kennzahlen.git

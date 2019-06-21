@@ -100,8 +100,13 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         // Load all needed data here
         let loadedTableName = '<%- loadedTable %>';
         loadedTableName = loadedTableName.trim();
-        document.getElementById('name').innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replace('_y',
+        const nameField = document.getElementById('name');
+        nameField.innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replace('_y',
             '').replaceAll('_', ' ');
+        const lastYear = '<%- lastYear %>';
+        if (lastYear !== 'yearly' && lastYear !== '') {
+            nameField.innerHTML += ', ' + lastYear;
+        }
         const measureData = '<%- measureData %>';
         const measureListData = '<%- measureListData %>';
         const lastSelected = '<%- lastSelected %>;';

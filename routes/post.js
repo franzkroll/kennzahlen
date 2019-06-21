@@ -144,6 +144,7 @@ const visualPostHelper = async (request, response) => {
                         loadedTable: result[0],
                         text: 'Daten erfolgreich geladen!',
                         lastSelected: request.body.measure,
+                        lastYear: request.body.year,
                         measureListData: measureList
                     });
                     // Show error if data query failed
@@ -154,6 +155,7 @@ const visualPostHelper = async (request, response) => {
                         measureData: '',
                         loadedTable: '',
                         lastSelected: '',
+                        lastYear: '',
                         text: 'Datensatz nicht vorhanden!',
                         measureListData: measureList
                     });
@@ -166,6 +168,7 @@ const visualPostHelper = async (request, response) => {
                     measureData: '',
                     loadedTable: '',
                     lastSelected: '',
+                    lastYear: '',
                     text: 'Dafür besitzen Se nicht die nötigen Rechte!',
                     measureListData: measureList
                 });

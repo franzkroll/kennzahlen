@@ -42,6 +42,10 @@ String.prototype.replaceAll = function (search, replacement) {
 
 let tableName2 = lastSelected.slice(0, lastSelected.length - 1);
 
+selM.onchange = function () {
+    nameField.innerHTML = '';
+}
+
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
@@ -353,6 +357,7 @@ selGraph.onchange = function (e) {
                         tension: 0.2
                     }
                 },
+                // Show all tooltips of current point
                 tooltips: {
                     mode: 'index',
                     intersect: false
@@ -631,13 +636,20 @@ Storage.prototype.getObject = function (key) {
  */
 document.getElementById('report').onclick = function () {
     html2canvas(document.body, {
+        // Scale image for better quality
         scale: 5,
         dpi: 400,
         onrendered: function (canvas) {
             // Convert image to dataURL
             const image = canvas.toDataURL("image/png");
             // Save dataURL in session storage
-            window.sessionStorage.setObject(new Date().getTime(), image);
+            try {
+                window.sessionStorage.setObject(new Date().getTime(), image);
+                document.getElementById('status').innerHTML = "Aktuelle Kennzahl erfolgreich hinzugefügt!"
+            } catch (error) {
+                console.log(error);
+                document.getElementById('status').innerHTML = "Fehler beim Hinzufügen der Kennzahl!"
+            }
         }
     });
 }
@@ -657,7 +669,7 @@ document.getElementById('download').onclick = function () {
     for (let key in sessionStorage) {
         if (!isNaN(key)) {
             const image = window.sessionStorage.getObject(key);
-            doc.addImage(image, 'PNG', 0, 0, width, height, '', 'SLOW');
+            doc.addImage(image, 'PNG', 0, 0, width, height * 0.65, '', 'SLOW');
             doc.addPage();
         }
     }

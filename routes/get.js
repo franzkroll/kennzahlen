@@ -40,6 +40,7 @@ const visualHelper = function (request, response) {
                 loadedTable: '',
                 text: '',
                 lastSelected: '',
+                lastYear: '',
                 measureListData: measureList
             });
             // Catch errors while loading from disk

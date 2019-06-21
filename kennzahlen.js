@@ -42,7 +42,7 @@ const routes = require('./routes/index.js');
 // Application uses express for rendering and displaying pages
 const app = express();
 
-// DDos prevention, shows 429 error after too many requests
+// DDos prevention, shows 429 error after too many requests, maybe lower a bit
 const ddos = new Ddos({
 	burst: 5,
 	limit: 20,
