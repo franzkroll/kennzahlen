@@ -555,7 +555,6 @@ selGraph.onchange = function (e) {
             // Add second data set if we want to display percent line
             if (svalue !== 'bar' && svalue !== 'horizontalBar' && percentData[0] != 0) {
                 const bgColor = hexToRgb(color);
-                console.log(percentData);
                 compareLine = {
                     label: measureAttr[i] + ' Soll',
                     data: percentData,
@@ -651,7 +650,7 @@ document.getElementById('report').onclick = function () {
     html2canvas(document.body, {
         // Scale image for better quality
         scale: 5,
-        dpi: 400,
+        dpi: 300,
         onrendered: function (canvas) {
             // Convert image to dataURL
             const image = canvas.toDataURL("image/png");
@@ -673,6 +672,7 @@ document.getElementById('report').onclick = function () {
 document.getElementById('download').onclick = function () {
     // Create new document
     let doc = new jsPDF('p', 'mm', 'a4');
+    doc.internal.scaleFactor = 1.5;
 
     // Set image width to a4
     const width = doc.internal.pageSize.getWidth();

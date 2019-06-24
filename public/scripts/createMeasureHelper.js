@@ -103,19 +103,3 @@ for (i = 0; i < roleList.length - 1; i++) {
         roleSaver.push(role[1]);
     }
 }
-
-// Add user and admin to role dropdown, * to mandate dropdown, maybe there is a more elegant way
-let opt = document.createElement('option');
-opt.appendChild(document.createTextNode('admin'));
-opt.value = 'admin';
-roleSelect.appendChild(opt);
-
-opt = document.createElement('option');
-opt.appendChild(document.createTextNode('user'));
-opt.value = 'user';
-roleSelect.appendChild(opt);
-
-opt = document.createElement('option');
-opt.appendChild(document.createTextNode('*'));
-opt.value = '*';
-mandateSelect.appendChild(opt);
