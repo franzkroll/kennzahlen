@@ -131,7 +131,7 @@ Schlagen entsprechende Befehle im Server fehl erhält der Nutzer Rückmeldungen 
 
 ## Screenshots
 
-TODO: Screenshots einfügen
+Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 ### Hauptmenü
 
