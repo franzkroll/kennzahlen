@@ -37,17 +37,30 @@
                 <input type="email" name="mail" placeholder="E-Mail"
                     title="Legen Sie hier eine gültige E-Mail Adresse fest, Adressen dürfen nicht doppelt vorkommen."
                     required>
-                <input type="text" name="role" placeholder="Rolle"
+                <div class="misc-text">
+                    Hier können Sie eine neue(s) Rolle(Mandat) eingeben oder eine bestehende aus dem Auswahlmenü
+                    auswählen.
+                </div>
+                <input type="text"
                     title="Legen Sie hier eine Rolle für den Benutzer fest. Mehrere Rollen müssen durch einen Unterstrich getrennt werden."
-                    required>
-                <input type="text" name="mandate" placeholder="Mandat"
+                    name="role" list="roles" placeholder="Rolle" style="margin-top:17px" />
+                <datalist id="roles"></datalist>
+                <input type="text"
                     title="Legen Sie hier ein Mandat für den Benutzer fest. * gibt Zugriff auf alle Bereiche. Mehrere Mandate müssen durch einen Unterstrich getrennt werden."
-                    required>
+                    name="mandate" list="mandates" placeholder="Mandat" required />
+                <datalist id="mandates"></datalist>
                 <span style=" display:block; height: 15px;"></span>
                 <input type="submit" value="Benutzer anlegen">
             </form>
         </div>
     </main>
+
+    <!-- Get variables and load helper script. -->
+    <script>
+        let roleList = '<%- roleList %>';
+        let mandateList = '<%- mandateList %>';
+    </script>
+    <script src="/scripts/createUserHelper.js"></script>
 
     <footer>
         <% include ../../partials/footer %>

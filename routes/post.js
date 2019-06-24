@@ -52,10 +52,19 @@ const authHelper = function (request, response) {
  * @param {Contains body with received user data.} request 
  * @param {Sends new admin page to the user, either with success or error message.} response 
  */
-const createUserHelper = function (request, response) {
+const createUserHelper = async (request, response) => {
+    // Load roles and mandate data
+    let roleList, mandateList;
+    try {
+        roleList = await IO.loadTextFile('roles');
+        mandateList = await IO.loadTextFile('mandates');
+    } catch (error) {
+        console.log(error);
+    }
+
     // Try to insert new user into the database.
     SQL.insertUserIntoDB(request).then(function () {
-        response.render('pages/admin/admin', {
+        response.render('pages/admin/adminIndex', {
             user: request.session.username,
             text: 'Benutzer erfolgreich erstellt.'
         });
@@ -73,7 +82,9 @@ const createUserHelper = function (request, response) {
         }
         response.render('pages/admin/createUser', {
             user: request.session.username,
-            text: responseText
+            text: responseText,
+            roleList: roleList,
+            mandateList: mandateList
         });
     });
 }
@@ -86,14 +97,14 @@ const createUserHelper = function (request, response) {
 const deleteUserHelper = function (request, response) {
     // Sent query to the database for deleting a user
     SQL.deleteUserFromDB(request.body.id).then(function () {
-        response.render('pages/admin/admin', {
+        response.render('pages/admin/adminIndex', {
             user: request.session.username,
             text: "Benutzer erfolgreich gelöscht."
         });
         // Catch possible errors, log them and sent error page to the user
     }).catch(function (error) {
         console.log(error);
-        response.render('pages/admin/admin', {
+        response.render('pages/admin/adminIndex', {
             user: request.session.username,
             text: "Fehler beim Löschen des Benutzers."
         });
@@ -435,6 +446,8 @@ const createMeasureHelper = async (request, response) => {
         response.render('pages/createMeasure', {
             text: "Fehler! Bitte geben Sie das Jahr der Erfassung ein!",
             user: request.session.username,
+            roleList: roleList,
+            mandateList: mandateList
         });
     }
 
@@ -453,6 +466,8 @@ const createMeasureHelper = async (request, response) => {
                         response.render('pages/createMeasure', {
                             text: "Fehler! Kennzahl existiert bereits!",
                             user: request.session.username,
+                            roleList: roleList,
+                            mandateList: mandateList
                         });
                     }
                 }
@@ -557,6 +572,8 @@ const createMeasureHelper = async (request, response) => {
             response.render('pages/createMeasure', {
                 text: "Kennzahl erfolgreich erstellt!",
                 user: request.session.username,
+                roleList: roleList,
+                mandateList: mandateList
             });
             // Catch mysql errors from the database
         }).catch(function (error) {
@@ -564,6 +581,8 @@ const createMeasureHelper = async (request, response) => {
             response.render('pages/createMeasure', {
                 text: "Fehler bei der Erstellung der Kennzahl! / Kennzahl existiert bereits!",
                 user: request.session.username,
+                roleList: roleList,
+                mandateList: mandateList
             });
         })
     }

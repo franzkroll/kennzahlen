@@ -54,14 +54,18 @@
 
                 <span style="display:block; height: 10px;"></span>
 
-                <!-- Field for setting roles of the measure. -->
-                <input type="text" name="role" placeholder="Rolle"
-                    title="Geben Sie eine Rolle ein, die die Kennzahl bearbeiten darf. Wollen Sie mehrere Rollen festlegen müssen Sie diese mit einem Unterstrich trennen."
-                    required>
-                <!-- Field for setting mandates of the measure. -->
-                <input type="text" name="mandate" placeholder="Mandat"
-                    title="Geben Sie eine Mandat ein, die die Kennzahl bearbeiten darf. Wollen Sie mehrere Mandate festlegen müssen Sie diese mit einem Unterstrich trennen."
-                    required>
+                <div class="misc-text">
+                    Hier können Sie eine neue(s) Rolle(Mandat) eingeben oder eine bestehende aus dem Auswahlmenü
+                    auswählen.
+                </div>
+                <input type="text"
+                    title="Legen Sie hier eine Rolle für den Benutzer fest. Mehrere Rollen müssen durch einen Unterstrich getrennt werden."
+                    name="role" list="roles" placeholder="Rolle" style="margin-top:17px" />
+                <datalist id="roles"></datalist>
+                <input type="text"
+                    title="Legen Sie hier ein Mandat für den Benutzer fest. * gibt Zugriff auf alle Bereiche. Mehrere Mandate müssen durch einen Unterstrich getrennt werden."
+                    name="mandate" list="mandates" placeholder="Mandat" required />
+                <datalist id="mandates"></datalist>
 
                 <!-- Dropdown menu for selecting input-cycle for the measure data. -->
                 <div class="misc-text" style="margin-bottom: 10px">
@@ -100,6 +104,11 @@
         </div>
     </main>
 
+    <!--Load in lists and helper script -->
+    <script>
+        let roleList = '<%- roleList%>';
+        let mandateList = '<%- mandateList %>';
+    </script>
     <script src="/scripts/createMeasureHelper.js"></script>
 
 

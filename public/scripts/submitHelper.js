@@ -133,12 +133,12 @@ for (let i, j = 0; i = selM.options[j]; j++) {
     }
 }
 
-// Automatically reselect last item that was entered, maybe we should also select the month
+// Automatically reselect last item that was entered
 for (let i, j = 0; i = selYear.options[j]; j++) {
     const date = lastMonth + lastYear;
 
     if (i.value == date) {
-        selYear.selectedIndex = j;
+        selYear.selectedIndex = j + 1;
         break;
     }
 }

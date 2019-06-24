@@ -180,15 +180,27 @@ const showHelper = function (request, response) {
  * @param {Used for login and role check.} request 
  * @param {Sends back error with success or failure message.} response 
  */
-const createUser = function (request, response) {
+const createUser = async (request, response) => {
     // Check if user is logged in and is admin
     if (request.session.loggedin) {
+        // Load in roles and mandates
+        let roleList, mandateList;
+
+        try {
+            roleList = await IO.loadTextFile('roles');
+            mandateList = await IO.loadTextFile('mandates');
+        } catch (error) {
+            console.log(error);
+        }
+
         SQL.checkRolePermissions('admin', request).then(function (result) {
             // Render admin page if user has correct roles or error page if not
             if (result) {
                 response.render('pages/admin/createUser', {
                     text: '',
-                    user: request.session.username
+                    user: request.session.username,
+                    mandateList: mandateList,
+                    roleList: roleList
                 });
             } else {
                 response.render('pages/errors/adminError');
@@ -271,14 +283,26 @@ const submitHelper = async (request, response) => {
  * @param {Used for login and role check.} request 
  * @param {Sends back createUser page.} response 
  */
-const createHelper = function (request, response) {
+const createHelper = async (request, response) => {
     // Check if user is logged in and has rights to create new measures
     if (request.session.loggedin) {
+        // Load needed lists for role menu
+        let roleList, mandateList;
+
+        try {
+            roleList = await IO.loadTextFile('roles');
+            mandateList = await IO.loadTextFile('mandates');
+        } catch (error) {
+            console.log(error);
+        }
+
         SQL.checkRolePermissions('user', request).then(function (result) {
             if (result) {
                 response.render('pages/createMeasure', {
                     user: request.session.username,
-                    text: ''
+                    text: '',
+                    roleList: roleList,
+                    mandateList: mandateList
                 });
             } else {
                 response.render('pages/errors/adminError')

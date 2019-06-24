@@ -19,8 +19,8 @@ const log_stdout = process.stdout;
 
 // Load https certificates, just self signed ones, should be okay with internal use
 const options = {
-	key: fs.readFileSync('keys/server.key'),
-	cert: fs.readFileSync('keys/server.cert')
+	key: fs.readFileSync('cert/server.key'),
+	cert: fs.readFileSync('cert/server.cert')
 };
 
 // Get current time and date, add them to every printed debug

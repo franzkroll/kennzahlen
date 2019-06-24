@@ -74,7 +74,7 @@ pm2 ls
 pm2 monit
 ```
 
-Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben. Möchte man eigene SSL-Zertifikate verwenden können diese im Ordner [keys](keys/) hinterlegt werden.
+Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben. Möchte man eigene SSL-Zertifikate verwenden können diese im Ordner [cert](cert/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
 
