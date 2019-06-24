@@ -47,14 +47,14 @@ const connectionData = mysql.createConnection({
 Die Anwendung ist nun über [localhost:8080](https://localhost:8080/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
 
 ```sh
-port:4444 node kennzahlen.js
+PORT:4444 node kennzahlen.js
 ```
 (Beispiel mit Port 4444, Standardmäßig wird Port 8080 verwendet.)
 
 Ebenso ist ein Start über eine feste IP-Adresse möglich, dies ist wieder über die Startoptionen möglich, oder eine Anpassung der ip-Variable in [kennzahlen.js](routes/kennzahlen.js). (Standardmäßig startet der Server über localhost.)
 
 ```sh
-ip:192.168.2.1 node kennzahlen.js
+IP:192.168.2.1 node kennzahlen.js
 ```
 (Beispiel mit IP 192.168.2.1)
 

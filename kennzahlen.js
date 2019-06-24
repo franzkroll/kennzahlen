@@ -42,7 +42,7 @@ const routes = require('./routes/index.js');
 // Application uses express for rendering and displaying pages
 const app = express();
 
-// DDos prevention, shows 429 error after too many requests, maybe lower a bit
+// DDos prevention, shows 429 error after too many requests, maybe lower threshold a bit?
 const ddos = new Ddos({
 	burst: 5,
 	limit: 20,
@@ -69,7 +69,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 // Reduces data, increases website reaction speed
 app.use(compression());
 
-// Path for linking stylesheet
+// Path for linking stylesheet and script helpers for pages
 app.use(express.static(path.resolve('./public')));
 
 // Logout user after 30 minutes
