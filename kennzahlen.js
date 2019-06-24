@@ -83,7 +83,7 @@ app.use(session({
 	rolling: true,
 	resave: false,
 	secret: 'secret',
-	saveUninitialized: false // Don't save sessions that aren't logged in.
+	saveUninitialized: false
 }));
 
 // Handles post Request for Login
@@ -103,7 +103,7 @@ const server = https.createServer(options, app).listen(port, ip, function () {
 // Logs Current Connections
 setInterval(() => server.getConnections(
 	(err, connections) => console.log(`${connections} connections currently open`)
-), 10000);
+), 50000);
 
 // Activate shutDown function when SIGTERM or SIGINT is received (process is cancelled)
 process.on('SIGTERM', shutDown);

@@ -814,10 +814,9 @@ const addAttributeHelper = async (request, response) => {
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
 const changeAttributeHelper = async (request, response) => {
+    // Try to load table data from disk
     let measureDescriptions, measureList;
-    let tableNames = [];
 
-    // Try to load data about tables from disk
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
@@ -825,6 +824,8 @@ const changeAttributeHelper = async (request, response) => {
         console.log(error);
     }
 
+    // Stores table names and name of old attribute for mysql
+    let tableNames = [];
     let attributeDataOld = request.body.attribute.replaceAll(' ', '_');
 
     // Loop through known measures and look for measure input by the user
@@ -893,10 +894,10 @@ const changeAttributeHelper = async (request, response) => {
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
 const deleteAttributeHelper = async (request, response) => {
+    // Try to load data about tables from disk
     let measureDescriptions, measureList;
     let tableNames = [];
 
-    // Try to load data about tables from disk
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
