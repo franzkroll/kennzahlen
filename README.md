@@ -145,7 +145,7 @@ TODO: Screenshots einfügen
 
 ![Alt text](misc_files/screenshots/imgCreate.png?raw=true "Title")
 
-### Visualiserung
+### Visualisierung
 
 ![Alt text](misc_files/screenshots/imgVisual.png?raw=true "Title")
 
