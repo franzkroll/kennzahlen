@@ -117,6 +117,14 @@ function checkRolePermissions(role, request) {
 }
 
 /**
+ * TODO: implement and comment
+ * @param {*} newPassword 
+ */
+function changeUserPassword(newPassword) {
+
+}
+
+/**
  * Queries database for the logged in user. Checks if the passed mandate equals the user mandate. Also returns true if user mandate
  * is '*'. This means the user has access to all mandates.
  * @param {Needed mandate to access this function.} mandate 

@@ -70,6 +70,9 @@ module.exports = function (app) {
     // Logout user and delete the session object
     app.get('/logout', GetHelpers.logoutHelper);
 
+    // So every user can change his password individually
+    app.get('/changePassword', GetHelpers.changePasswordHelper);
+
     // Display measure and options to add a new attribute to them
     app.get('/changeMeasure', GetHelpers.changeHelper);
 
@@ -113,4 +116,7 @@ module.exports = function (app) {
 
     // Handles changing of existing attribute from existing measure
     app.post('/changeAttr', PostHelpers.changeAttributeHelper);
+
+    // Handles insertion of new password
+    app.post('/changePassword', PostHelpers.changePasswordHelper);
 }

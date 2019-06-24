@@ -345,6 +345,20 @@ const adminHelper = function (request, response) {
 }
 
 /**
+ * Displays page for changing user password.
+ * @param {Used for login and role check.} request 
+ * @param {Contains page for changing password.} response 
+ */
+const changePasswordHelper = function (request, response) {
+    if (request.session.loggedin) {
+        response.render('pages/changePassword', {
+            user: request.session.username,
+            text: ''
+        });
+    }
+}
+
+/**
  * Loads page for changing a measure, which means adding an attribute to an existing measure.
  * @param {Request from the user, used for checking if user is logged in.} request 
  * @param {Response sent back, renders new page with measure data.} response 
@@ -393,5 +407,6 @@ module.exports = {
     createHelper: createHelper,
     adminHelper: adminHelper,
     helpFunction: helpFunction,
-    changeHelper: changeHelper
+    changeHelper: changeHelper,
+    changePasswordHelper: changePasswordHelper
 }

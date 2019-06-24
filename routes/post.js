@@ -970,6 +970,29 @@ const deleteAttributeHelper = async (request, response) => {
 }
 
 /**
+ * Takes entered user data for new password, checks if old password is correct. If both new passwords are the same and fulfill 
+ * password criteria call sql function for changing password.
+ */
+const changePasswordHelper = function (request, response) {
+    console.log(request.body.oldPw);
+    console.log(request.body.newPw);
+    console.log(request.body.newPw2);
+
+    // Check if entered password is correct
+
+    // Check if new passwords are both the same
+
+    // Check if new passwords fulfills password criteria
+
+    // Insert new password into the database, REPLACE INTO?
+
+    response.render('pages/changePassword', {
+        user: request.session.username,
+        text: 'Passwort erfolgreich geändert!'
+    });
+}
+
+/**
  * Receives name and year, converts it to corresponding name in sql database and queries
  * the database for this measure, converts it to a string and passes it upwards. All errors
  * are also passed upwards.
@@ -1043,5 +1066,6 @@ module.exports = {
     deleteHelper: deleteHelper,
     addAttributeHelper: addAttributeHelper,
     changeAttributeHelper: changeAttributeHelper,
-    deleteAttributeHelper: deleteAttributeHelper
+    deleteAttributeHelper: deleteAttributeHelper,
+    changePasswordHelper: changePasswordHelper
 }
