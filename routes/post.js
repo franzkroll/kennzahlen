@@ -837,9 +837,6 @@ const changeAttributeHelper = async (request, response) => {
                 measureList[i][index] = request.body.changeVar;
                 measureDescriptions[i][index] = request.body.changeDesc;
 
-                console.log(measureList[i]);
-                console.log(measureDescriptions[i]);
-
                 // Format tablename correctly here
                 tableName = measureList[i][measureList[i].length - 1].slice(0, measureList[i][measureList[i].length - 1].length - 1) + '_';
                 // Store index here for later, should be the same for all

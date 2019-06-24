@@ -135,18 +135,28 @@ TODO: Screenshots einfügen
 
 ### Hauptmenü
 
+![Alt text](misc_files/screenshots/imgMain.png?raw=true "Title")
+
 ### Eingabeformular
+
+![Alt text](misc_files/screenshots/imgSubmit.png?raw=true "Title")
 
 ### Erstellungsformular
 
+![Alt text](misc_files/screenshots/imgCreate.png?raw=true "Title")
+
 ### Visualiserung
+
+![Alt text](misc_files/screenshots/imgVisual.png?raw=true "Title")
+
+### Statusmonitor
+
+![Alt text](misc_files/screenshots/imgStatus.png?raw=true "Title")
 
 ## Bisher noch fehlende Funktionen
 
-* TODO: Update bei Projektende
 * Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
 * Täglich erfasste Kennzahlen
-* Auswahlliste für Mandate/Rollen
 
 ## Kontakt
 

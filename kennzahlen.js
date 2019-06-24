@@ -51,7 +51,7 @@ const ddos = new Ddos({
 });
 
 // DDos prevention
-app.use(ddos.express)
+app.use(ddos.express);
 
 // Set ejs as view engine for serving pages
 app.set('view engine', 'ejs');
@@ -61,7 +61,7 @@ app.use(helmet());
 app.use(helmet.noCache());
 app.use(helmet.referrerPolicy({
 	policy: 'same-origin'
-}))
+}));
 
 // Set icon for tabs etc.
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
