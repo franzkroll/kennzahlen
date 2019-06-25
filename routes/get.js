@@ -13,6 +13,8 @@ const SQL = require('./mysql.js');
  * @param {Used for checking for a successful log in} request 
  * @param {Sends back index page to the user} response 
  */
+console.log('Read from file.');
+
 const homeHelper = function (request, response) {
     // Make sure that the user is logged in
     if (request.session.loggedin) {

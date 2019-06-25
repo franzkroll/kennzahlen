@@ -12,7 +12,6 @@ const Ddos = require('ddos');
 const https = require('https');
 require('dotenv').config();
 
-
 // Overwrite default console log and write into debug.log instead..
 const log_file = fs.createWriteStream(__dirname + '/debug.log', {
 	flags: 'w'

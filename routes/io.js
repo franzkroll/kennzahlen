@@ -29,7 +29,6 @@ function loadTextFile(name) {
                 }
             }
             resolve(array);
-            console.log('Read from file.');
         } catch (error) {
             reject(error);
         }
@@ -63,7 +62,6 @@ const arrayToTxt = function (name, array) {
             }
         });
         file.end();
-        console.log('Wrote to file');
     } catch (error) {
         console.log(error);
     }

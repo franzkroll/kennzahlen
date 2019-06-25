@@ -41,7 +41,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (1,'admin','$2b$10$LqN6a4YUqH.3zhcrIiNQwuVWDc5fji/QovOllpIkz3TSZFp09ET7y','franz.kroll@b-tu.de','admin','*');
+INSERT INTO `accounts` VALUES (1,'admin','$2b$10$LqN6a4YUqH.3zhcrIiNQwuVWDc5fji/QovOllpIkz3TSZFp09ET7y','admin@test.de','admin','*');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
