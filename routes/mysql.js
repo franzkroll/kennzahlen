@@ -321,7 +321,6 @@ function changeTableColumn(tableData, attributeDataOld, attributeData) {
  */
 function deleteColumnFromDB(tableData, attributeData) {
     return new Promise(function (resolve, reject) {
-
         // Cycle through possible table names and add the attribute to them
         for (i = 0; i < tableData.length; i++) {
             // Build query here because it doesn't work otherwise
@@ -332,11 +331,39 @@ function deleteColumnFromDB(tableData, attributeData) {
                 if (err) return reject(err);
             });
         }
-
         resolve();
     });
 }
 
+/**
+ * Changes password of specified user in the database. Also checks if password is safe.
+ * @param {User that wants to change his password.} username 
+ * @param {New password for specified user.} password 
+ */
+function changeUserPassword(username, password) {
+    return new Promise(function (resolve, reject) {
+        // Check if password is a good password
+        if (pwCheck(password)) {
+            // Hash inserted password
+            bcrypt.hash(password, saltRounds, function (err, hash) {
+                if (err) {
+                    reject(err);
+                } else {
+                    // Insert the user into database
+                    const sql = 'UPDATE accounts SET password =' + mysql.escape(hash) + ' WHERE username =' + mysql.escape(username) + ';';
+                    connectionLogin.query(sql, function (err) {
+                        if (err) return reject(err);
+                        resolve();
+                    });
+                }
+            });
+            // Return error if test failed
+        } else {
+            err = "pw";
+            reject(err);
+        }
+    });
+}
 
 /**
  * Check if entered password is a safe password, used when a new user is created.
@@ -385,5 +412,6 @@ module.exports = {
     getUserFromDB: getUserFromDB,
     addColumnToDB: addColumnToDB,
     deleteColumnFromDB: deleteColumnFromDB,
-    changeTableColumn: changeTableColumn
+    changeTableColumn: changeTableColumn,
+    changeUserPassword: changeUserPassword
 }

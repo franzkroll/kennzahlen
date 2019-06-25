@@ -410,6 +410,7 @@ const submitDataHelper = async (request, response) => {
  * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
 const createMeasureHelper = async (request, response) => {
+    // Load all needed data from disk
     let measureDescriptions, measureList, roleList, entryList, mandateList;
 
     try {
@@ -971,24 +972,58 @@ const deleteAttributeHelper = async (request, response) => {
 
 /**
  * Takes entered user data for new password, checks if old password is correct. If both new passwords are the same and fulfill 
- * password criteria call sql function for changing password.
+ * password criteria call sql function for changing password. Maybe there is an easier way to code the error message.
  */
 const changePasswordHelper = function (request, response) {
-    console.log(request.body.oldPw);
-    console.log(request.body.newPw);
-    console.log(request.body.newPw2);
-
-    // Check if entered password is correct
-
-    // Check if new passwords are both the same
-
-    // Check if new passwords fulfills password criteria
-
-    // Insert new password into the database, REPLACE INTO?
-
-    response.render('pages/changePassword', {
-        user: request.session.username,
-        text: 'Passwort erfolgreich geändert!'
+    // Check if old password is correct
+    SQL.getUserFromDB(request.session.username).then(function (results) {
+        // Hash and compare with stored hash
+        bcrypt.compare(request.body.oldPw, results[0].password, function (error, result) {
+            // Log possible error
+            if (error) console.log(error);
+            if (result === true) {
+                // Check if new passwords are both the same
+                if (request.body.newPw === request.body.newPw2) {
+                    // Call mysql function
+                    SQL.changeUserPassword(request.session.username, request.body.newPw).then(function () {
+                        response.render('pages/changePassword', {
+                            user: request.session.username,
+                            text: 'Passwort erfolgreich geändert.'
+                        });
+                    }).catch(function (error) {
+                        console.log(error);
+                        if (error == 'pw') {
+                            response.render('pages/changePassword', {
+                                user: request.session.username,
+                                text: 'Neues Passwort zu unsicher.'
+                            });
+                        } else {
+                            // Render error page
+                            response.render('pages/changePassword', {
+                                user: request.session.username,
+                                text: 'Fehler beim Ändern des Passworts.'
+                            });
+                        }
+                    });
+                } else {
+                    // Render error page
+                    response.render('pages/changePassword', {
+                        user: request.session.username,
+                        text: 'Neue Passwörter stimmen nicht überein!'
+                    });
+                }
+            } else {
+                // Render error page
+                response.render('pages/changePassword', {
+                    user: request.session.username,
+                    text: 'Altes Passwort stimmt nicht überein!'
+                });
+            }
+        });
+        // Catch sql errorsFehler beim Ändern des Passworts
+    }).catch(function (error) {
+        if (error) console.log(error);
+        response.render('pages/errors/loginFailed');
     });
 }
 
@@ -1012,6 +1047,7 @@ function loadNameFromSQL(name, year) {
                 }
             }
 
+            // Slice out the info for building the yearly column
             let indexCut = tableName.indexOf('~');
             tableName = tableName.slice(0, indexCut);
 
