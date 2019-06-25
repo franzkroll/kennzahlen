@@ -1,6 +1,6 @@
 # Kennzahlen-System der Leitstelle Lausitz
 
-System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, chart.js.)
+System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, Chart.js.)
 
 ## Features
 
@@ -19,7 +19,7 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [/.env](/.env), angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahlen Informationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen.) Ebenso können in der Konfigurationsdatei IP und Port des Servers angepasst werden. 
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [/.env](/.env), angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahlen Informationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) 
 
 ### Datenfelder in Konfigurationsdatei
 
@@ -29,7 +29,7 @@ SERVER_PORT=8080
 
 DB_HOST='localhost'
 DB_LOGIN_USER='user'
-DB_LOGIN_PASSWORD='passwort'
+DB_LOGIN_PASSWORD='passwortstoppen'
 DB_LOGIN_DATABASE='nodelogin'
 
 DB_MEASURE_USER='user'
@@ -41,7 +41,7 @@ Die Anwendung ist nun über [localhost:8080](https://localhost:8080/) erreichbar
 ```sh
 PORT:4444 node kennzahlen.js
 ```
-(Beispiel mit Port 4444, Standardmäßig wird Port 8080 verwendet.)
+(Beispiel mit Port 4444)
 
 Ebenso ist ein Start über eine feste IP-Adresse möglich, dies ist wieder über die Startoptionen möglich, oder eine Anpassung der ip-Variable in [kennzahlen.js](routes/kennzahlen.js). (Standardmäßig startet der Server über localhost.)
 
@@ -50,7 +50,7 @@ IP:192.168.2.1 node kennzahlen.js
 ```
 (Beispiel mit IP 192.168.2.1)
 
-Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2). Diese sorgt für einen automatischen Neustart bei Absturz der App. Installation, Starten, bzw. stoppen erfolgt dann mit folgenden befehlen:
+Zum start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2) empfohlen. Diese sorgt für einen automatischen Neustart bei Absturz der App. Installation, Starten, Stoppen bzw. Neustarten erfolgt dann mit folgenden befehlen:
 
 ```sh
 npm install pm2
@@ -109,7 +109,7 @@ Kennzahl: 1.1, Anzahl der Alarmierungen, Jahr 2018
 
 Tabellenname in Datenbank: 1$1_Anzahl_der_Alarmierungen_2018
 
-Punkte werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
+Punkte in der ID werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
 
 ## Benutzung des Web-Interfaces
 
@@ -128,23 +128,23 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 ### Hauptmenü
 
-![Alt text](misc_files/screenshots/imgMain.png?raw=true "Title")
+![](misc_files/screenshots/imgMain.png?raw=true "Hauptmenü")
 
 ### Eingabeformular
 
-![Alt text](misc_files/screenshots/imgSubmit.png?raw=true "Title")
+![](misc_files/screenshots/imgSubmit.png?raw=true "Eingabeformular")
 
 ### Erstellungsformular
 
-![Alt text](misc_files/screenshots/imgCreate.png?raw=true "Title")
+![](misc_files/screenshots/imgCreate.png?raw=true "Erstellungsformular")
 
 ### Visualisierung
 
-![Alt text](misc_files/screenshots/imgVisual.png?raw=true "Title")
+![](misc_files/screenshots/imgVisual.png?raw=true "Visualisierung")
 
 ### Statusmonitor
 
-![Alt text](misc_files/screenshots/imgStatus.png?raw=true "Title")
+![](misc_files/screenshots/imgStatus.png?raw=true "Statusmonitor")
 
 ## Bisher noch fehlende Funktionen
 
