@@ -19,30 +19,22 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in [routes/mysql.js](routes/mysql.js), im Feld 'connectionLogin' angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahlen Informationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner files eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen.)
+Ebenso ist eine lokale Installation von MySQL erforderlich, die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [/.env](/.env), angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahlen Informationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen.) Ebenso können in der Konfigurationsdatei IP und Port des Servers angepasst werden. 
 
-### Datenfelder die an lokale MySQL-Zugangsdaten angepasst werden müssen:
+### Datenfelder in Konfigurationsdatei
 
-#### Zugang zu Benutzerdatenbank
+```c
+SERVER_IP='127.0.0.1'
+SERVER_PORT=8080
 
-```js
-const connectionLogin = mysql.createConnection({
-    host: 'localhost',
-    user: 'dbaccess',
-    password: 'passwort',
-    database: 'nodelogin'
-});
-```
+DB_HOST='localhost'
+DB_LOGIN_USER='user'
+DB_LOGIN_PASSWORD='passwort'
+DB_LOGIN_DATABASE='nodelogin'
 
-#### Zugang zu Kennzahlendatebank
-
-```js
-const connectionData = mysql.createConnection({
-    host: 'localhost',
-    user: 'dbaccessData',
-    password: 'passwort ',
-    database: 'measures'
-});
+DB_MEASURE_USER='user'
+DB_MEASURE_PASSWORD='passwort'
+DB_MEASURE_DATABASE='measures'
 ```
 Die Anwendung ist nun über [localhost:8080](https://localhost:8080/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
 
@@ -88,12 +80,13 @@ Möchten man Benutzer neu erstellen muss man auf ein sicheres Passwort achten. E
 
 #### Beispiel
 
-| id | username | passwort | email         | role  |
-| -- | -------- | -------- | ------------- | ----- |
-| 1  | admin    | admin    | test@test.com | admin |
+| id | username | passwort | email         | role  | mandate |
+| -- | -------- | -------- | ------------- | ----- | ------- |
+| 1  | admin    | admin    | test@test.com | admin | cottbus |
 
 
 Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche, 'user' und allen weiteren Rollen fehlt der Zugriff auf die Verwaltungsbereiche. Ein Benutzer mit der Rolle 'submit' darf nur Daten eintragen und keine neuen Kennzahlen anlegen. Weitere Rollen können ebenso verwendet werden um den Zugriff auf die verschiedenen Kennzahlen festzulegen. Diese müssen dann bei der Erstellung der Kennzahl spezifiziert werden. IDs werden automatisch fortlaufend vergeben und müssen nicht bei der Erstellung festgelegt werden.
+Benutzer mit dem Mandat '*' haben Zugriff auf alle Mandate.
 
 ### Kennzahlendatenbank
 

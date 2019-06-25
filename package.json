@@ -15,6 +15,7 @@
     "chartjs-plugin-zoom": "0.7.0",
     "compression": "1.7.4",
     "ddos": "0.2.1",
+    "dotenv": "8.0.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-server-status": "^1.0.3",

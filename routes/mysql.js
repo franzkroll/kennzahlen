@@ -4,29 +4,30 @@
  * of the prevention of sql-injections.
  */
 
-//Imports 
+// Imports 
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const passwordValidator = require('password-validator');
 const IO = require('./io.js');
+require('dotenv').config();
 
 // Salt rounds for password encryption
 const saltRounds = 10;
 
 // Create SQL-Connection for accessing measure data
 const connectionData = mysql.createConnection({
-    host: 'localhost',
-    user: 'dbaccessData',
-    password: 'N&HQkzW]WF2bBA*k',
-    database: 'measures'
+    host: process.env.DB_HOST,
+    user: process.env.DB_MEASURE_USER,
+    password: process.env.DB_MEASURE_PASSWORD,
+    database: process.env.DB_MEASURE_DATABASE
 });
 
 // Create SQL-Connection for accessing user data
 const connectionLogin = mysql.createConnection({
-    host: 'localhost',
-    user: 'dbaccess',
-    password: 'Pdgy#MW$Jud6F$_B',
-    database: 'nodelogin'
+    host: process.env.DB_HOST,
+    user: process.env.DB_LOGIN_USER,
+    password: process.env.DB_LOGIN_PASSWORD,
+    database: process.env.DB_LOGIN_DATABASE
 });
 
 /**
@@ -367,7 +368,7 @@ function changeUserPassword(username, password) {
 
 /**
  * Check if entered password is a safe password, used when a new user is created.
- * @param {Password to be checked.} password 
+ * @param {PasswLegen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften.ord to be checked.} password 
  */
 function pwCheck(password) {
     const schema = new passwordValidator();

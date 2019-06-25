@@ -10,6 +10,8 @@ const util = require('util');
 const favicon = require('serve-favicon');
 const Ddos = require('ddos');
 const https = require('https');
+require('dotenv').config();
+
 
 // Overwrite default console log and write into debug.log instead..
 const log_file = fs.createWriteStream(__dirname + '/debug.log', {
@@ -32,9 +34,9 @@ console.log = function (d) {
 };
 
 // Start server on Port 8080 if no other port is specified
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || process.env.SERVER_PORT;
 // Start server on localhost if no other ip is specified
-const ip = process.env.IP || '127.0.0.1';
+const ip = process.env.IP || process.env.SERVER_IP;
 
 // link routes 
 const routes = require('./routes/index.js');
