@@ -117,13 +117,6 @@ function checkRolePermissions(role, request) {
     });
 }
 
-/**
- * TODO: implement and comment
- * @param {*} newPassword 
- */
-function changeUserPassword(newPassword) {
-
-}
 
 /**
  * Queries database for the logged in user. Checks if the passed mandate equals the user mandate. Also returns true if user mandate

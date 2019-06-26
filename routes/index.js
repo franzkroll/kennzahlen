@@ -4,7 +4,7 @@
  */
 
 module.exports = function (app) {
-    // Imports ...
+    // Import
     const statusMonitor = require('express-status-monitor')();
 
     // Load in helper functions, which contain the functions for the routes
@@ -17,7 +17,7 @@ module.exports = function (app) {
 
     /**
      * 
-     * GET REQUESTS
+     * GET ROUTES
      * 
      */
 
@@ -83,7 +83,7 @@ module.exports = function (app) {
 
     /**
      * 
-     * POST REQUESTS
+     * POST ROUTES
      * 
      */
 

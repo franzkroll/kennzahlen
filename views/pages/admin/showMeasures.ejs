@@ -17,10 +17,11 @@
         <!-- Dropdown menus and button for deleting users. -->
         <div style="text-align:center">
             <form action="deleteMeasure" method="post">
-                <select name="measureSelect" id="measureSelect" style="width:40%; margin-right: 30px"
-                    class="dropdown">ID</select>
-                <select name="yearSelect" id="yearSelect" style="width:30%; margin-right: 30px"
-                    class="dropdown">ID</select>
+                <select name="measureSelect" id="measureSelect" title="Wählen Sie hier die zu Löschende Kennzahl aus."
+                    style="width:40%; margin-right: 30px" class="dropdown">ID</select>
+                <select name="yearSelect" id="yearSelect"
+                    title="Wählen Sie hier das zu  Löschende Jahr der Kennzahl aus."
+                    style="width:30%; margin-right: 30px" class="dropdown">ID</select>
                 <a href="/showMeasures"><button type="submit" style="width:20%" class="button">Löschen</button></a>
             </form>
         </div>

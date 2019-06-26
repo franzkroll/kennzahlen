@@ -53,8 +53,10 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+// Slices out a semicolon
 let tableName2 = lastSelected.slice(0, lastSelected.length - 1);
 
+// Delete name because we don't have any data
 selM.onchange = function () {
     nameField.innerHTML = '';
 }
@@ -93,8 +95,10 @@ selM.onclick = function () {
                 if (measure[j] === inputText) {
                     filled = true;
 
+                    // Get tablename of the received data
                     let tableName = measure[measure.length - 1];
 
+                    // Slice out info how the yearly sum is collected
                     let index = tableName.indexOf('~');
                     sumCalc = tableName.slice(index + 1, tableName.length);
 
@@ -537,6 +541,7 @@ selGraph.onchange = function (e) {
                 fill: true
             }
         } else {
+            // Save percent data in own array
             let percentData = [];
 
             for (k = 0; k < dataGraph[i].length; k++) {
@@ -598,7 +603,6 @@ function getRandomColor() {
     }
     return color;
 }
-
 
 /**
  * Helper for placing objects in session storage.

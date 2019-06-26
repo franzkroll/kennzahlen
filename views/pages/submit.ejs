@@ -27,13 +27,17 @@
             <form action="submit" method="POST">
                 <!-- Selection menu for measure and year/month. -->
                 <div style=" text-align:center;margin-bottom: 15px;margin-right: 10px">
-                    <select id="measure" style="width:90%" name="measure" class="dropdownS" required></select>
-                    <select id="duration" style="width:40%" name="date" class="dropdownS" required></select>
+                    <select id="measure" style="width:90%" name="measure"
+                        title="Wählen Sie hier die Kennzahl aus, für die sie Daten eingeben möchten." class="dropdownS"
+                        required></select>
+                    <select id="duration" style="width:40%" name="date"
+                        title="Wählen Sie das Datum aus, für das sie Daten eingeben möchten." class="dropdownS"
+                        required></select>
                 </div>
                 <!-- Text fields with attributes get added here. -->
                 <div id="container"></div>
                 <span style="display:block; height: 10px;"></span>
-                <input type="submit" value="Eintragen">
+                <input type="submit" title="Trägt die Daten ein." value="Eintragen">
             </form>
         </div>
 

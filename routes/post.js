@@ -247,6 +247,7 @@ const submitDataHelper = async (request, response) => {
                     }
                 }
 
+                // We don't need the summation info here
                 let indexCut = tableName.indexOf('~');
                 tableName = tableName.slice(0, indexCut);
 
@@ -298,6 +299,7 @@ const submitDataHelper = async (request, response) => {
                     }
                 }
 
+                // Finish query for sql
                 query = query.slice(0, query.length - 1) + ');';
 
                 // Month for automatic reselection
@@ -688,6 +690,7 @@ const deleteHelper = async (request, response) => {
         }
     }
 
+    // We don't need the summation info anymore
     let indexCut = tableName.indexOf('~');
     tableName = tableName.slice(0, indexCut);
 
@@ -972,7 +975,7 @@ const deleteAttributeHelper = async (request, response) => {
 
 /**
  * Takes entered user data for new password, checks if old password is correct. If both new passwords are the same and fulfill 
- * password criteria call sql function for changing password. Maybe there is an easier way to code the error message.
+ * password criteria call sql function for changing password. Maybe there is an easier way to code the error message / page renders.
  */
 const changePasswordHelper = function (request, response) {
     // Check if old password is correct
