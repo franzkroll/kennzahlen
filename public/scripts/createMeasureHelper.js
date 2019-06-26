@@ -78,19 +78,15 @@ let roleSaver = [];
 for (i = 0; i < roleList.length - 1; i++) {
     const role = roleList[i].split(',').filter(Boolean);
     const mandate = mandateList[i].split(',').filter(Boolean);
-
     let opt = document.createElement('option');
 
-
     if (!mandateSaver.includes(mandate[1])) {
-
         // Add mandate to list
         opt.appendChild(document.createTextNode(mandate[1]));
         opt.value = mandate[1];
         mandateSelect.appendChild(opt);
 
         mandateSaver.push(mandate[1]);
-
     }
 
     if (!roleSaver.includes(role[1])) {

@@ -19,7 +19,6 @@ for (i = 0; i < roleList.length - 1; i++) {
 
     let opt = document.createElement('option');
 
-
     if (!mandateSaver.includes(mandate[1])) {
 
         // Add mandate to list
@@ -28,7 +27,6 @@ for (i = 0; i < roleList.length - 1; i++) {
         mandateSelect.appendChild(opt);
 
         mandateSaver.push(mandate[1]);
-
     }
 
     if (!roleSaver.includes(role[1])) {

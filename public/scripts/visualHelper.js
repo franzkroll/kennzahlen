@@ -268,7 +268,7 @@ selM.onclick = function () {
 
                             // We only need the second part of the data for the table
                             if (columns[k].split(':')[1].slice(0, 2) === '-1') {
-                                cellData = 'n/a';
+                                cellData = 'n.v.';
                             } else {
                                 cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
                             }
@@ -278,7 +278,7 @@ selM.onclick = function () {
                             cell.innerHTML = cellData;
 
                             // Just add a zero if we don't have the data
-                            if (cellData === 'n/a') {
+                            if (cellData === 'n.v.') {
                                 cellData = 0;
                             }
 
