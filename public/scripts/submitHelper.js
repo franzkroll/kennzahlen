@@ -86,7 +86,7 @@ selM.onclick = function () {
                 }
             } else {
                 const currentYear = new Date().getFullYear();
-                for (l = currentYear - 10; l <= currentYear + 10; l++) {
+                for (l = currentYear - 15; l <= currentYear + 15; l++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(l));
                     // Color existing entries green
@@ -113,7 +113,7 @@ selM.onclick = function () {
                     text.setAttribute("name", "var" + (i - 2));
                     text.setAttribute("id", "id" + (i - 2));
                     text.setAttribute("placeholder", measure[i]);
-                    text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein. Falls der Wert nicht vorhanden ist geben Sie bitte -1 ein.");
+                    text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein. Falls der Wert nicht vorhanden ist, geben Sie bitte -1 ein.");
                     // ... and add it to the container
                     div.appendChild(text);
                     fieldContainer.appendChild(div);

@@ -30,7 +30,7 @@
 
                 <!-- Field for setting name of the measure. -->
                 <input type="text" name="name" placeholder="Name der Kennzahl"
-                    title="Legen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften."
+                    title="Legen Sie hier einen Namen für die Kennzahl fest, ein Name darf nur einmal verwendet werden."
                     required>
 
                 <!-- Field for setting year of the measure. -->
@@ -91,9 +91,11 @@
 
                 <!-- Buttons for adding and deleting text fields. -->
                 <div>
-                    <input style="text-align:center;width:47.5%;margin-right:10px" class="button" type="button"
-                        value="Neues Feld" id="add" />
-                    <input style="width:47.5%" class="button" type="button" value="Feld löschen" id="delete" />
+                    <input style="text-align:center;width:47.5%;margin-right:10px"
+                        title="Fügt ein neues Eigenschaftsfeld hinzu" class="button" type="button" value="Neues Feld"
+                        id="add" />
+                    <input style="width:47.5%" class="button" type="button" title="Löscht das letzte Eigenschaftsfeld"
+                        value="Feld löschen" id="delete" />
                 </div>
 
                 <span style="display:block; height: 20px;"></span>
