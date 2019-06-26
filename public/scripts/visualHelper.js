@@ -246,7 +246,8 @@ selM.onclick = function () {
                         let cell = row.insertCell(-1);
                         cell.innerHTML = measure[j + 2];
 
-                        if (!yearHead) {
+                        // Don't insert 0 if user sums values himself
+                        if (!yearHead && sumCalc !== 'self') {
                             let cell2 = row.insertCell(-1);
                             cell2.innerHTML = 0;
                         }
@@ -304,9 +305,9 @@ selM.onclick = function () {
         } else {
             if (sumCalc === 'sum') {
                 // Replace year value with calculated sum
-                table.rows[l].cells[1].innerHTML = sumArray[l - 1];
+                table.rows[l].cells[1].innerHTML = Number(sumArray[l - 1].toFixed(2));
             } else if (sumCalc === 'median') {
-                table.rows[l].cells[1].innerHTML = (sumArray[l - 1] / dataGraph[0].length).toFixed(2);
+                table.rows[l].cells[1].innerHTML = Number((sumArray[l - 1] / dataGraph[0].length).toFixed(2));
             } // We don't have to do anything for self
         }
     }
@@ -682,7 +683,7 @@ document.getElementById('download').onclick = function () {
     for (let key in sessionStorage) {
         if (!isNaN(key)) {
             const image = window.sessionStorage.getObject(key);
-            doc.addImage(image, 'PNG', 0, 0, width, height * 0.65, '', 'SLOW');
+            doc.addImage(image, 'PNG', 0, 0, width * 0.9, height * 0.65, '', 'SLOW');
             doc.addPage();
         }
     }

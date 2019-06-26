@@ -32,20 +32,21 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         <div id="status" class="misc-text" data-html2canvas-ignore="true"> <%- text -%></div>
         <span style="display:block; height: 10px;"></span>
 
-
         <!--Dropdown menus for measure and year selection, button queries data from mysql. -->
         <div style="text-align:center;" data-html2canvas-ignore="true">
             <form action="visual" method="post">
-                <select id="measure" style="width:50%" name="measure" class="dropdownS" required></select>
-                <select style="width: 20%" id="year" name="year" class="dropdownS" required>
+                <select id="measure" style="width:50%" title="Wählen Sie hier die gewünschte Kennzahl aus"
+                    name="measure" class="dropdownS" required></select>
+                <select style="width: 20%" id="year" title="Wählen Sie hier das gewünschte Jahr aus." name="year"
+                    class="dropdownS" required>
                 </select>
-                <div style="text-align: center"><button type="submit" id="button" class="button">Daten abfragen</button>
+                <div style="text-align: center"><button title="Stellt die ausgewählte Kennzahl dar." type="submit"
+                        id="button" class="button">Daten abfragen</button>
                 </div>
             </form>
         </div>
 
         <span style="display:block; height: 15px;"></span>
-
 
         <h4 id="name" style="text-align: center">
         </h4>
@@ -57,7 +58,7 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
 
         <!-- Contains dropdown selection for graph options and canvas for graphs. -->
         <div style="text-align: center" data-html2canvas-ignore="true">
-            <select id="graph" class="dropdownS">
+            <select title="Wählen Sie hier den Graph-Typ aus." id="graph" class="dropdownS">
                 <option value="bar">Balkendiagramm</option>
                 <option value="horizontalBar">Balkendiagramm horizontal</option>
                 <option value="line">Liniendiagramm</option>
@@ -74,18 +75,22 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         <span style="display:block; height: 10px;"></span>
 
         <!-- Print only current page. -->
-        <div data-html2canvas-ignore="true" style="text-align: center"><button type="submit" onclick="window.print()"
+        <div data-html2canvas-ignore="true" title="Ruft eine Druckübersicht der aktuellen Ansicht auf."
+            style="text-align: center"><button type="submit" onclick="window.print()"
                 class="button">Sofortdruck</button></div>
 
         <span style="display:block; height: 12px;"></span>
 
         <!-- Buttons for creating reports. -->
         <div style="text-align: center" data-html2canvas-ignore="true">
-            <button type="submit" id="report" class="button">Zu Report hinzufügen</button>
+            <button type="submit" title="Fügt die aktuelle Ansicht zu einem Report hinzu." id="report" class="button">Zu
+                Report hinzufügen</button>
             &nbsp&nbsp&nbsp
-            <button type="submit" id="delete" class="button">Neuer Report</button>
+            <button type="submit" title="Löscht alle bisherigen Ansichten im Report." id="delete" class="button">Neuer
+                Report</button>
             &nbsp&nbsp&nbsp
-            <button type="submit" id="download" class="button">Report herunterladen</button>
+            <button type="submit" title="Lädt den erstellten Report als PDF herunter." id="download"
+                class="button">Report herunterladen</button>
         </div>
 
     </main>
@@ -100,19 +105,23 @@ in with 'Daten abfragen'. Bottom section contains graphs create with Chart.js
         // Load all needed data here
         let loadedTableName = '<%- loadedTable %>';
         loadedTableName = loadedTableName.trim();
+        // Set current measure as title
         const nameField = document.getElementById('name');
         nameField.innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replace('_y',
             '').replaceAll('_', ' ');
         const lastYear = '<%- lastYear %>';
+        // Add year to non yearly measures in title
         if (lastYear !== 'yearly' && lastYear !== '') {
             nameField.innerHTML += ', ' + lastYear;
         }
+        // Load all data lists
         const measureData = '<%- measureData %>';
         const measureListData = '<%- measureListData %>';
         const lastSelected = '<%- lastSelected %>;';
         const userName = '<%- user %>';
     </script>
 
+    <!-- Load in helper script. -->
     <script src="/scripts/visualHelper.js"></script>
 
     <footer>

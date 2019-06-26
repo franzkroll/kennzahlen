@@ -150,6 +150,7 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 * Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
 * Täglich erfasste Kennzahlen
+* Erstellung von Reports für ein gesamtes Mandat
 
 ## Kontakt
 

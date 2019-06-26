@@ -17,23 +17,31 @@ Has header and footer for navigation and info.
 		<!-- Buttons for the different sections of the system. -->
 		<div style="text-align:center;">
 			<div>
-				<a href="/visual"><button class="button">Visualisierung bestehender Kennzahlen</button></a>
+				<a href="/visual"><button title="Öffnet Übersicht zum Abrufen und Darstellen von Kennzahle."
+						class="button">Visualisierung bestehender Kennzahlen</button></a>
 			</div>
 			<div>
-				<a href="/submit"><button class="button">Eingabeformular für Kennzahlen</button></a>
+				<a href="/submit"><button title="Öffnet Übersicht zur Eingabe von Kennzahlendaten."
+						class="button">Eingabeformular für Kennzahlen</button></a>
 			</div>
 			<div>
-				<a href="/createMeasure"><button class="button">Neue Kennzahl anlegen</button></a>
+				<a href="/createMeasure"><button title="Öffnet Menü zur Erstellung neuer Kennzahlen."
+						class="button">Neue
+						Kennzahl anlegen</button></a>
 			</div>
 			<div>
-				<a href="/changeMeasure"><button class="button">Bestehende Kennzahl bearbeiten</button></a>
+				<a href="/changeMeasure"><button
+						title="Öffnet Menü zur Bearbeitung von bereits existierenden Kennzahlen."
+						class="button">Bestehende Kennzahl bearbeiten</button></a>
 			</div>
 			<div>
-				<a href="/measureHelp"><button class="button">Beschreibungen der Kennzahlen anzeigen</button></a>
+				<a href="/measureHelp"><button title="Zeigt Beschreibung zu allen Kennzahlen im System."
+						class="button">Beschreibungen der Kennzahlen anzeigen</button></a>
 			</div>
 		</div>
 	</main>
 
+	<!--Clear existing sessionStorage (= reportData). Could also be done somewhere else. -->
 	<script>
 		window.sessionStorage.clear();
 	</script>
