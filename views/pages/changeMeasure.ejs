@@ -18,7 +18,8 @@ Page for changing already created measures.
         <div class="misc-text">
             Wählen Sie hier eine bereits bestehende Kennzahl aus. Danach ist es Ihnen möglich eine neue Eigenschaft zu
             dieser hinzuzufügen, zu Löschen oder eine bestehende Eigenschaft zu ändern. Name der Eigenschaft und
-            Beschreibung dürfen kein Komma enthalten. Achtung: Das Löschen von Attributen löscht die dazugehörigen Werte
+            Beschreibung dürfen kein Komma enthalten. Achtung: Das Löschen von Eigenschaft löscht die dazugehörigen
+            Werte
             permanent! Alle Aktionen gelten jeweils für alle Jahre der Kennzahl.
         </div>
 
@@ -38,13 +39,13 @@ Page for changing already created measures.
                     name="measure" class="dropdownS" required></select>
 
                 <!-- Selection menu for individual attributes. -->
-                <select id="attribute" style="width:90%" title="Wählen Sie hier das zu bearbeitende Attribut aus."
+                <select id="attribute" style="width:90%" title="Wählen Sie hier die zu bearbeitende Eigenschaft aus."
                     name="attribute" class="dropdownS"></select>
 
                 <span style="display:block; height: 12px;"></span>
 
-                <input formAction="deleteAttr" type="submit" title="Löscht das augewählte Attribut." style="width:50%"
-                    value="Attribut löschen">
+                <input formAction="deleteAttr" type="submit" title="Löscht die ausgewählte Eigenschaft."
+                    style="width:50%" value="Eigenschaft löschen">
 
                 <span style="display:block; height: 12px;"></span>
 
@@ -60,8 +61,8 @@ Page for changing already created measures.
                 <span style="display:block; height: 12px;"></span>
 
                 <input formaction="changeAttr" type="submit"
-                    title="Ändert das Attribut zu der eingegeben Eigenschaft/Beschreibung." style="width:50%"
-                    value="Attribut ändern">
+                    title="Ändert die Eigenschaft zu der eingegeben Eigenschaft/Beschreibung." style="width:50%"
+                    value="Eigenschaft ändern">
 
                 <span style="display:block; height: 17px;"></span>
 
@@ -76,7 +77,8 @@ Page for changing already created measures.
 
                 <span style="display:block; height: 12px;"></span>
 
-                <input formaction="addAttr" type="submit" style="width:50%" value="Attribut hinzufügen">
+                <input formaction="addAttr" type="submit" style="width:50%"
+                    title="Fügt die eingegebene Eigenschaft der Kennzahl hinzu." value="Eigenschaft hinzufügen">
             </form>
         </div>
     </main>
