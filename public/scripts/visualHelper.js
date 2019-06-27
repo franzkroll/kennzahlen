@@ -233,6 +233,13 @@ selM.onclick = function () {
                     // Count current cell we are inserting, so we don't add data into the wrong month
                     let count = 1;
 
+                    // We have on more value with manually yearly values
+                    if (sumCalc === 'self') {
+                        count = 0;
+                    } else {
+                        count = 1;
+                    }
+
                     // Cycle through data for measure and take column breaks into account
                     for (k = j + 1; k < columns.length; k += columnCount) {
                         // Remove everything from data that isn't a number or decimal point
@@ -270,14 +277,15 @@ selM.onclick = function () {
                             sumArray[j] = sumArray[j] + parseFloat(cellData);
                         }
 
-                        // Special case for yearly measures, in monthly and quarterly measures the year is left out
-                        dataBuilder.push(cellData);
+                        // Don't add user summed values to the graph
+                        if (!(sumCalc === 'self' && k === j + 1)) {
+                            dataBuilder.push(cellData);
+                        }
                     }
                     // Push data to array for graphs
                     dataGraph.push(dataBuilder);
                 }
             }
-
         }
     }
 
