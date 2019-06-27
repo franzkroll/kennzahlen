@@ -494,7 +494,7 @@ selGraph.onchange = function (e) {
         });
     }
 
-    // Default colors for graphs, random colors are used if array is empty
+    // Default colors for graphs, random colors are used if array doesn't have enough colors
     const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#8c564b', '#bcbd22', '#7f7f7f', '#17becf', '#9467bd', '#d62728', '#e377c2'];
 
     // Add previously defined and filled arrays to the chart data
