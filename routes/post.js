@@ -508,7 +508,7 @@ const createMeasureHelper = async (request, response) => {
             entryList.push([request.body.name, 'dummy;']);
         }
 
-        let sql;
+        let sql = '';
 
         // Format name correctly for mysql and add the year, backticks handle sql injection escape
         let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
@@ -645,7 +645,6 @@ const deleteHelper = async (request, response) => {
                     }
                 }
                 found = true;
-
 
                 // Find corresponding entry in entryList, remove all values in that entry that contain the deleted year
                 for (k = 0; k < entryList.length; k++) {

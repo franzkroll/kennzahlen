@@ -180,8 +180,6 @@ selM.onclick = function () {
                 }
             }
 
-            // TODO: Fill corresponding cell, not just in order
-
             // Precaution so we don't leave the array length later on, only enter if the 
             // table head is already done and we are ready to write data into the table
             if (insertedHead && (j < measure.length - 3)) {
@@ -229,7 +227,16 @@ selM.onclick = function () {
                     // Saves data for graphs
                     let dataBuilder = [];
 
+                    console.log(table.tHead.rows[0]);
+                    let count = 1;
+
                     for (k = j + 1; k < columns.length; k += columnCount) {
+                        if (columns[k - 1].split(':')[1].length >= 5) {
+                            console.log(Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)));
+                        }
+
+                        console.log('count:' + count);
+
                         // Remove everything from data that isn't a number or decimal point
                         let cellData;
 
@@ -240,14 +247,19 @@ selM.onclick = function () {
                             cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
                         }
 
+                        // Just add a zero if we don't have the data, comparison is weird, maybe easier
+                        if (cellData === 'n.v.') {
+                            cellData = 0;
+                        } else if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5)) {
+                            console.log('need to fill');
+                            cellData = 0;
+                            k -= columnCount;
+                        }
+                        count++
+
                         // Fill correct table cell with data
                         let cell = row.insertCell(-1);
                         cell.innerHTML = cellData;
-
-                        // Just add a zero if we don't have the data
-                        if (cellData === 'n.v.') {
-                            cellData = 0;
-                        }
 
                         // Add to year sum here
                         if (!sumArray[j]) {
@@ -548,7 +560,7 @@ selGraph.onchange = function (e) {
 }
 
 /**
- * Converts value from hexadecimal format to rgb format.
+ * Converts color value from hexadecimal format to rgb format.
  * @param {Color in hexadecimal format.} hex 
  */
 function hexToRgb(hex) {
