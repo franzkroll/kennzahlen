@@ -80,6 +80,9 @@ selM.onclick = function () {
     let sumArray = [];
     let sumCalc;
 
+    // Save spots we filled for later rows
+    let filling = [];
+
     // Loop through received array data until we find the needed measure
     for (i = 0; i < measureArray.length && !insertedHead; i++) {
         // Split actual data of the measure 
@@ -243,16 +246,19 @@ selM.onclick = function () {
                         }
 
                         // Just add a zero if we don't have the data, comparison is weird, maybe easier
-                        if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5)) {
+                        if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5) || (filling.includes(count))) {
                             cellData = 'n.v.';
+                            filling.push(count);
                             k -= columnCount;
                         }
+
                         count++
 
                         // Fill correct table cell with data
                         let cell = row.insertCell(-1);
                         cell.innerHTML = cellData;
 
+                        // Substitute again for graphs
                         if (cellData === 'n.v.') {
                             cellData = 0;
                         }
@@ -286,6 +292,9 @@ selM.onclick = function () {
             } else if (sumCalc === 'median') {
                 table.rows[l].cells[1].innerHTML = Number((sumArray[l - 1] / dataGraph[0].length).toFixed(2));
             } // We don't have to do anything for self
+        }
+        if ((filling.length >= 0) && (sumCalc === 'median')) {
+            table.rows[l].cells[1].innerHTML = 'n.v.';
         }
     }
 }
