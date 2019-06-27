@@ -20,12 +20,12 @@ const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
 const button = document.getElementById('button');
 
-// Saves values in double brackets from measure attributes => the percent lines to be displayed in the graph
-let percentValues = [];
-
 // Used for creating table headers with months and quarters
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
+
+// Saves values in double brackets from measure attributes => the percent lines to be displayed in the graph
+let percentValues = [];
 
 // Labels for the graph, needs months, quarters or years
 let labels = [];
@@ -33,17 +33,9 @@ let labels = [];
 // Saves current chart so we can destroy it before creating a new one
 let currentChart;
 
-// Format measure array and add to select
-for (i = 0; i < measureArray.length - 1; i++) {
-    const measure = measureArray[i].split(',').filter(Boolean);
-    let opt = document.createElement('option');
-    opt.appendChild(document.createTextNode(measure[0]));
-    opt.value = measure[0];
-    selM.appendChild(opt);
-}
-
 // Saves for display in graph
 let dataGraph = [];
+
 // Saves attributes of the current measure
 let measureAttr = [];
 
@@ -55,6 +47,15 @@ String.prototype.replaceAll = function (search, replacement) {
 
 // Slices out a semicolon
 let tableName2 = lastSelected.slice(0, lastSelected.length - 1);
+
+// Format measure array and add to select
+for (i = 0; i < measureArray.length - 1; i++) {
+    const measure = measureArray[i].split(',').filter(Boolean);
+    let opt = document.createElement('option');
+    opt.appendChild(document.createTextNode(measure[0]));
+    opt.value = measure[0];
+    selM.appendChild(opt);
+}
 
 // Delete name because we don't have any data
 selM.onchange = function () {
@@ -69,240 +70,206 @@ selM.onclick = function () {
     // Get selected measure
     var inputText = this.children[this.selectedIndex].innerHTML.trim();
 
-    // True if table has already been filled
-    let filled = false;
-
     // For checking if table head was already inserted
     let insertedHead = false;
 
     // Stores which type the table is
-    let monthHead = false;
     let yearHead = false;
-    let quarterHead = false;
 
     // Saves type of sum and sum values
     let sumArray = [];
     let sumCalc;
 
-    // Loop through received array data
-    for (i = 0; i < measureArray.length; i++) {
+    // Loop through received array data until we find the needed measure
+    for (i = 0; i < measureArray.length && !insertedHead; i++) {
         // Split actual data of the measure 
         const measure = measureArray[i].split(',').filter(Boolean);
         // Only fill table if it hasn't been filled before
-        if (!filled) {
-            for (j = 0; j < measure.length - 1; j++) {
-                // If measure is found clear table and prepare select for new data
-                if (measure[j] === inputText) {
-                    filled = true;
+        for (j = 0; j < measure.length - 1; j++) {
+            // If measure is found clear table and prepare select for new data
+            if (measure[j] === inputText) {
+                // Get tablename of the received data
+                let tableName = measure[measure.length - 1];
 
-                    // Get tablename of the received data
-                    let tableName = measure[measure.length - 1];
+                // Slice out info how the yearly sum is collected
+                let index = tableName.indexOf('~');
+                sumCalc = tableName.slice(index + 1, tableName.length);
 
-                    // Slice out info how the yearly sum is collected
-                    let index = tableName.indexOf('~');
-                    sumCalc = tableName.slice(index + 1, tableName.length);
+                // Clear chart if changed to an item without data
+                if (currentChart) {
+                    currentChart.destroy();
+                }
 
-                    // Clear chart if changed to an item without data
-                    if (currentChart) {
-                        currentChart.destroy();
-                    }
+                // Clear data for graphs and saved attributes
+                measureAttr = [];
+                dataGraph = [];
 
-                    //Clear rows of the table except the first row
-                    for (i = table.rows.length - 1; i > 0; i--) {
-                        table.deleteRow(i);
-                    }
+                // Clear selection of the years and table
+                selYear.innerHTML = "";
+                table.innerHTML = "";
 
-                    // Clear data for graphs and saved attributes
-                    measureAttr = [];
-                    dataGraph = [];
+                // Split years here for year table, only if it isn't yearly or quarterly measure
+                years = measure[j + 1].trim().split(':');
 
-                    // Clear selection of the years
-                    selYear.innerHTML = "";
-                    table.innerHTML = "";
+                // Returns true if quarterly or monthly measure
+                if (/^\d+$/.test(years[0])) {
+                    years = years.sort();
 
-                    // Split years here for year table, only if it isn't yearly or quarterly measure
-                    years = measure[j + 1].trim().split(':');
-
-                    // Returns true if quarterly or monthly measure
-                    if (/^\d+$/.test(years[0])) {
-                        years = years.sort();
-
-                        // Put years into the select menu for tables
-                        for (k = 0; k < years.length; k++) {
-                            let opt = document.createElement('option');
-                            opt.value = years[k];
-                            opt.appendChild(document.createTextNode(years[k]));
-                            selYear.appendChild(opt);
-                        }
-
-                        if (measure[2] === 'quarterly') {
-                            quarterHead = true;
-                        } else {
-                            monthHead = true;
-                        }
-                        // Returns true if yearly measure
-                    } else if (years[0] === 'yearly') {
-                        yearHead = true;
-                        // Add first row of years here
+                    // Put years into the select menu for tables
+                    for (k = 0; k < years.length; k++) {
                         let opt = document.createElement('option');
-                        opt.value = years[0];
-                        opt.appendChild(document.createTextNode('jährliche Erfassung'));
+                        opt.value = years[k];
+                        opt.appendChild(document.createTextNode(years[k]));
                         selYear.appendChild(opt);
                     }
-
-                    // Insert table header for months
-                    if (measureData && !insertedHead && monthHead) {
-                        labels = months.slice(2, months.length);
-
-                        let header = table.createTHead();
-                        let row = header.insertRow(0);
-
-                        insertedHead = true;
-
-                        for (l = 0; l < months.length; l++) {
-                            let cell = row.insertCell(l);
-                            cell.outerHTML = "<th>" + months[l] + "</th>";
-                        }
-                        // Insert correct years from data into table head
-                    } else if (measureData && !insertedHead && yearHead) {
-                        labels = [];
-                        let header = table.createTHead();
-                        let row = header.insertRow(0);
-
-                        let cellCount = 1;
-
-                        let deleteAgain = false;
-
-                        let cellMain = row.insertCell(0);
-                        cellMain.outerHTML = "<th>Eigenschaft der Kennzahl</th>";
-
-                        const yearArray = measureData.split(',');
-
-                        for (h = 0; h < yearArray.length - 1; h++) {
-                            if (yearArray[h].includes('Monat')) {
-                                let cell = row.insertCell(cellCount);
-                                cell.outerHTML = "<th>" + yearArray[h].split(':')[1] + "</th>";
-                                cellCount++;
-                                labels.push(yearArray[h].split(':')[1]);
-                            }
-
-                            // Something went wrong if we are adding anything else than a simple year here
-                            if (yearArray[h].split(':')[1].length === 5) {
-                                deleteAgain = true;
-                                labels = [];
-                            }
-                        }
-
-                        if (deleteAgain) {
-                            table.innerHTML = "";
-                        } else {
-                            insertedHead = true;
-                        }
-                        // Insert quarters here into table head
-                    } else if (measureData && !insertedHead && quarterHead) {
-                        labels = quarters.slice(2, months.length);
-
-                        let header = table.createTHead();
-                        let row = header.insertRow(0);
-
-                        for (l = 0; l < quarters.length; l++) {
-                            let cell = row.insertCell(l);
-                            cell.outerHTML = "<th>" + quarters[l] + "</th>";
-                        }
-
-                        measure.splice(2, 1);
-                        insertedHead = true;
-
-                    }
+                } else if (years[0] === 'yearly') {
+                    yearHead = true;
+                    // Add first row of years here
+                    let opt = document.createElement('option');
+                    opt.value = years[0];
+                    opt.appendChild(document.createTextNode('jährliche Erfassung'));
+                    selYear.appendChild(opt);
                 }
 
-                // TODO: Fill corresponding cell, not just in order
+                // Add first table row
+                let header = table.createTHead();
+                let row = header.insertRow(0);
 
-                // Precaution so we don't leave the array length later on
-                if (insertedHead && (j < measure.length - 3)) {
-                    // Prepare new table rows for data
-                    let row = table.insertRow(j + 1);
+                // Grab yearly measures first
+                if (measureData && !insertedHead && yearHead) {
+                    labels = [];
 
-                    let opt = document.createElement('option');
-                    opt.value = measure[j + 1];
-                    opt.appendChild(document.createTextNode(measure[j + 1]));
+                    let cellMain = row.insertCell(0);
+                    cellMain.outerHTML = "<th>Eigenschaft der Kennzahl</th>";
 
-                    // Save attributes of measure, location of them starts in the third array cell
-                    measureAttr.push(measure[j + 2]);
+                    // Split years of the measure into array
+                    const yearArray = measureData.split(',');
 
-                    // Look for percent entry syntax
-                    if (measure[j + 2].includes('[[')) {
-                        // And slice out the percent value
-                        const percentEntry = measure[j + 2];
-
-                        // Add graph data for complete graph at percent value
-                        const percentValue = percentEntry.slice(percentEntry.indexOf('[[') + 2, percentEntry.indexOf(']]') - 1);
-                        percentValues.push(percentValue);
-
-                        measure[j + 2] = measure[j + 2].replace(']]', '');
-                        measure[j + 2] = measure[j + 2].replace('[[', '');
-                    } else {
-                        percentValues.push(0);
-                    }
-
-                    // Append data to table if there is any to add and if we got the right data already
-                    if ((inputText === (tableName2.replace(/[0-9]/g, '').replaceAll('_', ' ')))) {
-                        // Fill first column of the table with the attributes of the measure
-                        let cell = row.insertCell(-1);
-                        cell.innerHTML = measure[j + 2];
-
-                        // Don't insert 0 if user sums values himself
-                        if (!yearHead && sumCalc !== 'self') {
-                            let cell2 = row.insertCell(-1);
-                            cell2.innerHTML = 0;
-                        }
-
-                        // Counts data columns
-                        var columnCount = measure.length - 2;
-
-                        // Saves data for graphs
-                        let dataBuilder = [];
-
-                        for (k = j + 1; k < columns.length; k += columnCount) {
-                            // Remove everything from data that isn't a number or decimal point
-                            let cellData;
-
-                            // We only need the second part of the data for the table
-                            if (columns[k].split(':')[1].slice(0, 2) === '-1') {
-                                cellData = 'n.v.';
-                            } else {
-                                cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
-                            }
-
-                            // Fill correct table cell with data
+                    // Cycle through years and add them to the table and graph labels
+                    for (h = 0; h < yearArray.length - 1; h++) {
+                        // Need to filter out some elements
+                        if (yearArray[h].includes('Monat') && yearArray[h].split(':')[1].length === 4) {
                             let cell = row.insertCell(-1);
-                            cell.innerHTML = cellData;
-
-                            // Just add a zero if we don't have the data
-                            if (cellData === 'n.v.') {
-                                cellData = 0;
-                            }
-
-                            // Add to year sum here
-                            if (!sumArray[j]) {
-                                sumArray.push(parseFloat(cellData));
-                            } else {
-                                // Prevents adding of NaN
-                                if (cellData) {
-                                    sumArray[j] = sumArray[j] + parseFloat(cellData);
-                                }
-                            }
-
-                            // Special case for yearly measures, in monthly and quarterly measures the year is left out
-                            dataBuilder.push(cellData);
+                            cell.outerHTML = "<th>" + yearArray[h].split(':')[1] + "</th>";
+                            labels.push(yearArray[h].split(':')[1]);
                         }
-                        // Push data to array for graphs
-                        dataGraph.push(dataBuilder);
                     }
+                    insertedHead = true;
+
+                    // Then quarterly measures
+                } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
+                    labels = quarters.slice(2, months.length);
+
+                    for (l = 0; l < quarters.length; l++) {
+                        let cell = row.insertCell(l);
+                        cell.outerHTML = "<th>" + quarters[l] + "</th>";
+                    }
+
+                    measure.splice(2, 1);
+                    insertedHead = true;
+                    // And finally monthly measures
+                } else {
+                    labels = months.slice(2, months.length);
+
+                    for (l = 0; l < months.length; l++) {
+                        let cell = row.insertCell(l);
+                        cell.outerHTML = "<th>" + months[l] + "</th>";
+                    }
+
+                    insertedHead = true;
                 }
             }
+
+            // TODO: Fill corresponding cell, not just in order
+
+            // Precaution so we don't leave the array length later on, only enter if the 
+            // table head is already done and we are ready to write data into the table
+            if (insertedHead && (j < measure.length - 3)) {
+                // Prepare new table rows for data
+                let row = table.insertRow(j + 1);
+
+                let opt = document.createElement('option');
+                opt.value = measure[j + 1];
+                opt.appendChild(document.createTextNode(measure[j + 1]));
+
+                // Save attributes of measure, location of them starts in the third array cell
+                measureAttr.push(measure[j + 2]);
+
+                // Look for percent entry syntax
+                if (measure[j + 2].includes('[[')) {
+                    // And slice out the percent value
+                    const percentEntry = measure[j + 2];
+
+                    // Add graph data for complete graph at percent value
+                    const percentValue = percentEntry.slice(percentEntry.indexOf('[[') + 2, percentEntry.indexOf(']]') - 1);
+                    percentValues.push(percentValue);
+
+                    // Replace marking for percent values so we don't display them
+                    measure[j + 2] = measure[j + 2].replace(']]', '');
+                    measure[j + 2] = measure[j + 2].replace('[[', '');
+                } else {
+                    percentValues.push(0);
+                }
+
+                // Append data to table if there is any to add and if we got the right data already
+                if ((inputText === (tableName2.replace(/[0-9]/g, '').replaceAll('_', ' ')))) {
+                    // Fill first column of the table with the attributes of the measure
+                    let cell = row.insertCell(-1);
+                    cell.innerHTML = measure[j + 2];
+
+                    // Don't insert 0 if user sums values himself
+                    if (!yearHead && sumCalc !== 'self') {
+                        let cell2 = row.insertCell(-1);
+                        cell2.innerHTML = 0;
+                    }
+
+                    // Counts data columns
+                    var columnCount = measure.length - 2;
+
+                    // Saves data for graphs
+                    let dataBuilder = [];
+
+                    for (k = j + 1; k < columns.length; k += columnCount) {
+                        // Remove everything from data that isn't a number or decimal point
+                        let cellData;
+
+                        // We only need the second part of the data for the table
+                        if (columns[k].split(':')[1].slice(0, 2) === '-1') {
+                            cellData = 'n.v.';
+                        } else {
+                            cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
+                        }
+
+                        // Fill correct table cell with data
+                        let cell = row.insertCell(-1);
+                        cell.innerHTML = cellData;
+
+                        // Just add a zero if we don't have the data
+                        if (cellData === 'n.v.') {
+                            cellData = 0;
+                        }
+
+                        // Add to year sum here
+                        if (!sumArray[j]) {
+                            sumArray.push(parseFloat(cellData));
+                        } else {
+                            // Prevents adding of NaN
+                            if (cellData) {
+                                sumArray[j] = sumArray[j] + parseFloat(cellData);
+                            }
+                        }
+
+                        // Special case for yearly measures, in monthly and quarterly measures the year is left out
+                        dataBuilder.push(cellData);
+                    }
+                    // Push data to array for graphs
+                    dataGraph.push(dataBuilder);
+                }
+            }
+
         }
     }
+
     // Change here to added year values
     for (l = 1; l < table.rows.length; l++) {
         if (sumArray[l - 1] === 'NaN' || !sumArray[l - 1]) {

@@ -122,6 +122,7 @@ selM.onclick = function () {
                     text.setAttribute("id", "id" + (i - 2));
                     text.setAttribute("placeholder", measure[i]);
                     text.setAttribute("title", "Geben Sie hier den Wert für die Eigenschaft der Kennzahl ein. Falls der Wert nicht vorhanden ist, geben Sie bitte -1 ein.");
+                    text.required = true;
                     // ... and add it to the container
                     div.appendChild(text);
                     fieldContainer.appendChild(div);

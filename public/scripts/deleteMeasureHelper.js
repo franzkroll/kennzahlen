@@ -41,6 +41,7 @@ selM.onclick = function () {
                     opt.value = years[k];
                     selY.appendChild(opt);
                 }
+                // Don't add years for yearly measure
             } else {
                 let opt = document.createElement('option');
                 opt.appendChild(document.createTextNode('jährliche Erfassung'));
