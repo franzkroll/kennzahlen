@@ -227,16 +227,11 @@ selM.onclick = function () {
                     // Saves data for graphs
                     let dataBuilder = [];
 
-                    console.log(table.tHead.rows[0]);
+                    // Count current cell we are inserting, so we don't add data into the wrong month
                     let count = 1;
 
+                    // Cycle through data for measure and take column breaks into account
                     for (k = j + 1; k < columns.length; k += columnCount) {
-                        if (columns[k - 1].split(':')[1].length >= 5) {
-                            console.log(Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)));
-                        }
-
-                        console.log('count:' + count);
-
                         // Remove everything from data that isn't a number or decimal point
                         let cellData;
 
@@ -251,7 +246,6 @@ selM.onclick = function () {
                         if (cellData === 'n.v.') {
                             cellData = 0;
                         } else if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5)) {
-                            console.log('need to fill');
                             cellData = 0;
                             k -= columnCount;
                         }
@@ -261,14 +255,13 @@ selM.onclick = function () {
                         let cell = row.insertCell(-1);
                         cell.innerHTML = cellData;
 
-                        // Add to year sum here
-                        if (!sumArray[j]) {
+                        console.log(sumArray);
+
+                        // Add to yearly sum here, push new entry if it doesn't exist yet
+                        if (typeof sumArray[j] === 'undefined') {
                             sumArray.push(parseFloat(cellData));
                         } else {
-                            // Prevents adding of NaN
-                            if (cellData) {
-                                sumArray[j] = sumArray[j] + parseFloat(cellData);
-                            }
+                            sumArray[j] = sumArray[j] + parseFloat(cellData);
                         }
 
                         // Special case for yearly measures, in monthly and quarterly measures the year is left out
@@ -284,7 +277,7 @@ selM.onclick = function () {
 
     // Change here to added year values
     for (l = 1; l < table.rows.length; l++) {
-        if (sumArray[l - 1] === 'NaN' || !sumArray[l - 1]) {
+        if (sumArray[l - 1] === 'NaN') {
             sumArray[l - 1] = 0;
         } else {
             if (sumCalc === 'sum') {
