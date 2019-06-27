@@ -80,6 +80,8 @@ selM.onclick = function () {
     let sumArray = [];
     let sumCalc;
 
+    let yearlyMeasure = false;
+
     // Save spots we filled for later rows
     let filling = [];
 
@@ -142,21 +144,35 @@ selM.onclick = function () {
                 if (measureData && !insertedHead && yearHead) {
                     labels = [];
 
-                    let cellMain = row.insertCell(0);
-                    cellMain.outerHTML = "<th>Eigenschaft der Kennzahl</th>";
-
                     // Split years of the measure into array
                     const yearArray = measureData.split(',');
 
-                    // Cycle through years and add them to the table and graph labels
-                    for (h = 0; h < yearArray.length - 1; h++) {
-                        // Need to filter out some elements
-                        if (yearArray[h].includes('Monat') && yearArray[h].split(':')[1].length === 4) {
-                            let cell = row.insertCell(-1);
-                            cell.outerHTML = "<th>" + yearArray[h].split(':')[1] + "</th>";
-                            labels.push(yearArray[h].split(':')[1]);
+                    let fillAlready = true;
+
+                    // Stupid work around to fix visual bug
+                    for (m = 0; m < yearArray.length; m += 2) {
+                        if (yearArray[m].split(':')[1].length > 4) {
+                            fillAlready = false;
                         }
                     }
+
+                    // Cycle through years and add them to the table and graph labels
+                    if (fillAlready) {
+
+                        let cellMain = row.insertCell(0);
+                        cellMain.outerHTML = "<th>Eigenschaft der Kennzahl</th>";
+
+                        for (h = 0; h < yearArray.length - 1; h++) {
+                            // Need to filter out some elements
+                            if (yearArray[h].includes('Monat') && yearArray[h].split(':')[1].length === 4) {
+                                let cell = row.insertCell(-1);
+                                cell.outerHTML = "<th>" + yearArray[h].split(':')[1] + "</th>";
+                                labels.push(yearArray[h].split(':')[1]);
+                            }
+                        }
+                    }
+
+                    yearlyMeasure = true;
                     insertedHead = true;
 
                     // Then quarterly measures
@@ -278,7 +294,9 @@ selM.onclick = function () {
                         }
 
                         // Don't add user summed values to the graph
-                        if (!(sumCalc === 'self' && k === j + 1)) {
+                        if (!(sumCalc === 'self' && k === j + 1) && !yearlyMeasure) {
+                            dataBuilder.push(cellData);
+                        } else if (yearlyMeasure) {
                             dataBuilder.push(cellData);
                         }
                     }
@@ -301,7 +319,7 @@ selM.onclick = function () {
                 table.rows[l].cells[1].innerHTML = Number((sumArray[l - 1] / dataGraph[0].length).toFixed(2));
             } // We don't have to do anything for self
         }
-        if ((filling.length >= 0) && (sumCalc === 'median')) {
+        if ((filling.length > 0) && (sumCalc === 'median')) {
             table.rows[l].cells[1].innerHTML = 'n.v.';
         }
     }
