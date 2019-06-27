@@ -243,10 +243,8 @@ selM.onclick = function () {
                         }
 
                         // Just add a zero if we don't have the data, comparison is weird, maybe easier
-                        if (cellData === 'n.v.') {
-                            cellData = 0;
-                        } else if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5)) {
-                            cellData = 0;
+                        if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5)) {
+                            cellData = 'n.v.';
                             k -= columnCount;
                         }
                         count++
@@ -255,7 +253,9 @@ selM.onclick = function () {
                         let cell = row.insertCell(-1);
                         cell.innerHTML = cellData;
 
-                        console.log(sumArray);
+                        if (cellData === 'n.v.') {
+                            cellData = 0;
+                        }
 
                         // Add to yearly sum here, push new entry if it doesn't exist yet
                         if (typeof sumArray[j] === 'undefined') {
@@ -279,7 +279,7 @@ selM.onclick = function () {
     for (l = 1; l < table.rows.length; l++) {
         if (sumArray[l - 1] === 'NaN') {
             sumArray[l - 1] = 0;
-        } else {
+        } else if (Number(sumArray[l - 1])) {
             if (sumCalc === 'sum') {
                 // Replace year value with calculated sum
                 table.rows[l].cells[1].innerHTML = Number(sumArray[l - 1].toFixed(2));
