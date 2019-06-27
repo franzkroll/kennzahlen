@@ -34,12 +34,18 @@ selM.onclick = function () {
 
     // Somehow we can get stuck in the next for loop, need this additional condition
     let isFound = false;
+    // Save sumCalc element because we need to color the years when the summation is done automatically
+    let sumCalc = '';
 
     // Loop through measure known to the system
     for (i = 0; i < measureArray.length && !isFound; i++) {
         const measure = measureArray[i].split(',').filter(Boolean);
 
         if (measure[0] === inputText) {
+            // Slice out the calc element
+            sumCalc = measure[measure.length - 1];
+            sumCalc = sumCalc.slice(sumCalc.indexOf('~') + 1, sumCalc.length);
+
             // Clear any existing fields
             selYear.innerHTML = "";
             fieldContainer.innerHTML = "";
@@ -48,11 +54,13 @@ selM.onclick = function () {
 
             // Checks if it is a yearly measure or not
             if (/^\d+$/.test(years[0])) {
+                years = years.sort();
+
                 for (k = 0; k < years.length; k++) {
                     let opt = document.createElement('option');
                     opt.appendChild(document.createTextNode(years[k]));
-                    // Color existing entries green
-                    if (entryListSplit[i].includes(',' + years[k])) {
+                    // Color existing entries green, also automatic summed elements
+                    if (entryListSplit[i].includes(',' + years[k]) || sumCalc !== 'self') {
                         opt.style.backgroundColor = '#90EE90';
                     }
                     opt.value = years[k];

@@ -125,6 +125,7 @@ selM.onclick = function () {
 
                     // Returns true if quarterly or monthly measure
                     if (/^\d+$/.test(years[0])) {
+                        years = years.sort();
 
                         // Put years into the select menu for tables
                         for (k = 0; k < years.length; k++) {

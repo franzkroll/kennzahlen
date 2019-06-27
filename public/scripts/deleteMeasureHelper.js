@@ -32,6 +32,8 @@ selM.onclick = function () {
             selY.innerHTML = "";
             // Check if its yearly measure or not
             if (/^\d+$/.test(years[0])) {
+                years = years.sort();
+
                 // Cycle through years of the measure and add them to the select
                 for (k = 0; k < years.length; k++) {
                     let opt = document.createElement('option');
