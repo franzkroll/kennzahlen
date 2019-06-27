@@ -186,6 +186,7 @@ selM.onclick = function () {
 
                     measure.splice(2, 1);
                     insertedHead = true;
+
                     // And finally monthly measures
                 } else {
                     labels = months.slice(2, months.length);
