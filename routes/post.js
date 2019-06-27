@@ -702,7 +702,7 @@ const deleteHelper = async (request, response) => {
     // Delete entry from the database
     SQL.deleteMeasureFromDB(tableName).then(function () {
         // Render page again with information text
-        response.render('pages/admin/showMeasures', {
+        response.render('pages/admin/deleteMeasure', {
             user: request.session.username,
             measures: measureList,
             text: 'Kennzahl erfolgreich gelöscht.'
@@ -710,7 +710,7 @@ const deleteHelper = async (request, response) => {
         // Or catch mysql error and show user corresponding error
     }).catch(function (error) {
         console.log(error);
-        response.render('pages/admin/showMeasures', {
+        response.render('pages/admin/deleteMeasure', {
             user: request.session.username,
             measures: measureList,
             text: 'Fehler beim Löschen der Kennzahl.'

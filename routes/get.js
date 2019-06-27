@@ -156,7 +156,7 @@ const showHelper = function (request, response) {
         IO.loadTextFile('tables').then(function (measureList) {
             SQL.checkRolePermissions('admin', request).then(function (result) {
                 if (result) {
-                    response.render('pages/admin/showMeasures', {
+                    response.render('pages/admin/deleteMeasure', {
                         user: request.session.username,
                         measures: measureList,
                         text: ''
@@ -387,7 +387,7 @@ const changeHelper = async (request, response) => {
                     descriptionList: descriptionList
                 });
             } else {
-                response.render('pages/errors/loginError');
+                response.render('pages/errors/adminError');
             }
         });
     } else {

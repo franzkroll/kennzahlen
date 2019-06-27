@@ -13,9 +13,9 @@
         <span style="display:block; height: 10px;"></span>
         <div class="misc-text">
             Bitte geben Sie alle Werte der ausgewählten Kennzahl ein und wählen Sie den Zeitraum. Eintragen schickt die
-            Daten ab. Nicht vorhandene Werte können später nachgetragen werden. Falls Zeiten bereits einen Eintrag
-            besitzen, ist diese Zeit grün hinterlegt im Auswahlmenü. Diese Werte werden bei erneutem Eintragen
-            überschrieben.
+            Daten ab. Nicht vorhandene Werte müssen durch -1 ersetzt werden und können später nachgetragen werden. Falls
+            Zeiten bereits einen Eintrag besitzen, ist diese Zeit grün hinterlegt im Auswahlmenü. Diese Werte werden bei
+            erneutem Eintragen überschrieben.
         </div>
         <span style="display:block; height: 10px;"></span>
         <div class="misc-text">
@@ -42,7 +42,7 @@
         </div>
     </main>
 
-    <!-- Load values for comfort functions, need them to automatically reselect last items. -->
+    <!-- Load variables. Last-variables are needed to automatically reselect last items. -->
     <script>
         const measureData = '<%- measureListData %>';
         const lastMeasure = '<%- measure %>';

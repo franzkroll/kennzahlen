@@ -215,7 +215,7 @@ selM.onclick = function () {
                     }
                 }
 
-                // TODO: fill corresponding cell, not just in order
+                // TODO: Fill corresponding cell, not just in order
 
                 // Precaution so we don't leave the array length later on
                 if (insertedHead && (j < measure.length - 3)) {
@@ -603,6 +603,8 @@ function getRandomColor() {
     }
     return color;
 }
+
+// TODO: Better report
 
 /**
  * Helper for placing objects in session storage.

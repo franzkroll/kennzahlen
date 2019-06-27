@@ -13,6 +13,13 @@ Also has a dropdown menu, in which a user can be selected and deleted from the d
     </header>
 
     <main>
+        <span style="display:block; height: 10px;"></span>
+
+        <div class="misc-text">
+            Hier sehen Sie eine Übersicht über die aktuell registrierten Benutzer. Im unteren Teil ist es möglich den
+            ausgewählten Benutzer zu Löschen.
+        </div>
+
         <!-- Prepare table here for data insertion. -->
         <div style="text-align: center">
             <table style="width:70%" id="userTable">
@@ -25,6 +32,7 @@ Also has a dropdown menu, in which a user can be selected and deleted from the d
                 </tr>
             </table>
         </div>
+
         <!-- Dropdown menu and button for deleting users. -->
         <div style="text-align:center">
             <form action="deleteUser" method="post">
