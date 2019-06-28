@@ -960,6 +960,7 @@ const deleteAttributeHelper = async (request, response) => {
             measureList: measureList,
             descriptionList: measureDescriptions
         });
+        copy
         // Catch possible errors
     }).catch(function (error) {
         console.log(error);
@@ -970,6 +971,84 @@ const deleteAttributeHelper = async (request, response) => {
             descriptionList: measureDescriptions
         });
     });
+}
+
+/**
+ * Adds a new year to an already existing measure.
+ * @param {Contains data about existing measure and the new year to add.} request 
+ * @param {Sends back new page with response message.} response 
+ */
+const addYearHelper = async (request, response) => {
+    // Load data lists from disk
+    let measureList, measureDescriptions;
+
+    try {
+        measureDescriptions = await IO.loadTextFile('desc');
+        measureList = await IO.loadTextFile('tables');
+    } catch (error) {
+        console.log(error);
+    }
+
+    let error = false;
+    let tableName = '';
+    let oldYear = '';
+
+    // Find existing measure in measure list
+    for (i = 0; i < measureList.length; i++) {
+        if (measureList[i][0] === request.body.measure) {
+            // Can't add year to yearly measures
+            if (measureList[i][1] === 'yearly') {
+                error = true;
+                response.render('pages/changeMeasure', {
+                    user: request.session.username,
+                    text: "Fehler, jährlich-erfasste Kennzahl!",
+                    measureList: measureList,
+                    descriptionList: measureDescriptions
+                });
+                // Check if year already exists
+            } else if (measureList[i][1].includes(request.body.year)) {
+                error = true;
+                response.render('pages/changeMeasure', {
+                    user: request.session.username,
+                    text: "Fehler, Jahr existiert bereits!",
+                    measureList: measureList,
+                    descriptionList: measureDescriptions
+                });
+            } else {
+                // Add year to table list
+                measureList[i][1] += ':' + request.body.year;
+
+                oldYear = measureList[i][1].split(':')[0];
+
+                // Need to get mysql tablename
+                tableName = measureList[i][measureList[i].length - 1];
+
+                // Write new array to txt file, sorting isn't needed here
+                IO.arrayToTxt('tables', measureList);
+            }
+        }
+    }
+
+    // If measure isn't a yearly measure and the year doesn't exist already we can try to create the table in database
+    if (!error) {
+        SQL.copyTableWithNewYear(tableName, oldYear, request.body.year).then(function () {
+            response.render('pages/changeMeasure', {
+                user: request.session.username,
+                text: "Jahr erfolgreich hinzugefügt.",
+                measureList: measureList,
+                descriptionList: measureDescriptions
+            });
+            // Catch errors while creating table
+        }).catch(function (error) {
+            console.log(error);
+            response.render('pages/changeMeasure', {
+                user: request.session.username,
+                text: "Fehler beim Hinzufügen des neuen Jahrs!",
+                measureList: measureList,
+                descriptionList: measureDescriptions
+            });
+        });
+    }
 }
 
 /**
@@ -1105,5 +1184,6 @@ module.exports = {
     addAttributeHelper: addAttributeHelper,
     changeAttributeHelper: changeAttributeHelper,
     deleteAttributeHelper: deleteAttributeHelper,
-    changePasswordHelper: changePasswordHelper
+    changePasswordHelper: changePasswordHelper,
+    addYearHelper: addYearHelper
 }

@@ -117,6 +117,9 @@ module.exports = function (app) {
     // Handles changing of existing attribute from existing measure
     app.post('/changeAttr', PostHelpers.changeAttributeHelper);
 
+    // Handles adding of a new year to a measure
+    app.post('/addYear', PostHelpers.addYearHelper);
+
     // Handles insertion of new password
     app.post('/changePassword', PostHelpers.changePasswordHelper);
 }

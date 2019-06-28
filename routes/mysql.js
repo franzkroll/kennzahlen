@@ -330,6 +330,32 @@ function deleteColumnFromDB(tableData, attributeData) {
 }
 
 /**
+ * Creates new table from existing table for new year.
+ * @param {Name of the table.} tableName 
+ * @param {Already existing year in the database.} oldYear 
+ * @param {New year to be created in database.} year 
+ */
+function copyTableWithNewYear(tableName, oldYear, year) {
+    return new Promise(function (resolve, reject) {
+        // Slice out unneeded information, create old name and new name
+        let index = tableName.indexOf('~');
+        tableName = tableName.slice(0, index) + '_' + oldYear;
+
+        const tableNameNew = tableName.slice(0, index) + '_' + year;
+
+        // Build query
+        query = 'CREATE TABLE ' + mysql.escapeId(tableNameNew) + ' LIKE ' + mysql.escapeId(tableName) + ';';
+
+        // Try to execute query
+        connectionData.query(query, function (err) {
+            if (err) return reject(err);
+        });
+
+        resolve();
+    });
+}
+
+/**
  * Changes password of specified user in the database. Also checks if password is safe.
  * @param {User that wants to change his password.} username 
  * @param {New password for specified user.} password 
@@ -407,5 +433,6 @@ module.exports = {
     addColumnToDB: addColumnToDB,
     deleteColumnFromDB: deleteColumnFromDB,
     changeTableColumn: changeTableColumn,
-    changeUserPassword: changeUserPassword
+    changeUserPassword: changeUserPassword,
+    copyTableWithNewYear: copyTableWithNewYear
 }
