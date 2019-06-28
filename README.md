@@ -159,7 +159,7 @@ franz.kroll@b-tu.de
 
 ## Lizenz
 
-Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php), Inhalt lizenziert unter CC BY NC SA 4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/).
+Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php).
 
 ## Disclaimer 
 
