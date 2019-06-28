@@ -91,7 +91,7 @@ Benutzer mit dem Mandat '*' haben Zugriff auf alle Mandate.
 ### Kennzahlendatenbank
 
 Die Kennzahlen werden jeweils in ihrer eigenen Tabelle gespeichert. Die Spalten speichern jeweils die Eigenschaften der Kennzahlen. Die Zeilen stellen verschiedene Zeitabstände dar (standardmäßig ein Monat). Die einzelnen Zellen speichern zugeordnet die Daten pro Zeitabschnitt und Kennzahleigenschaft. Pro Jahr und Kennzahl wird eine neue Tabelle erstellt. Möchten für ein neues Jahr neue Kennzahlendaten eingetragen werden, muss eine neue Tabelle erstellet werde.
-Erstellt ein Benutzer neue Kennzahlen, wird dynamische eine neue Tabelle angelegt. Der Ordner [files](files/) enthält Metainformationen der Kennzahlen. Diese dienen zur einfacheren Zuordnung der Kennzahlen zu den Tabllen. Ebenso muss zum Füllen der GUI-Elemente in vielen Fällen nicht auf die Datenbank zugegriffen werden.
+Erstellt ein Benutzer neue Kennzahlen, wird eine neue Tabelle in der Datenbank angelegt. Der Ordner [files](files/) enthält Metainformationen der Kennzahlen. Diese dienen zur einfacheren Zuordnung der Kennzahlen zu den Tabllen. Ebenso muss zum Füllen der GUI-Elemente in vielen Fällen nicht auf die Datenbank zugegriffen werden.
 Standardmäßig werden die MySQL Tabellen nach den Namen der Kennzahlen benannt.
 
 #### Beispiel
