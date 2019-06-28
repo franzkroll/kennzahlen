@@ -1,6 +1,6 @@
 # Kennzahlen-System der Leitstelle Lausitz
 
-System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, Chart.js.)
+System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, Chart.js und jspdf.)
 
 ## Features
 
@@ -113,7 +113,7 @@ Punkte in der ID werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
 
 ## Benutzung des Web-Interfaces
 
-Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte visualisieren und Daten zu bestehenden Kennzahlen eintragen.
+Nach der Anmeldung wird die Startseite der Anwendung angezeigt. Hier ist es möglich auf die verschiedenen Bereiche des Systems zuzugreifen. Es lassen sich neue Kennzahlen erstellen, bereits erstellte visualisieren, Kennzahlen bearbeiten und Daten zu bestehenden Kennzahlen eintragen. Weiterhin lassen sich ebenso die Beschreibungen der Kennzahlen anzeigen.
 
 Zum Abrufen der Kennzahlen steht jeweils eine Tabelle zur Verfügung,. Ebenso können sie über verschiedene Arten von Graphen angezeigt werden. Zur Eingabe von Kennzahlen muss die Kennzahl und der entsprechende Zeitraum ausgewählt werden - danach ist die Eingabe über die erzeugten Textfelder möglich. Ebenso lassen sich Kennzahlen bearbeiten und ein Report über mehrere Kennzahlen erstellen. Alle Funktionen sind genauer unter Hilfe im Menü der Website erklärt.
 
