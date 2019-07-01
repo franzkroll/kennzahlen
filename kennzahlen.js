@@ -24,7 +24,7 @@ const options = {
 // Automatic log file saving
 const transport = new(winston.transports.DailyRotateFile)({
 	filename: './logs/kennzahlen-%DATE%.log',
-	datePattern: 'DD-MM-YYYY-HH',
+	datePattern: 'DD-MM-YYYY',
 	zippedArchive: true,
 	maxSize: '20m',
 	maxFiles: '14d'
@@ -99,11 +99,9 @@ app.use(session({
 	saveUninitialized: false
 }));
 
-// Handles post Request for Login
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
-
 app.use(bodyParser.json());
 
 routes(app);

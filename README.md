@@ -66,7 +66,7 @@ pm2 ls
 pm2 monit
 ```
 
-Ein log über alle Ereignisse wird automatisch erstellt. Diese werden 14 Tage lang gespeichert.
+Ein log über alle Ereignisse wird automatisch im Ordner [logs](logs/) erstellt. Diese werden 14 Tage lang gespeichert. 
 Möchte man eigene SSL-Zertifikate verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
@@ -135,7 +135,7 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 ![](misc_files/screenshots/imgSubmit.png?raw=true "Eingabeformular")
 
-### Erstellungsformular
+### Erstellungsformular 
 
 ![](misc_files/screenshots/imgCreate.png?raw=true "Erstellungsformular")
 
