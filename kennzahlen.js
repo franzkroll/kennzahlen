@@ -23,7 +23,7 @@ const options = {
 
 // Automatic log file saving
 const transport = new(winston.transports.DailyRotateFile)({
-	filename: 'kennzahlen-%DATE%.log',
+	filename: './logs/kennzahlen-%DATE%.log',
 	datePattern: 'DD-MM-YYYY-HH',
 	zippedArchive: true,
 	maxSize: '20m',
