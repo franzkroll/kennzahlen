@@ -66,7 +66,8 @@ pm2 ls
 pm2 monit
 ```
 
-Ein log über alle Ereignisse wird in debug.log erstellt. Dieser wird beim Neustart wieder überschrieben. Möchte man eigene SSL-Zertifikate verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
+Ein log über alle Ereignisse wird automatisch erstellt. Diese werden 14 Tage lang gespeichert.
+Möchte man eigene SSL-Zertifikate verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
 
@@ -148,9 +149,11 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 ## Bisher noch fehlende Funktionen
 
+* Funktion zum Wechseln von Benutzerrollen
 * Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
 * Täglich erfasste Kennzahlen
 * Erstellung von Reports für ein gesamtes Mandat
+* Spätere Änderung der Summenberechnung
 
 ## Kontakt
 

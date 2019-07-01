@@ -11,12 +11,9 @@ const favicon = require('serve-favicon');
 const Ddos = require('ddos');
 const https = require('https');
 require('dotenv').config();
+const winston = require('winston');
+require('winston-daily-rotate-file');
 
-// Overwrite default console log and write into debug.log instead..
-const log_file = fs.createWriteStream(__dirname + '/debug.log', {
-	flags: 'w'
-});
-const log_stdout = process.stdout;
 
 // Load https certificates, just self signed ones, should be okay with internal use
 const options = {
@@ -24,12 +21,27 @@ const options = {
 	cert: fs.readFileSync('cert/server.cert')
 };
 
+// Automatic log file saving
+const transport = new(winston.transports.DailyRotateFile)({
+	filename: 'kennzahlen-%DATE%.log',
+	datePattern: 'DD-MM-YYYY-HH',
+	zippedArchive: true,
+	maxSize: '20m',
+	maxFiles: '14d'
+});
+
+const logger = winston.createLogger({
+	transports: [
+		transport
+	]
+});
+
 // Get current time and date, add them to every printed debug
 console.log = function (d) {
 	const time = new Date();
-	const dateString = (time.toDateString() + " / " + time.toTimeString()).split('(')
-	log_file.write(dateString[0] + ': ' + util.format(d) + '\n');
-	log_stdout.write(dateString[0] + ': ' + util.format(d) + '\n');
+	const dateString = (time.toDateString() + " / " + time.toTimeString()).split('(');
+	console.info(dateString[0] + ': ' + util.format(d));
+	logger.info(dateString[0] + ': ' + util.format(d) + '\n');
 };
 
 // Start server on Port 8080 if no other port is specified

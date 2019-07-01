@@ -1150,7 +1150,7 @@ function loadNameFromSQL(name, year) {
 }
 
 /**
- * Sorts a two-dimensional array by the value of the first entry in every array. Maybe needs more comments.
+ * Sorts a two-dimensional array by the value of the first entry in every array.
  * @param {Array to be sorted.} array 
  */
 const sort2DArray = function (array) {
