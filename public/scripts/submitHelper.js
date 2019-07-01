@@ -21,8 +21,6 @@ for (i = 0; i < measureArray.length - 1; i++) {
     selM.appendChild(opt);
 }
 
-// TODO: Color background only works in Chrome, not Firefox, but it should
-
 // Needed for converting month number to text
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['1. Quartal', '2. Quartal', '3. Quartal', '4. Quartal'];
