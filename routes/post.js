@@ -960,7 +960,6 @@ const deleteAttributeHelper = async (request, response) => {
             measureList: measureList,
             descriptionList: measureDescriptions
         });
-        copy
         // Catch possible errors
     }).catch(function (error) {
         console.log(error);
