@@ -150,9 +150,10 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 ## Bisher noch fehlende Funktionen
 
 * Funktion zum Wechseln von Benutzerrollen
-* Bei nicht jährlichen Kennzahlen Vergleich über mehrere Jahre
+* Wiederherstellung von vergessenen Passwörtern (eventuell über E-Mail)
+* Vergleich von Kennzahlen über mehrere Jahre
 * Täglich erfasste Kennzahlen
-* Erstellung von Reports für ein gesamtes Mandat
+* Automatische Erstellung von Reports für ein gesamtes Mandat
 * Spätere Änderung der Summenberechnung
 
 ## Kontakt
