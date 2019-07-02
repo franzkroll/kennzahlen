@@ -21,8 +21,7 @@ Page for changing already created measures.
             Wählen Sie hier eine bereits bestehende Kennzahl aus. Danach ist es Ihnen möglich eine neue Eigenschaft zu
             dieser hinzuzufügen, zu Löschen oder eine bestehende Eigenschaft zu ändern. Ebenso ist es möglich ein neues
             Jahr zu einer Kennzahl hinzuzufügen. Name der Eigenschaft und Beschreibung dürfen kein Komma enthalten.
-            Achtung: Das Löschen von Eigenschaft löscht die dazugehörigen Daten permanent! Alle Aktionen gelten jeweils
-            für alle Jahre der Kennzahl.
+            Achtung: Das Löschen von Eigenschaft löscht die dazugehörigen Daten permanent!
         </div>
 
         <span style="display:block; height: 10px;"></span>
@@ -56,6 +55,9 @@ Page for changing already created measures.
 
                 <!-- CHANGING OF ATTRIBUTE -->
 
+                <h3 style="font-weight: bold">Attribut ändern</h3>
+                <span style="display:block; height: 12px;"></span>
+
                 <!-- Measure attribute that the user wants to add gets entered here. -->
                 <input type="text" name="changeVar" id="varChange"
                     title="Geben Sie hier einen Namen für die Eigenschaft der Kennzahl ein.">
@@ -68,10 +70,12 @@ Page for changing already created measures.
                 <input formaction="changeAttr" type="submit"
                     title="Ändert die Eigenschaft zu der eingegeben Eigenschaft/Beschreibung." style="width:50%;"
                     value="Eigenschaft ändern">
-
-                <span style="display:block; height: 17px;"></span>
+                <span style="display:block; height: 12px;"></span>
 
                 <!-- ADDING OF ATTRIBUTE -->
+
+                <h3 style="font-weight: bold">Attribut hinzufügen</h3>
+                <span style="display:block; height: 12px;"></span>
 
                 <!-- Measure attribute that the user wants to add gets entered here. -->
                 <input type="text" name="var" placeholder="Neue Eigenschaft für Kennzahl"
@@ -87,8 +91,11 @@ Page for changing already created measures.
 
                 <span style="display:block; height: 12px;"></span>
 
+                <h3 style="font-weight: bold">Jahr hinzufügen</h3>
+                <span style="display:block; height: 12px;"></span>
+
                 <!-- Adding of a new year to a measure. -->
-                <input type="number" name="year" placeholder="Jahr"
+                <input type="number" name="year" placeholder="Neues Jahr"
                     title="Geben Sie das Jahr ein, das sie zur Kennzahl hinzufügen möchten.">
 
                 <span style="display:block; height: 12px;"></span>

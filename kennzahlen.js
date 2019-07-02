@@ -57,8 +57,8 @@ const app = express();
 
 // DDos prevention, shows 429 error after too many requests, maybe lower threshold a bit?
 const ddos = new Ddos({
-	burst: 5,
-	limit: 20,
+	burst: 7,
+	limit: 25,
 	testmode: false,
 	whitelist: []
 });
