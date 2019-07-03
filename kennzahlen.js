@@ -14,7 +14,6 @@ require('dotenv').config();
 const winston = require('winston');
 require('winston-daily-rotate-file');
 
-
 // Load https certificates, just self signed ones, should be okay with internal use
 const options = {
 	key: fs.readFileSync('cert/server.key'),
