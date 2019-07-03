@@ -778,6 +778,7 @@ const addAttributeHelper = async (request, response) => {
         }
     }
 
+    // Only enter attribute if it didn't exist before
     if (!alreadyExists) {
         // Make sure we have the correct entry and start adding values
         if (measureList[foundIndex][0] === request.body.measure) {
@@ -788,6 +789,7 @@ const addAttributeHelper = async (request, response) => {
                 const entry = measureDescriptions[foundIndex];
                 entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
 
+                // Add the new description
                 measureDescriptions[foundIndex].push(descData[j]);
                 // Insert it into measureList, but before the last element
                 measureList[foundIndex].splice(measureList[foundIndex].length - 1, 0, attributeData[j]);
@@ -816,6 +818,7 @@ const addAttributeHelper = async (request, response) => {
                 descriptionList: measureDescriptions
             });
         });
+        // Display error message otherwise
     } else {
         response.render('pages/changeMeasure', {
             user: request.session.username,
@@ -949,6 +952,7 @@ const deleteAttributeHelper = async (request, response) => {
                     }
                     tableNames.push(tableName + '_' + years[j]);
                 }
+                // Should never happen, but display error message if we can't the attribute
             } else {
                 console.log('ERROR: Couldn\'t find attribute.');
                 response.render('pages/changeMeasure', {
