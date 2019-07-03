@@ -952,7 +952,7 @@ const deleteAttributeHelper = async (request, response) => {
                     }
                     tableNames.push(tableName + '_' + years[j]);
                 }
-                // Should never happen, but display error message if we can't the attribute
+                // Should never happen, but display error message if we can't find the attribute
             } else {
                 console.log('ERROR: Couldn\'t find attribute.');
                 response.render('pages/changeMeasure', {
