@@ -740,6 +740,17 @@ const addAttributeHelper = async (request, response) => {
     let attributeData = [];
     let foundIndex = -1;
     let tableName;
+    let alreadyExists = false;
+
+    // Get stuff from request and save in corresponding arrays
+    for (let key in request.body) {
+        // Save found stuff for later, for now only one value in each, but could be easily converted to multiple values
+        if (key.includes('var')) {
+            attributeData.push(request.body[key]);
+        } else if (key.includes('desc')) {
+            descData.push(request.body[key] + ';');
+        }
+    }
 
     // Cycle through measures known to the system and look for entered measure
     for (i = 0; i < measureList.length; i++) {
@@ -748,6 +759,12 @@ const addAttributeHelper = async (request, response) => {
             tableName = measureList[i][measureList[i].length - 1].slice(0, measureList[i][measureList[i].length - 1].length - 1) + '_';
             // Store index here for later, should be the same for all
             foundIndex = i;
+
+            for (j = 0; j < attributeData.length; j++) {
+                if (measureList[i].includes(attributeData[j])) {
+                    alreadyExists = true;
+                }
+            }
 
             // Split years of the measure
             const years = measureList[i][1].split(':');
@@ -761,54 +778,52 @@ const addAttributeHelper = async (request, response) => {
         }
     }
 
-    // Get stuff from request and save in corresponding arrays
-    for (let key in request.body) {
-        // Save found stuff for later, for now only one value in each, but could be easily converted to multiple values
-        if (key.includes('var')) {
-            attributeData.push(request.body[key]);
-        } else if (key.includes('desc')) {
-            descData.push(request.body[key] + ';');
+    if (!alreadyExists) {
+        // Make sure we have the correct entry and start adding values
+        if (measureList[foundIndex][0] === request.body.measure) {
+            // Add descData to correct place in description array
+            // Add new attributes to correct place in tables array
+            for (j = 0; j < descData.length; j++) {
+                // Remove the last semicolon so we don't get confused later
+                const entry = measureDescriptions[foundIndex];
+                entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+
+                measureDescriptions[foundIndex].push(descData[j]);
+                // Insert it into measureList, but before the last element
+                measureList[foundIndex].splice(measureList[foundIndex].length - 1, 0, attributeData[j]);
+            }
         }
-    }
+        // Write new arrays to txt file, sorting isn't necessary here
+        IO.arrayToTxt('tables', measureList);
+        IO.arrayToTxt('desc', measureDescriptions);
 
-    // Make sure we have the correct entry and start adding values
-    if (measureList[foundIndex][0] === request.body.measure) {
-        // Add descData to correct place in description array
-        // Add new attributes to correct place in tables array
-        for (j = 0; j < descData.length; j++) {
-            // Remove the last semicolon so we don't get confused later
-            const entry = measureDescriptions[foundIndex];
-            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
-
-            measureDescriptions[foundIndex].push(descData[j]);
-            // Insert it into measureList, but before the last element
-            measureList[foundIndex].splice(measureList[foundIndex].length - 1, 0, attributeData[j]);
-        }
-    }
-
-    // Write new arrays to txt file, sorting isn't necessary here
-    IO.arrayToTxt('tables', measureList);
-    IO.arrayToTxt('desc', measureDescriptions);
-
-    // Delete entry from the database and render page again with status information
-    SQL.addColumnToDB(tableNames, attributeData).then(function () {
-        // Render page again with information text
+        // Delete entry from the database and render page again with status information
+        SQL.addColumnToDB(tableNames, attributeData).then(function () {
+            // Render page again with information text
+            response.render('pages/changeMeasure', {
+                user: request.session.username,
+                text: "Neue Attribute erfolgreich hinzugefügt.",
+                measureList: measureList,
+                descriptionList: measureDescriptions
+            });
+            // Or catch mysql error and show user corresponding error
+        }).catch(function (error) {
+            console.log(error);
+            response.render('pages/changeMeasure', {
+                user: request.session.username,
+                text: "Fehler beim Hinzufügen des neuen Attributs!",
+                measureList: measureList,
+                descriptionList: measureDescriptions
+            });
+        });
+    } else {
         response.render('pages/changeMeasure', {
             user: request.session.username,
-            text: "Neue Attribute erfolgreich hinzugefügt.",
+            text: "Fehler beim Hinzufügen des neuen Attributs, Attribut existiert bereits!",
             measureList: measureList,
             descriptionList: measureDescriptions
         });
-        // Or catch mysql error and show user corresponding error
-    }).catch(function (error) {
-        console.log(error);
-        response.render('pages/changeMeasure', {
-            user: request.session.username,
-            text: "Fehler beim Hinzufügen des neuen Attributs!",
-            measureList: measureList,
-            descriptionList: measureDescriptions
-        });
-    });
+    }
 }
 
 /**
