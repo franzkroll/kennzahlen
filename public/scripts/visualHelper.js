@@ -230,7 +230,7 @@ selM.onclick = function () {
                 }
 
                 // Append data to table if there is any to add and if we got the right data already
-                if ((inputText === (tableName2.replace(/[0-9]/g, '').replaceAll('_', ' ')))) {
+                if ((inputText === (tableName2.replaceAll('_', ' ')))) {
                     // Fill first column of the table with the attributes of the measure
                     let cell = row.insertCell(-1);
                     cell.innerHTML = measure[j + 2];

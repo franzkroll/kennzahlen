@@ -1072,7 +1072,7 @@ const addYearHelper = async (request, response) => {
 /**
  * Takes entered user data for new password, checks if old password is correct. If both new passwords are the same and fulfill 
  * password criteria call sql function for changing password. Maybe there is an easier way to code the error message / page renders.
- * TODO: https://codereview.stackexchange.com/questions/223409/better-code-for-error-handling-in-nodejs-and-express
+ * TODO: https://codereview.stackexchange.com/questions/223409/better-code-for-error-handling-in-nodejs-and-express 
  */
 const changePasswordHelper = function (request, response) {
     // Check if old password is correct
