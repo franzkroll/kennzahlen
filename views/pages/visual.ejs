@@ -110,9 +110,14 @@ data-html2canvas-ignore is used to only add the table and canvas to the pdf.
         loadedTableName = loadedTableName.trim();
         // Set current measure as title
         const nameField = document.getElementById('name');
-        nameField.innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replace('_y',
-            '').replaceAll('_', ' ');
+        console.log(loadedTableName);
+        if (loadedTableName.includes('$')) {
+            nameField.innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replaceAll('_', ' ');
+        } else {
+            nameField.innerHTML = loadedTableName.slice(2, loadedTableName.length - 5).replaceAll('_', ' ');
+        }
         const lastYear = '<%- lastYear %>';
+
         // Add year to non yearly measures in title
         if (lastYear !== 'yearly' && lastYear !== '') {
             nameField.innerHTML += ', ' + lastYear;

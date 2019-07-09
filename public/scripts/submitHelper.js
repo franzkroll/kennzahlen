@@ -44,8 +44,6 @@ selM.onclick = function () {
             sumCalc = measure[measure.length - 1];
             sumCalc = sumCalc.slice(sumCalc.indexOf('~') + 1, sumCalc.length);
 
-            console.log(sumCalc);
-
             // Clear any existing fields
             selYear.innerHTML = "";
             fieldContainer.innerHTML = "";
