@@ -44,6 +44,8 @@ selM.onclick = function () {
             sumCalc = measure[measure.length - 1];
             sumCalc = sumCalc.slice(sumCalc.indexOf('~') + 1, sumCalc.length);
 
+            console.log(sumCalc);
+
             // Clear any existing fields
             selYear.innerHTML = "";
             fieldContainer.innerHTML = "";
@@ -62,7 +64,10 @@ selM.onclick = function () {
                         opt.style.backgroundColor = '#90EE90';
                     }
                     opt.value = years[k];
-                    selYear.appendChild(opt);
+
+                    if (sumCalc === 'self') {
+                        selYear.appendChild(opt);
+                    }
 
                     // Add quarters to dropdown menu
                     if (measure[2] === 'quarterly') {
