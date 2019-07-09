@@ -454,6 +454,15 @@ const createMeasureHelper = async (request, response) => {
         });
     }
 
+    // Check if user enters tablename as attribute name again
+    for (let key in request.body) {
+        if (key.includes('var')) {
+            if (request.body[key] === request.body.name) {
+                error = true;
+            }
+        }
+    }
+
     // Don't need all this if something went wrong before
     if (!error) {
         // Check if table already exists, just add year if it doesn't exist, use same descriptions if it exists
@@ -532,7 +541,7 @@ const createMeasureHelper = async (request, response) => {
         for (let key in request.body) {
             if (key.includes('var')) {
                 table.push(request.body[key]);
-                sql += '`' + request.body[key].replaceAll(' ', '_') + '` FLOAT,'
+                sql += '`' + request.body[key].replaceAll(' ', '_') + '` FLOAT,';
             } else if (key.includes('desc')) {
                 desc.push(request.body[key]);
             }
@@ -582,12 +591,19 @@ const createMeasureHelper = async (request, response) => {
         }).catch(function (error) {
             console.log(error);
             response.render('pages/createMeasure', {
-                text: "Fehler bei der Erstellung der Kennzahl! / Kennzahl existiert bereits!",
+                text: "Fehler bei der Erstellung der Kennzahl!",
                 user: request.session.username,
                 roleList: roleList,
                 mandateList: mandateList
             });
         })
+    } else {
+        response.render('pages/createMeasure', {
+            text: "Fehler bei der Erstellung der Kennzahl!",
+            user: request.session.username,
+            roleList: roleList,
+            mandateList: mandateList
+        });
     }
 }
 

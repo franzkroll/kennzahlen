@@ -269,7 +269,7 @@ selM.onclick = function () {
                             cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
                         }
 
-                        // Just add a zero if we don't have the data, comparison is weird, maybe easier
+                        // Just add a zero if we don't have the data, comparison is weird, maybe there is an easier way
                         if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5) || (filling.includes(count))) {
                             cellData = 'n.v.';
                             filling.push(count);

@@ -110,7 +110,7 @@ data-html2canvas-ignore is used to only add the table and canvas to the pdf.
         loadedTableName = loadedTableName.trim();
         // Set current measure as title
         const nameField = document.getElementById('name');
-        console.log(loadedTableName);
+
         if (loadedTableName.includes('$')) {
             nameField.innerHTML = loadedTableName.slice(4, loadedTableName.length - 5).replaceAll('_', ' ');
         } else {
