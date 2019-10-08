@@ -66,8 +66,7 @@ forever list
 forever logs
 ```
 
-Ein log über alle Ereignisse wird ebenso automatisch im Ordner [logs](logs/) erstellt. Diese werden 14 Tage lang gespeichert. 
-Möchte man eigene SSL-Zertifikate verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
+Ein log über alle Ereignisse wird ebenso automatisch im Ordner [logs](logs/) erstellt. Möchte man ein eigenes SSL-Zertifikat  verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
 
