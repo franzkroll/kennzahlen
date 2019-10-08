@@ -50,23 +50,23 @@ IP:192.168.2.1 node kennzahlen.js
 ```
 (Beispiel mit IP 192.168.2.1)
 
-Zum Start wird aber die Benutzung von pm2 (https://www.npmjs.com/package/pm2) empfohlen. Diese sorgt für einen automatischen Neustart beim Absturz der App. Installation, Starten, Stoppen bzw. Neustarten erfolgt dann mit folgenden befehlen:
+Zum Start wird aber die Benutzung von forever (https://www.npmjs.com/package/forever) empfohlen. Diese sorgt für einen automatischen Neustart beim Absturz der App. Installation, Starten, Stoppen bzw. Neustarten erfolgt dann mit folgenden befehlen:
 
 ```sh
-npm install pm2
-pm2 start kennzahlen
-pm2 stop kennzahlen
-pm2 restart kennzahlen
+npm install forever
+forever start kennzahlen
+forever stop kennzahlen
+forever restart kennzahlen
 ```
 
-Folgende Befehle geben Statusinformation über die Anwendung:
+Eventuell müssen Befehe für forever mit sudo ausgeführt werden. Folgender Befehl gibt Statusinformation über die Anwendung:
 
 ```sh
-pm2 ls
-pm2 monit
+forever list
+forever logs
 ```
 
-Ein log über alle Ereignisse wird automatisch im Ordner [logs](logs/) erstellt. Diese werden 14 Tage lang gespeichert. 
+Ein log über alle Ereignisse wird ebenso automatisch im Ordner [logs](logs/) erstellt. Diese werden 14 Tage lang gespeichert. 
 Möchte man eigene SSL-Zertifikate verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
