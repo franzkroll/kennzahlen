@@ -17,22 +17,22 @@
         <!-- Show different selection options for admin functions. -->
         <div style="text-align:center;">
             <div>
-                <a href="/status"><button style="width:300px"
+                <a href="<%= process.env.BASEURL %>/status"><button style="width:300px"
                         title="Zeigt eine Statistikübersicht des Servers der letzten 15 Minuten."
                         class="button">Serverstatistiken</button></a>
             </div>
             <div>
-                <a href="/createUser"><button style="width:300px"
+                <a href="<%= process.env.BASEURL %>/createUser"><button style="width:300px"
                         title="Öffnet Menü zur Erstellung eines neuen Benutzers." class="button">Neuen Benutzer
                         erstellen</button></a>
             </div>
             <div>
-                <a href="/showUser"><button style="width:300px"
+                <a href="<%= process.env.BASEURL %>/showUser"><button style="width:300px"
                         title="Zeigt eine Übersicht über alle registrierten Benutzer und gibt die Möglichkeit Benutzer zu Löschen."
                         class="button">Aktuell registrierte Benutzer anzeigen</button></a>
             </div>
             <div>
-                <a href="/showMeasures"><button style="width:300px" class="button">Kennzahlen löschen</button></a>
+                <a href="<%= process.env.BASEURL %>/showMeasures"><button style="width:300px" class="button">Kennzahlen löschen</button></a>
             </div>
         </div>
     </main>

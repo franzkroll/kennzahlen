@@ -24,7 +24,7 @@
         <span style="display:block; height: 17px;"></span>
         <!-- Form for entering new user data, submit sends request to server. -->
         <div class="login-formS">
-            <form action="createUser" method="POST">
+            <form action="<%= process.env.BASEURL %>createUser" method="POST">
                 <input type="text" name="username" placeholder="Benutzername"
                     title="Geben Sie hier den Benutzernamen ein, Benutzernamen dürfen nur einmal im System vorkommen."
                     required>
