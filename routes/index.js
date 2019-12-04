@@ -24,6 +24,14 @@ module.exports = function (app) {
      * GET ROUTES
      * 
      */
+    // redirect to baseurl or render login page
+    app.get('/', function (request, response) {
+		if (base) {
+			response.redirect(base+'/')
+		} else {
+			response.render('pages/login');
+		};
+    });
 
     // Render login page when user first accesses the application
     app.get(base+'/', function (request, response) {
