@@ -7,5 +7,6 @@ node_modules/
 *.md
 *.pdf
 *.json
+*.log.gz
 !package-lock.json
 !package.json
