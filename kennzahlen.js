@@ -49,9 +49,9 @@ const port = process.env.PORT || process.env.SERVER_PORT;
 const ip = process.env.IP || process.env.SERVER_IP;
 
 // link routes 
-const routes = require('./routes/index.js')
+const routes = require('./routes/index.js');
 
-// Application uses express for serving pages
+// Application uses express for rendering and displaying pages
 const app = express();
 
 // DDos prevention, shows 429 error after too many requests, maybe lower threshold a bit?
