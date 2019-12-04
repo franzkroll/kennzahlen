@@ -107,7 +107,7 @@ routes(app);
 
 // Start server on port that was previously defined
 const server = https.createServer(options, app).listen(port, ip, function () {
-	console.log('Server listening on ' + ip + ':' + port + ' …');
+	console.log('Server listening on https://' + ip + ':' + port + ' …');
 });
 
 // Logs Current Connections
