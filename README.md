@@ -27,6 +27,8 @@ Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu 
 SERVER_IP='127.0.0.1'
 SERVER_PORT=8080
 
+BASEURL='/kpi'
+
 DB_HOST='localhost'
 DB_LOGIN_USER='user'
 DB_LOGIN_PASSWORD='passwort'
