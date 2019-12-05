@@ -82,7 +82,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(compression());
 
 // Path for linking stylesheet and script helpers for pages
-app.use(express.static(path.resolve('./public')));
+app.use(process.env.BASEURL ,express.static(path.resolve('./public')));
 
 // Logout user after 30 minutes
 const logoutMinutes = 30;
