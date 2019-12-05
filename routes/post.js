@@ -6,7 +6,7 @@
  */
 
 // Import needed functions
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
