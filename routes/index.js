@@ -4,12 +4,13 @@
  */
 
 module.exports = function (app) {
-    // Import
-    const statusMonitor = require('express-status-monitor')();
-	require('dotenv').config();
+    require('dotenv').config();
 
-	// Set baseurl
-	const base = process.env.BASEURL;
+    // Set baseurl
+    const base = process.env.BASEURL;
+
+    // Import statusMonitor
+    const statusMonitor = require('express-status-monitor')({ path: base+'/status', socketPath: base+'/socket.io' });
 
     // Load in helper functions, which contain the functions for the routes
     const PostHelpers = require('./post.js');
