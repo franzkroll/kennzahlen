@@ -19,7 +19,7 @@
             <h3 style="font-weight: bold">Kennzahl löschen</h3>
             <span style="display:block; height: 12px;"></span>
 
-            <form action="deleteMeasure" method="post">
+            <form action="<%= process.env.BASEURL %>deleteMeasure" method="post">
                 <div>
                     <select name="measureSelect" id="measureSelect"
                         title="Wählen Sie hier die zu Löschende Kennzahl aus." style="width:40%; margin-right: 30px"
@@ -28,7 +28,7 @@
                         title="Wählen Sie hier das zu  Löschende Jahr der Kennzahl aus."
                         style="width:30%; margin-right: 30px" class="dropdown">ID</select>
                 </div>
-                <a href="/showMeasures"><button type="submit"
+                <a href="<%= process.env.BASEURL %>/showMeasures"><button type="submit"
                         onclick="return confirm('Sind sie sicher, dass sie die Kennzahl löschen möchten? Dies löscht alle Daten permanent!');"
                         style="width:20%;background-color: #eb2d53" class="button">Löschen</button></a>
             </form>
@@ -45,6 +45,6 @@
     const measures = '<%- measures %>';
 </script>
 
-<script src="/scripts/deleteMeasureHelper.js"></script>
+<script src="<%= process.env.BASEURL %>/scripts/deleteMeasureHelper.js"></script>
 
 </html>

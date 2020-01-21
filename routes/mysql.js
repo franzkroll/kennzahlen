@@ -6,7 +6,7 @@
 
 // Imports 
 const mysql = require('mysql');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const passwordValidator = require('password-validator');
 const IO = require('./io.js');
 require('dotenv').config();

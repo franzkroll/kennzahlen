@@ -12,10 +12,12 @@ Login page/Landing page of the website.
 	<!-- Create basic login form. -->
 	<main style="text-align: center">
 		<div class="login-form">
-			<h1>Kennzahlen - Login</h1>
-			<form action="/auth" method="POST">
-				<input type="text" name="username" placeholder="Username" required>
-				<input type="password" name="password" placeholder="Password" required>
+			<h1>Kennzahlensystem</h1>
+			<h2>Anmeldung</h2>
+			<br>
+			<form action="<%= process.env.BASEURL %>/auth" method="POST">
+				<input type="text" name="username" placeholder="Benutzername" required>
+				<input type="password" name="password" placeholder="Passwort" required>
 				<span style="display:block; height: 10px;"></span>
 				<input type="submit" value="Login">
 			</form>
@@ -24,6 +26,11 @@ Login page/Landing page of the website.
 		<div>
 			Wenden Sie sich bitte an den Administrator, falls Sie einen Account benötigen sollten.<br>
 			Nach einer Inaktivität von einer halben Stunde erfolgt eine automatische Abmeldung.
+		</div>
+		<br>
+		<div>
+			Weitere Informationen zu dieser Software finden Sie unter 
+			<a href="https://github.com/franzkroll/kennzahlen">https://github.com/franzkroll/kennzahlen</a>
 		</div>
 	</main>
 

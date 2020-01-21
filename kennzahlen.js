@@ -49,9 +49,9 @@ const port = process.env.PORT || process.env.SERVER_PORT;
 const ip = process.env.IP || process.env.SERVER_IP;
 
 // link routes 
-const routes = require('./routes/index.js')
+const routes = require('./routes/index.js');
 
-// Application uses express for serving pages
+// Application uses express for rendering and displaying pages
 const app = express();
 
 // DDos prevention, shows 429 error after too many requests, maybe lower threshold a bit?
@@ -82,7 +82,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(compression());
 
 // Path for linking stylesheet and script helpers for pages
-app.use(express.static(path.resolve('./public')));
+app.use(process.env.BASEURL ,express.static(path.resolve('./public')));
 
 // Logout user after 30 minutes
 const logoutMinutes = 30;
@@ -107,7 +107,7 @@ routes(app);
 
 // Start server on port that was previously defined
 const server = https.createServer(options, app).listen(port, ip, function () {
-	console.log('Server listening on ' + ip + ':' + port + ' …');
+	console.log('Server listening on https://' + ip + ':' + port + ' …');
 });
 
 // Logs Current Connections
