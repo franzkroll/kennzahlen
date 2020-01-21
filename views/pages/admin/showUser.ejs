@@ -38,7 +38,7 @@ Also has a dropdown menu, in which a user can be selected and deleted from the d
 
         <!-- Dropdown menu and button for deleting users. -->
         <div style="text-align:center">
-            <form action="<%= process.env.BASEURL %>deleteUser" method="post">
+            <form action="<%= process.env.BASEURL %>/deleteUser" method="post">
                 <select name="id" id="userDelete" title="Wählen Sie hier den zu Löschenden Benutzer aus."
                     style="width:10%; margin-right: 30px" class="dropdown">ID</select>
                 <a href="<%= process.env.BASEURL %>/register"><button type="submit" title="Löscht den ausgewählten Benutzer."
