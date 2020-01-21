@@ -61,7 +61,7 @@ forever stop kennzahlen
 forever restart kennzahlen
 ```
 
-Eventuell müssen Befehe für forever mit sudo ausgeführt werden. Folgender Befehl gibt Statusinformation über die Anwendung:
+Eventuell müssen Befehle für forever mit sudo ausgeführt werden. Folgender Befehl gibt Statusinformation über die Anwendung:
 
 ```sh
 forever list
