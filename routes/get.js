@@ -7,6 +7,8 @@
 // Imports..
 const IO = require('./io.js');
 const SQL = require('./mysql.js');
+// Set baseurl
+const base = process.env.BASEURL;
 
 /**
  * Display index page after logging in.
@@ -97,7 +99,7 @@ const logoutHelper = function (request, response) {
             if (err) {
                 console.log(error);
             } else {
-                return response.redirect('/');
+                return response.redirect(base+'/');
             }
         });
     }

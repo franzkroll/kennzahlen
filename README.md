@@ -27,6 +27,8 @@ Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu 
 SERVER_IP='127.0.0.1'
 SERVER_PORT=8080
 
+BASEURL='/kpi'
+
 DB_HOST='localhost'
 DB_LOGIN_USER='user'
 DB_LOGIN_PASSWORD='passwort'
@@ -59,7 +61,7 @@ forever stop kennzahlen
 forever restart kennzahlen
 ```
 
-Eventuell müssen Befehe für forever mit sudo ausgeführt werden. Folgender Befehl gibt Statusinformation über die Anwendung:
+Eventuell müssen Befehle für forever mit sudo ausgeführt werden. Folgender Befehl gibt Statusinformation über die Anwendung:
 
 ```sh
 forever list

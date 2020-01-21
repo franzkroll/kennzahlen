@@ -169,6 +169,7 @@ li a:hover:not(.active) {
     background-image: url("https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png");
     background-repeat: no-repeat;
     background-position: right center;
+    background-color: #e8d8d8;
 }
 
 .login-formS {
