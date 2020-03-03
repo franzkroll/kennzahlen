@@ -39,10 +39,12 @@ selM.onclick = function () {
     for (i = 0; i < measureArray.length && !isFound; i++) {
         const measure = measureArray[i].split(',').filter(Boolean);
 
-        if (measure[0] === inputText) {
+		if (measure[0] === inputText) {
             // Slice out the calc element
             sumCalc = measure[measure.length - 1];
             sumCalc = sumCalc.slice(sumCalc.indexOf('~') + 1, sumCalc.length);
+
+			isFound = true;
 
             // Clear any existing fields
             selYear.innerHTML = "";
