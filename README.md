@@ -19,7 +19,7 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [.env](/.env) angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden, müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahleninformationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: admin), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) 
+Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [.env](/.env) angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden, müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahleninformationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) 
 
 ### Datenfelder in Konfigurationsdatei
 
