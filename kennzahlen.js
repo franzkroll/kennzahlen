@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const noCache = require('nocache');
 const path = require('path');
 const fs = require('fs');
 const compression = require('compression');
@@ -70,10 +71,10 @@ app.set('view engine', 'ejs');
 
 // Prevention against multiple attacks
 app.use(helmet());
-app.use(helmet.noCache());
 app.use(helmet.referrerPolicy({
 	policy: 'same-origin'
 }));
+app.use(noCache());
 
 // Set icon for tabs etc.
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
