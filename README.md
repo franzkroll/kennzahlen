@@ -84,7 +84,7 @@ Möchte man Benutzer neu erstellen, muss man auf ein sicheres Passwort achten. E
 
 | id | username | passwort | email         | role  | mandate |
 | -- | -------- | -------- | ------------- | ----- | ------- |
-| 1  | admin    | admin    | test@test.com | admin | cottbus |
+| 1  | admin    | Admin123!| test@test.com | admin | cottbus |
 
 
 Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche, 'user' und allen weiteren Rollen fehlt der Zugriff auf den Adminbereich. Ein Benutzer mit der Rolle 'user' darf ebenso Kennzahlen erstellen und bearbeiten. Weitere Rollen können ebenso verwendet werden um den Zugriff auf die verschiedenen Kennzahlen festzulegen. Diese müssen bei der Erstellung der Kennzahl spezifiziert werden. IDs werden automatisch fortlaufend vergeben und müssen nicht bei der Erstellung festgelegt werden.
