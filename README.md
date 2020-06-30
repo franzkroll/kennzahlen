@@ -2,6 +2,12 @@
 
 System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, Chart.js und jspdf.)
 
+ACHTUNG: DEVELOPMENT BRANCH, ENTHÄLT HÄUFIGE ÄNDERUNGEN
+
+## NEUE FEATURES GEGENÜBER AKTUELLER VERSION
+
+* Protokollierung gescheiterter Login-Versuche unter [logs](logs/)
+
 ## Features
 
 Verschiedene Nutzer haben die Möglichkeit, Kennzahlen einzusehen, einzutragen, beziehungsweise auch neue Kennzahlen anzulegen. Es ist möglich, Nutzern Zugriff auf verschiedene Kennzahlen und Leitstellen zuzuweisen. Ein Admin hat die Möglichkeit Serverstatistiken einzusehen, sowie Nutzer und Kennzahlen zu erstellen und zu verwalten. (Das über die Website erreichbare Hilfe-Menü gibt genauere Auskunft zu allen Funktionen.)
