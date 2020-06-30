@@ -389,7 +389,7 @@ function changeUserPassword(username, password) {
 
 /**
  * Check if entered password is a safe password, used when a new user is created.
- * @param {PasswLegen Sie hier einen Namen für die Kennzahl fest, die Kennzahl enthält mehrere Eigenschaften.ord to be checked.} password 
+ * @param password Password which is to be checked.
  */
 function pwCheck(password) {
     const schema = new passwordValidator();
