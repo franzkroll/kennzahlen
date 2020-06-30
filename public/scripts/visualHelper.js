@@ -20,6 +20,7 @@ const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
 const button = document.getElementById('button');
 
+
 // Used for creating table headers with months and quarters
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
@@ -127,6 +128,8 @@ selM.onclick = function () {
                         opt.appendChild(document.createTextNode(years[k]));
                         selYear.appendChild(opt);
                     }
+
+              
                 } else if (years[0] === 'yearly') {
                     yearHead = true;
                     // Add first row of years here
@@ -134,6 +137,15 @@ selM.onclick = function () {
                     opt.value = years[0];
                     opt.appendChild(document.createTextNode('jährliche Erfassung'));
                     selYear.appendChild(opt);
+                }
+
+                // Automatic reselection of the year, that was last selected
+                for (let i = 0; i < selYear.options.length; i++) {
+                    if (selYear.options[i].value === lastYear) {
+                        selYear.selectedIndex = i;
+                                        
+                        break;
+                    }
                 }
 
                 // Add first table row
@@ -631,6 +643,7 @@ Storage.prototype.getObject = function (key) {
 }
 
 // Automatically reselect last item that was entered, this in turn loads the table already
+// TODO: Something is wrong with the for-loop
 for (let i, j = 0; i = selM.options[j]; j++) {
     if (i.value === lastSelected.slice(0, lastSelected.length - 1)) {
         selM.selectedIndex = j;
@@ -643,6 +656,10 @@ for (let i, j = 0; i = selM.options[j]; j++) {
         break;
     }
 }
+
+console.log(lastYear);
+
+
 
 /**
  * Helper method for storing objects in session storage.
