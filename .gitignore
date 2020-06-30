@@ -12,4 +12,4 @@ sql_backup/
 *.log.gz
 !package-lock.json
 !package.json
-.env
+.*

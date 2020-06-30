@@ -19,7 +19,8 @@ const connectionData = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_MEASURE_USER,
     password: process.env.DB_MEASURE_PASSWORD,
-    database: process.env.DB_MEASURE_DATABASE
+    database: process.env.DB_MEASURE_DATABASE,
+    port: process.env.MYSQL_PORT
 });
 
 // Create SQL-Connection for accessing user data
@@ -27,7 +28,8 @@ const connectionLogin = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_LOGIN_USER,
     password: process.env.DB_LOGIN_PASSWORD,
-    database: process.env.DB_LOGIN_DATABASE
+    database: process.env.DB_LOGIN_DATABASE,
+    port: process.env.MYSQL_PORT
 });
 
 /**

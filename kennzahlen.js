@@ -20,8 +20,8 @@ const options = {
 	cert: fs.readFileSync('cert/server.cert')
 };
 
-// Automatic log file saving
-const transport = new(winston.transports.DailyRotateFile)({
+// Automatic log file saving with winston, logs are saved for 14 days
+const defaultLog = new(winston.transports.DailyRotateFile)({
 	filename: './logs/kennzahlen-%DATE%.log',
 	datePattern: 'DD-MM-YYYY',
 	zippedArchive: true,
@@ -31,7 +31,7 @@ const transport = new(winston.transports.DailyRotateFile)({
 
 const logger = winston.createLogger({
 	transports: [
-		transport
+		defaultLog
 	]
 });
 

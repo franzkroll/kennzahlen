@@ -10,6 +10,25 @@ const bcrypt = require('bcryptjs');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
+const winston = require('winston');
+require('winston-daily-rotate-file');
+
+
+// Automatic log file saving for failed login attempts
+const failedLoginAttempts = new(winston.transports.DailyRotateFile)({
+	filename: './logs/login-%DATE%.log',
+	datePattern: 'DD-MM-YYYY',
+	zippedArchive: true,
+	maxSize: '20m',
+	maxFiles: '30d'
+});
+
+const logger = winston.createLogger({
+	transports: [
+		failedLoginAttempts
+	]
+});
+
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -37,15 +56,22 @@ const authHelper = function (request, response) {
                 });
                 console.log("User '" + request.session.username + "' logged in.");
             } else {
+                // TODO: log failed login attempt here, write failed login attempt in separate log
+                logger.info("Failed login attempt by user " + username + "! Username is known by the system." );
+
                 response.render('pages/errors/loginFailed');
             }
         });
         // Catch sql errors
     }).catch(function (error) {
+        // Log error in console, write failed login attempt in separate log
         if (error) console.log(error);
+        logger.warn("Failed login attempt by user " + username + "! Username is not known by the system." );
+
         response.render('pages/errors/loginFailed');
     });
 }
+
 
 /**
  * Called after user has input data for a new user. Tries to insert it into the database.
