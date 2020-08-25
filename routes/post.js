@@ -10,6 +10,25 @@ const bcrypt = require('bcryptjs');
 const IO = require('./io.js');
 const SQL = require('./mysql.js')
 const mysql = require('mysql');
+const winston = require('winston');
+require('winston-daily-rotate-file');
+
+
+// Automatic log file saving for failed login attempts
+const failedLoginAttempts = new(winston.transports.DailyRotateFile)({
+	filename: './logs/login-%DATE%.log',
+	datePattern: 'DD-MM-YYYY',
+	zippedArchive: true,
+	maxSize: '20m',
+	maxFiles: '30d'
+});
+
+const logger = winston.createLogger({
+	transports: [
+		failedLoginAttempts
+	]
+});
+
 
 /**
  * Called while logging in, queries database for user password, hashes the input password and compares 
@@ -37,15 +56,22 @@ const authHelper = function (request, response) {
                 });
                 console.log("User '" + request.session.username + "' logged in.");
             } else {
+                // TODO: log failed login attempt here, write failed login attempt in separate log
+                logger.info("Failed login attempt by user " + username + "! Username is known by the system." );
+
                 response.render('pages/errors/loginFailed');
             }
         });
         // Catch sql errors
     }).catch(function (error) {
+        // Log error in console, write failed login attempt in separate log
         if (error) console.log(error);
+        logger.warn("Failed login attempt by user " + username + "! Username is not known by the system." );
+
         response.render('pages/errors/loginFailed');
     });
 }
+
 
 /**
  * Called after user has input data for a new user. Tries to insert it into the database.
@@ -197,7 +223,7 @@ const visualPostHelper = async (request, response) => {
  * @param {Sends new submit page back to the user, either with error or success text.} response 
  */
 const submitDataHelper = async (request, response) => {
-    let roleList, measureList, entryList, result, mandateList;
+    let roleList, measureList, entryList, entryListNew, result, mandateList;
 
     // Used to convert month to month number
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -210,6 +236,8 @@ const submitDataHelper = async (request, response) => {
         measureList = await IO.loadTextFile('tables');
         roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
+        // Working copy in case the SQL query fails
+        entryListNew = await IO.loadTextFile('entries');
     } catch (error) {
         console.log(error);
     }
@@ -320,10 +348,10 @@ const submitDataHelper = async (request, response) => {
                 let entry;
 
                 // Find correct entry in list of entries
-                for (k = 0; k < entryList.length; k++) {
-                    if (entryList[k][0] === request.body.measure) {
+                for (k = 0; k < entryListNew.length; k++) {
+                    if (entryListNew[k][0] === request.body.measure) {
                         found = true;
-                        entry = entryList[k];
+                        entry = entryListNew[k];
                     }
                 }
 
@@ -360,11 +388,14 @@ const submitDataHelper = async (request, response) => {
                 }
 
                 // Sort and write to disk if there was no sql error
-                entryList = await sort2DArray(entryList);
-                IO.arrayToTxt('entries', entryList);
+                entryListNew = await sort2DArray(entryListNew);
 
                 // And insert them into the database
                 SQL.measureDataRequest(query).then(function () {
+                    // Only write entries to real list and disk if sql-query was successful
+                    entryList = entryListNew;
+                    IO.arrayToTxt('entries', entryList);
+
                     response.render('pages/submit', {
                         text: "Daten erfolgreich eingetragen!",
                         user: request.session.username,
@@ -418,7 +449,7 @@ const createMeasureHelper = async (request, response) => {
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
-        roleList = await IO.loadTextFile('roles');
+        roleList = await IO.loadTextFile('roles');  
         entryList = await IO.loadTextFile('entries');
         mandateList = await IO.loadTextFile('mandates');
     } catch (error) {
