@@ -15,18 +15,18 @@ require('winston-daily-rotate-file');
 
 
 // Automatic log file saving for failed login attempts
-const failedLoginAttempts = new(winston.transports.DailyRotateFile)({
-	filename: './logs/login-%DATE%.log',
-	datePattern: 'DD-MM-YYYY',
-	zippedArchive: true,
-	maxSize: '20m',
-	maxFiles: '30d'
+const failedLoginAttempts = new (winston.transports.DailyRotateFile)({
+    filename: './logs/login-%DATE%.log',
+    datePattern: 'DD-MM-YYYY',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '30d'
 });
 
 const logger = winston.createLogger({
-	transports: [
-		failedLoginAttempts
-	]
+    transports: [
+        failedLoginAttempts
+    ]
 });
 
 
@@ -57,7 +57,7 @@ const authHelper = function (request, response) {
                 console.log("User '" + request.session.username + "' logged in.");
             } else {
                 // TODO: log failed login attempt here, write failed login attempt in separate log
-                logger.info("Failed login attempt by user " + username + "! Username is known by the system." );
+                logger.info("Failed login attempt by user " + username + "! Username is known by the system.");
 
                 response.render('pages/errors/loginFailed');
             }
@@ -66,7 +66,7 @@ const authHelper = function (request, response) {
     }).catch(function (error) {
         // Log error in console, write failed login attempt in separate log
         if (error) console.log(error);
-        logger.warn("Failed login attempt by user " + username + "! Username is not known by the system." );
+        logger.warn("Failed login attempt by user " + username + "! Username is not known by the system.");
 
         response.render('pages/errors/loginFailed');
     });
@@ -449,7 +449,7 @@ const createMeasureHelper = async (request, response) => {
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
-        roleList = await IO.loadTextFile('roles');  
+        roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
         mandateList = await IO.loadTextFile('mandates');
     } catch (error) {
@@ -466,6 +466,7 @@ const createMeasureHelper = async (request, response) => {
     let addYear = false;
     let monthly = false;
     let quarterly = false;
+    let daily = false;
     let error = false;
 
     // Determine which kind of measure was entered by the user
@@ -473,6 +474,8 @@ const createMeasureHelper = async (request, response) => {
         quarterly = true;
     } else if (request.body.cycle === 'monthly' && request.body.year) {
         monthly = true;
+    } else if (request.body.cycle === 'daily' && request.body.year) {
+        daily = true;
     } else if (request.body.cycle !== 'yearly') {
         // Something went wrong
         error = true;
@@ -504,7 +507,7 @@ const createMeasureHelper = async (request, response) => {
                 measureExists = true;
                 for (j = 0; j < years.length; j++) {
                     // Show error if year already exists, which means the measure already exists in the system
-                    if ((quarterly || monthly) && years[j] == request.body.year) {
+                    if ((quarterly || monthly || daily) && years[j] == request.body.year) {
                         yearExists = true;
                         response.render('pages/createMeasure', {
                             text: "Fehler! Kennzahl existiert bereits!",
@@ -515,7 +518,7 @@ const createMeasureHelper = async (request, response) => {
                     }
                 }
                 // Add year if it doesn't exist
-                if ((quarterly || monthly) && !yearExists && measureExists) {
+                if ((quarterly || monthly || daily) && !yearExists && measureExists) {
                     addYear = true;
                     measureList[i][1] += ':' + request.body.year;
                 }
@@ -553,17 +556,22 @@ const createMeasureHelper = async (request, response) => {
         // Format name correctly for mysql and add the year, backticks handle sql injection escape
         let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
 
+        // TODO: better format for code in if
         // Build string here with correct attributes
         if (quarterly) {
             // Create table and data for measures that are measured quarterly, they are still stored in the default format
             table.push(request.body.year);
             table.push(request.body.cycle);
-            desc.push('dummy');
+            //desc.push('dummy');
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (monthly) {
             table.push(request.body.year);
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
+        } else if (daily) {
+            table.push(request.body.year);
+            sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Tag INTEGER, ';
         } else {
+            console.log('landed in else case');
             table.push(request.body.cycle);
             sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
         }
@@ -578,13 +586,28 @@ const createMeasureHelper = async (request, response) => {
             }
         }
 
-        // Make month the primary key
-        sql += ' constraint pk_1 primary key(Monat));';
+        // Make month the primary key 
+        // TODO: is this needed? change for daily measures?
+        if (!daily) {
+            sql += ' constraint pk_1 primary key(Monat));';
+        } else {
+            sql += ' constraint pk_1 primary key(Tag));';
+        }
 
         // Add semicolon, later needed for identification
-        tableName += '~' + request.body.sumCalc + ';';
+        if (daily) {
+            tableName += '-daily~' + request.body.sumCalc + ';';
+        } else {
+            tableName += '~' + request.body.sumCalc + ';';
+        }
         table.push(tableName);
-        desc[desc.length - 1] = desc[desc.length - 1] + ';';
+
+        if (!daily) {
+            desc[desc.length - 1] = desc[desc.length - 1] + ';';
+        } else {
+            console.log('daily kennung hinzugefügt');
+            desc[desc.length - 1] = desc[desc.length - 1] + ';';
+        }
 
         // Push table and description data into loaded table
         if (!addYear) {
