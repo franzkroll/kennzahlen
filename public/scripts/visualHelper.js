@@ -172,8 +172,6 @@ selM.onclick = function () {
 
                 // Grab yearly measures first
                 if (measureData && !insertedHead && yearHead) {
-                    console.log('got measure data');
-
                     labels = [];
 
                     // Split years of the measure into array
@@ -209,9 +207,13 @@ selM.onclick = function () {
 
                     // Then quarterly measures
                 } else if (dailyMeasure) {
+                    console.log('got measure data');
+                    // Correctly format the table head
+                    for (p = 0; p < daysInMonth[0]; p++) {
+                        labels.push(p);
+                    }
 
-
-
+                    console.log(labels);
                 } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
                     labels = quarters.slice(2, months.length);
 
