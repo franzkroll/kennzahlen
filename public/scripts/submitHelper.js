@@ -30,11 +30,28 @@ document.getElementById('dailyDateLabel').style.display = 'none';
 const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['1. Quartal', '2. Quartal', '3. Quartal', '4. Quartal'];
 
+/**
+ * Determines the current date and sets the range for the datepicker (+/- 3 years).
+ */
 function setDatePickerValues() {
-    // TODO: implement
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    const futureToday = (yyyy + 3) + '-' + mm + '-' + dd;
+    const pastToday = (yyyy - 3) + '-' + mm + '-' + dd;
+
+    const dailyDate = document.getElementById('dailyDate');
+
+    dailyDate.setAttribute('value', today);
+    dailyDate.setAttribute('min', pastToday);
+    dailyDate.setAttribute('max', futureToday);
 }
 
-// TODO: center the elements again
+
+// Only makes the needed elements for picking an interval visible
 function switchView(isPicker) {
     if (isPicker) {
         document.getElementById('duration').style.display = 'none';
@@ -48,7 +65,8 @@ function switchView(isPicker) {
 }
 
 // Search for measure that was input by the user, when found display attributes
-selM.onclick = function () {
+// TODO: check why it gets triggered twice
+selM.onchange = function () {
     const index = this.selectedIndex;
     const inputText = this.children[index].innerHTML.trim();
 
@@ -76,11 +94,11 @@ selM.onclick = function () {
 
             // Check for daily measure
             if (measure[measure.length - 1].includes('-daily')) {
-                console.log('found daily measure');
                 // Hide the normal menu
                 switchView(true);
-                // Create date picker
 
+                // Update date picker with current values
+                setDatePickerValues();
 
                 // Enter values for correct date, how do we sort the mysql entries here?
                 // Checks if it is a yearly measure or not            
@@ -172,6 +190,9 @@ selM.onclick = function () {
         }
     }
 }
+
+selM.onchange();
+
 
 // Automatically reselect last item that was entered
 for (let i, j = 0; i = selM.options[j]; j++) {
