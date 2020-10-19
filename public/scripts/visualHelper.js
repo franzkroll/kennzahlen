@@ -82,6 +82,7 @@ selM.onclick = function () {
     let sumCalc;
 
     let yearlyMeasure = false;
+    let dailyMeasure = false;
 
     // Save spots we filled for later rows
     let filling = [];
@@ -96,6 +97,10 @@ selM.onclick = function () {
             if (measure[j] === inputText) {
                 // Get tablename of the received data
                 let tableName = measure[measure.length - 1];
+
+                if (tableName.includes('_daily')) {
+                    dailyMeasure = true;
+                }
 
                 // Slice out info how the yearly sum is collected
                 let index = tableName.indexOf('~');
@@ -116,20 +121,22 @@ selM.onclick = function () {
 
                 // Split years here for year table, only if it isn't yearly or quarterly measure
                 years = measure[j + 1].trim().split(':');
+                
+                // Sort the years, makes the output look nicer
+                years = years.sort();
 
                 // Returns true if quarterly or monthly measure
-                if (/^\d+$/.test(years[0])) {
-                    years = years.sort();
+                if (dailyMeasure) {
+                    console.log(years);
 
+                } else if (/^\d+$/.test(years[0])) {
                     // Put years into the select menu for tables
                     for (k = 0; k < years.length; k++) {
                         let opt = document.createElement('option');
                         opt.value = years[k];
                         opt.appendChild(document.createTextNode(years[k]));
                         selYear.appendChild(opt);
-                    }
-
-              
+                    }            
                 } else if (years[0] === 'yearly') {
                     yearHead = true;
                     // Add first row of years here
@@ -137,7 +144,7 @@ selM.onclick = function () {
                     opt.value = years[0];
                     opt.appendChild(document.createTextNode('jährliche Erfassung'));
                     selYear.appendChild(opt);
-                }
+                } 
 
                 // Automatic reselection of the year, that was last selected
                 for (let i = 0; i < selYear.options.length; i++) {
@@ -701,6 +708,7 @@ document.getElementById('report').onclick = function () {
 
 /**
  * Creates new pdf document from all previously stored measure in the session storage
+ * TODO: jspdf is broken
  */
 document.getElementById('download').onclick = function () {
     // Create new document
