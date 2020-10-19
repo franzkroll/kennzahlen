@@ -362,7 +362,7 @@ const submitDataHelper = async (request, response) => {
                 // Get indexes of month or quarters
                 if (quarterly) {
                     quarterNumber = quarters.indexOf(month);
-                } else if(daily) {
+                } else if (daily) {
                     //monthNumber = date.slice();
                 } else {
                     monthNumber = months.indexOf(month);
@@ -390,6 +390,7 @@ const submitDataHelper = async (request, response) => {
                 // Push completely new entry if the measure wasn't present before
                 if (found) {
                     // If not slice out the comma and add the new number to it, also check before to make sure we don't have a duplicate entry
+                    // TODO: could be formatted better
                     if (quarterly) {
                         if (!entry.includes(quarterNumber + year) && !entry.includes(quarterNumber + year + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
@@ -401,8 +402,11 @@ const submitDataHelper = async (request, response) => {
                             entry.push(year + ';');
                         }
                     } else if (daily) {
-
-                        // TODO: add entry for daily values    
+                        let dateNumber = date.replaceAll('-','');
+                        if (!entry.includes(dateNumber) && !entry.includes(dateNumber + ';')) {
+                            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+                            entry.push(dateNumber + ';');
+                        }
                     } else {
                         if (!entry.includes(monthNumber + year) && !entry.includes(monthNumber + year + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
@@ -590,7 +594,7 @@ const createMeasureHelper = async (request, response) => {
             // Create table and data for measures that are measured quarterly, they are still stored in the default format
             table.push(request.body.year);
             table.push(request.body.cycle);
-            //desc.push('dummy'); // TODO: check if we need this 
+            desc.push('dummy'); // TODO: check why this is here
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (monthly) {
             table.push(request.body.year);
@@ -631,11 +635,7 @@ const createMeasureHelper = async (request, response) => {
         }
         table.push(tableName);
 
-        if (!daily) {
-            desc[desc.length - 1] = desc[desc.length - 1] + ';';
-        } else {
-            desc[desc.length - 1] = desc[desc.length - 1] + ';';
-        }
+        desc[desc.length - 1] = desc[desc.length - 1] + ';';
 
         // Push table and description data into loaded table
         if (!addYear) {
