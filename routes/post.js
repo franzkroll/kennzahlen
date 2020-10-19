@@ -242,7 +242,7 @@ const submitDataHelper = async (request, response) => {
         console.log(error);
     }
 
-    // Save index, because for keeps running while reading from disk
+    // Save index, because for-loop keeps running while reading from disk
     let indexSave = -1;
     let found = false;
 
@@ -252,6 +252,7 @@ const submitDataHelper = async (request, response) => {
             indexSave = i;
             let quarterly = false;
             let yearly = false;
+            let daily = false;
             found = true;
 
             // If measure is found, check if saved role equals current role and admin/user
@@ -279,11 +280,21 @@ const submitDataHelper = async (request, response) => {
                 let indexCut = tableName.indexOf('~');
                 tableName = tableName.slice(0, indexCut);
 
-                // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
-                const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
+                let year;
+                let date;
 
-                // Get just the year
-                const year = date.slice(date.length - 4, date.length);
+                if (tableName.includes('_daily')) {
+                    date = request.body.dailyDate;
+                    year = date.slice(0, 4);
+
+                    daily = true;
+                } else {
+                    // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
+                    date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
+
+                    // Get just the year
+                    year = date.slice(date.length - 4, date.length);
+                }
 
                 // Build sql string
                 let query = 'REPLACE INTO `' + tableName;
@@ -306,10 +317,14 @@ const submitDataHelper = async (request, response) => {
                     } else {
                         query += parseInt((quarters.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
                     }
+                } else if (daily) {
+                    console.log('need to daily stuff and format the query');
+                    query += '_' + year + '` () values (';
+
+                    query += mysql.escape(date.replaceAll('-', '')) + ',';
                 } else {
                     // Add year to tablename
                     query += '_' + year + '` () values (';
-
 
                     // First case handles the year entry, second case entries with months
                     if (date.length === 4) {
@@ -318,6 +333,7 @@ const submitDataHelper = async (request, response) => {
                         query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
                     }
                 }
+
 
                 // Get attributes, they are already in the right order
                 for (let key in request.body) {
@@ -330,8 +346,14 @@ const submitDataHelper = async (request, response) => {
                 // Finish query for sql
                 query = query.slice(0, query.length - 1) + ');';
 
+                console.log(query);
+
                 // Month for automatic reselection
-                month = date.slice(0, date.length - 4);
+                if (!daily) {
+                    month = date.slice(0, date.length - 4);
+                } else {
+                    month = 0;
+                }
 
                 // Contain month or quarter number if it exists, else it is -1
                 let quarterNumber = -1;
@@ -340,6 +362,8 @@ const submitDataHelper = async (request, response) => {
                 // Get indexes of month or quarters
                 if (quarterly) {
                     quarterNumber = quarters.indexOf(month);
+                } else if(daily) {
+                    //monthNumber = date.slice();
                 } else {
                     monthNumber = months.indexOf(month);
                 }
@@ -376,6 +400,9 @@ const submitDataHelper = async (request, response) => {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
                             entry.push(year + ';');
                         }
+                    } else if (daily) {
+
+                        // TODO: add entry for daily values    
                     } else {
                         if (!entry.includes(monthNumber + year) && !entry.includes(monthNumber + year + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
@@ -439,6 +466,7 @@ const submitDataHelper = async (request, response) => {
  * Called when user tries to create a new measure. Has to check if table already exists, the new year already exists.
  * If one of the above is true, then only the lists on disk are modified. If they don't exist already a new measure 
  * is also created in the mysql database.
+ * // TODO: remove id from gui, assign it automatically
  * @param {Request received from the user, hopefully contains all the necessary data to save the measure in the system.} request 
  * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
@@ -562,12 +590,13 @@ const createMeasureHelper = async (request, response) => {
             // Create table and data for measures that are measured quarterly, they are still stored in the default format
             table.push(request.body.year);
             table.push(request.body.cycle);
-            //desc.push('dummy');
+            //desc.push('dummy'); // TODO: check if we need this 
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (monthly) {
             table.push(request.body.year);
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (daily) {
+            tableName += '_daily';
             table.push(request.body.year);
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Tag INTEGER, ';
         } else {
@@ -596,7 +625,7 @@ const createMeasureHelper = async (request, response) => {
 
         // Add semicolon, later needed for identification
         if (daily) {
-            tableName += '-daily~' + request.body.sumCalc + ';';
+            tableName += '~' + request.body.sumCalc + ';';
         } else {
             tableName += '~' + request.body.sumCalc + ';';
         }
@@ -605,7 +634,6 @@ const createMeasureHelper = async (request, response) => {
         if (!daily) {
             desc[desc.length - 1] = desc[desc.length - 1] + ';';
         } else {
-            console.log('daily kennung hinzugefügt');
             desc[desc.length - 1] = desc[desc.length - 1] + ';';
         }
 
@@ -790,6 +818,7 @@ const deleteHelper = async (request, response) => {
 /**
  * Receives post requests from changeMeasure page, collects all the necessary info and passes it to 
  * the database as request. If everything goes well the column is added to the correct table in the database.
+ * // TODO: needs to be updated for daily measures?
  * @param {Request from the user page, contains all the data needed for creation of new column.} request 
  * @param {Sends back new page with success/error text.} response 
  */
@@ -901,6 +930,7 @@ const addAttributeHelper = async (request, response) => {
 
 /**
  * Changes the specified attribute of the measure. Reloads the page again.
+ * TODO: check if it needs updates for daily measures? 
  * @param {Request from the user. Contains the attribute to be changed.} request 
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */

@@ -65,7 +65,6 @@ function switchView(isPicker) {
 }
 
 // Search for measure that was input by the user, when found display attributes
-// TODO: check why it gets triggered twice
 selM.onchange = function () {
     const index = this.selectedIndex;
     const inputText = this.children[index].innerHTML.trim();
@@ -93,7 +92,7 @@ selM.onchange = function () {
             years = measure[1].split(':');
 
             // Check for daily measure
-            if (measure[measure.length - 1].includes('-daily')) {
+            if (measure[measure.length - 1].includes('_daily')) {
                 // Hide the normal menu
                 switchView(true);
 
@@ -191,14 +190,13 @@ selM.onchange = function () {
     }
 }
 
-selM.onchange();
-
+selM.selectedIndex = -1;
 
 // Automatically reselect last item that was entered
 for (let i, j = 0; i = selM.options[j]; j++) {
     if (i.value === lastMeasure) {
         selM.selectedIndex = j;
-        selM.onclick();
+        selM.onchange();
         break;
     }
 }
