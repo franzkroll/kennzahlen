@@ -402,7 +402,7 @@ const submitDataHelper = async (request, response) => {
                             entry.push(year + ';');
                         }
                     } else if (daily) {
-                        let dateNumber = date.replaceAll('-','');
+                        let dateNumber = date.replaceAll('-', '');
                         if (!entry.includes(dateNumber) && !entry.includes(dateNumber + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
                             entry.push(dateNumber + ';');

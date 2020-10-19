@@ -18,12 +18,14 @@ const table = document.getElementById("dataTable");
 const selGraph = document.getElementById('graph');
 const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
+const selMonth = document.getElementById('month');
 const button = document.getElementById('button');
 
 
 // Used for creating table headers with months and quarters
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
+const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 // Saves values in double brackets from measure attributes => the percent lines to be displayed in the graph
 let percentValues = [];
@@ -121,22 +123,32 @@ selM.onclick = function () {
 
                 // Split years here for year table, only if it isn't yearly or quarterly measure
                 years = measure[j + 1].trim().split(':');
-                
+
                 // Sort the years, makes the output look nicer
                 years = years.sort();
 
-                // Returns true if quarterly or monthly measure
-                if (dailyMeasure) {
-                    console.log(years);
+                // Only show month menu if it's a daily measure
+                if (!dailyMeasure) {
+                    document.getElementById('month').style.visibility = 'hidden';
+                } else {
+                    selMonth.style.visibility = 'visible';
 
-                } else if (/^\d+$/.test(years[0])) {
-                    // Put years into the select menu for tables
+                    for (l = 2; l < months.length; l++) {
+                        let opt = document.createElement('option');
+                        opt.value = months[l];
+                        opt.appendChild(document.createTextNode(months[l]));
+                        selMonth.appendChild(opt);
+                    }
+                }
+
+                // Returns true if quarterly or monthly or daily measure, fills year select menu with values
+                if (dailyMeasure || (/^\d+$/.test(years[0]))) {
                     for (k = 0; k < years.length; k++) {
                         let opt = document.createElement('option');
                         opt.value = years[k];
                         opt.appendChild(document.createTextNode(years[k]));
                         selYear.appendChild(opt);
-                    }            
+                    }
                 } else if (years[0] === 'yearly') {
                     yearHead = true;
                     // Add first row of years here
@@ -144,13 +156,12 @@ selM.onclick = function () {
                     opt.value = years[0];
                     opt.appendChild(document.createTextNode('jährliche Erfassung'));
                     selYear.appendChild(opt);
-                } 
+                }
 
                 // Automatic reselection of the year, that was last selected
                 for (let i = 0; i < selYear.options.length; i++) {
                     if (selYear.options[i].value === lastYear) {
                         selYear.selectedIndex = i;
-                                        
                         break;
                     }
                 }
@@ -161,6 +172,8 @@ selM.onclick = function () {
 
                 // Grab yearly measures first
                 if (measureData && !insertedHead && yearHead) {
+                    console.log('got measure data');
+
                     labels = [];
 
                     // Split years of the measure into array
@@ -195,6 +208,10 @@ selM.onclick = function () {
                     insertedHead = true;
 
                     // Then quarterly measures
+                } else if (dailyMeasure) {
+
+
+
                 } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
                     labels = quarters.slice(2, months.length);
 
