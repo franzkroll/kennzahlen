@@ -10,7 +10,7 @@
   "author": "Leitstelle Lausitz",
   "repository": {
     "type": "git",
-    "url": "https://github.com/franzkroll/kennzahlen.git"
+    "url": "git+https://github.com/franzkroll/kennzahlen.git"
   },
   "license": "ISC",
   "dependencies": {
@@ -39,11 +39,7 @@
     "winston-daily-rotate-file": "3.9.0"
   },
   "devDependencies": {
-    "forever": "^3.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/franzkroll/kennzahlen.git"
+    "forever": "^3.0.2"
   },
   "bugs": {
     "url": "https://github.com/franzkroll/kennzahlen/issues"
