@@ -174,8 +174,12 @@ const visualPostHelper = async (request, response) => {
                 console.log(error);
             }
 
-            // Only access when user has correct role and mandate
-            if (result && resultMandate) {
+            // Detect if it's a daily measure
+            if (request.body.month.length > 1) {
+                console.log("Found daily month: " + request.body.month);
+
+                // TODO: format to correct table, load only the matching entries
+            } else if (result && resultMandate) {
                 loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
                     // Render page with newly acquired data
                     response.render('pages/visual', {
