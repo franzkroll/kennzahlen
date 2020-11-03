@@ -65,6 +65,16 @@ selM.onchange = function () {
     nameField.innerHTML = '';
 }
 
+function SelectHasValue(select, value) {
+    obj = document.getElementById(select);
+
+    if (obj !== null) {
+        return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
+    } else {
+        return false;
+    }
+}
+
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
@@ -132,12 +142,13 @@ selM.onclick = function () {
                     document.getElementById('month').style.visibility = 'hidden';
                 } else {
                     selMonth.style.visibility = 'visible';
-
                     for (l = 2; l < months.length; l++) {
-                        let opt = document.createElement('option');
-                        opt.value = months[l];
-                        opt.appendChild(document.createTextNode(months[l]));
-                        selMonth.appendChild(opt);
+                        if (selMonth.length < 13) {
+                            let opt = document.createElement('option');
+                            opt.value = months[l];
+                            opt.appendChild(document.createTextNode(months[l]));
+                            selMonth.appendChild(opt);
+                        }         
                     }
                 }
 
@@ -207,13 +218,10 @@ selM.onclick = function () {
 
                     // Then quarterly measures
                 } else if (dailyMeasure) {
-                    console.log('got measure data');
                     // Correctly format the table head
                     for (p = 0; p < daysInMonth[0]; p++) {
                         labels.push(p);
                     }
-
-                    console.log(labels);
                 } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
                     labels = quarters.slice(2, months.length);
 
@@ -682,9 +690,6 @@ for (let i, j = 0; i = selM.options[j]; j++) {
         break;
     }
 }
-
-console.log(lastYear);
-
 
 
 /**

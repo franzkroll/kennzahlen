@@ -174,13 +174,9 @@ const visualPostHelper = async (request, response) => {
                 console.log(error);
             }
 
-            // Detect if it's a daily measure
-            if (request.body.month.length > 1) {
-                console.log("Found daily month: " + request.body.month);
-
-                // TODO: format to correct table, load only the matching entries
-            } else if (result && resultMandate) {
-                loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
+            // Only access when user has correct role and mandate
+            if (result && resultMandate) {
+                loadNameFromSQL(request.body.measure, request.body.year, request.body.month).then(function (result) {
                     // Render page with newly acquired data
                     response.render('pages/visual', {
                         user: request.session.username,
@@ -1238,7 +1234,7 @@ const changePasswordHelper = function (request, response) {
  * @param {Name of the measure that we want the data of.} name 
  * @param {Year of the measure that we want the data of.} year 
  */
-function loadNameFromSQL(name, year) {
+function loadNameFromSQL(name, year, month) {
     return new Promise(function (resolve, reject) {
         // Load file with table names for checking
         IO.loadTextFile('tables').then(function (measureList) {
@@ -1258,7 +1254,7 @@ function loadNameFromSQL(name, year) {
             // If user has entered a year we can add it and query the database
             if (year) {
                 tableName = tableName + "_" + year.trim();
-                SQL.getMeasureFromDB(tableName).then(function (result) {
+                SQL.getMeasureFromDB(tableName, month).then(function (result) {
                     resolve([tableName, result]);
                 }).catch(function (error) {
                     reject(error);
