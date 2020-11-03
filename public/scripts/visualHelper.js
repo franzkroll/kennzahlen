@@ -13,6 +13,7 @@
 // Split data that was received into an array
 const measureArray = measureListData.split(';');
 
+
 // Get needed elements from html page
 const table = document.getElementById("dataTable");
 const selGraph = document.getElementById('graph');
@@ -23,6 +24,7 @@ const button = document.getElementById('button');
 
 
 // Used for creating table headers with months and quarters
+const monthsIndex = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
 const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -86,6 +88,9 @@ selM.onclick = function () {
     // For checking if table head was already inserted
     let insertedHead = false;
 
+    // 
+    let dailyPrepared = false;
+
     // Stores which type the table is
     let yearHead = false;
 
@@ -148,7 +153,7 @@ selM.onclick = function () {
                             opt.value = months[l];
                             opt.appendChild(document.createTextNode(months[l]));
                             selMonth.appendChild(opt);
-                        }         
+                        }
                     }
                 }
 
@@ -217,11 +222,17 @@ selM.onclick = function () {
                     insertedHead = true;
 
                     // Then quarterly measures
-                } else if (dailyMeasure) {
-                    // Correctly format the table head
-                    for (p = 0; p < daysInMonth[0]; p++) {
+                } else if (measureData && dailyMeasure) {
+                    console.log('daily measure found');
+                    // Find out the correct month
+                    const monthIndex = monthsIndex.indexOf(selectedMonth);
+
+                    // Correctly format labels for graph, fill it with the right number of months
+                    for (p = 0; p <= daysInMonth[monthIndex]; p++) {
                         labels.push(p);
                     }
+
+                    dailyPrepared = true;
                 } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
                     labels = quarters.slice(2, months.length);
 
@@ -243,6 +254,65 @@ selM.onclick = function () {
                     }
 
                     insertedHead = true;
+                }
+            }
+
+            if (dailyPrepared && measureData && (j < measure.length - 3)) {
+                measureAttr.push(measure[j + 2]);
+
+                // Add data to graph
+
+                // Append data to table if there is any to add and if we got the right data already
+                if ((inputText === (tableName2.replaceAll('_', ' ')))) {
+                    let dataBuilder = [];
+
+                    if (sumCalc === 'self') {
+                        count = 0;
+                    } else {
+                        count = -1;
+                    }
+
+                    console.log(columns);
+
+                    // Cycle through data for measure and take column breaks into account, 
+                    // TODO: needs to be fixed
+                    for (k = j + 1; k < columns.length; k += columnCount) {
+                        // Remove everything from data that isn't a number or decimal point
+                        let cellData;
+
+                        // We only need the second part of the data for the table
+                        if (columns[k].split(':')[1].slice(0, 2) === '-1') {
+                            cellData = 'n.v.';
+                        } else {
+                            cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
+                            console.log(cellData);
+                        }
+
+                        // Just add a zero if we don't have the data, comparison is weird, maybe there is an easier way
+                        if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5) || (filling.includes(count))) {
+                            console.log('no data');
+
+                            cellData = 'n.v.';
+                            filling.push(count);
+                            k -= columnCount;
+                        }
+
+                        count++
+
+                        // Substitute again for graphs
+                        if (cellData === 'n.v.') {
+                            cellData = 0;
+                        }
+
+                        // Don't add user summed values to the graph
+                        if (!(sumCalc === 'self' && k === j + 1) && !yearlyMeasure) {
+                            dataBuilder.push(cellData);
+                        } else if (yearlyMeasure) {
+                            dataBuilder.push(cellData);
+                        }
+                    }
+
+                    dataGraph.push(dataBuilder);
                 }
             }
 

@@ -185,7 +185,8 @@ const visualPostHelper = async (request, response) => {
                         text: 'Daten erfolgreich geladen!',
                         lastSelected: request.body.measure,
                         lastYear: request.body.year,
-                        measureListData: measureList
+                        measureListData: measureList,
+                        selectedMonth: request.body.month
                     });
                     // Show error if data query failed
                 }).catch(function (error) {
@@ -197,7 +198,8 @@ const visualPostHelper = async (request, response) => {
                         lastSelected: '',
                         lastYear: '',
                         text: 'Datensatz nicht vorhanden!',
-                        measureListData: measureList
+                        measureListData: measureList,
+                        selectedMonth: ''
                     });
                 });
                 // Show error if user has wrong rights
@@ -210,7 +212,8 @@ const visualPostHelper = async (request, response) => {
                     lastSelected: '',
                     lastYear: '',
                     text: 'Dafür besitzen Se nicht die nötigen Rechte!',
-                    measureListData: measureList
+                    measureListData: measureList,
+                    selectedMonth: ''
                 });
             }
         }
