@@ -223,16 +223,16 @@ selM.onclick = function () {
 
                     // Then quarterly measures
                 } else if (measureData && dailyMeasure) {
-                    console.log('daily measure found');
                     // Find out the correct month
                     const monthIndex = monthsIndex.indexOf(selectedMonth);
 
-                    // Correctly format labels for graph, fill it with the right number of months
-                    for (p = 0; p <= daysInMonth[monthIndex]; p++) {
+                    // Correctly format labels for graph, fill it with the right number of days for the corresponding month
+                    for (p = 1; p <= daysInMonth[monthIndex]; p++) {
                         labels.push(p);
                     }
 
                     dailyPrepared = true;
+                    insertedHead = true;
                 } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
                     labels = quarters.slice(2, months.length);
 
@@ -258,26 +258,36 @@ selM.onclick = function () {
             }
 
             if (dailyPrepared && measureData && (j < measure.length - 3)) {
+                document.getElementById('name').style.visibility = "hidden";
+
                 measureAttr.push(measure[j + 2]);
 
-                // Add data to graph
+                // Look for percent entry syntax
+                if (measure[j + 2].includes('[[')) {
+                    // And slice out the percent value
+                    const percentEntry = measure[j + 2];
+
+                    // Add graph data for complete graph at percent value
+                    const percentValue = percentEntry.slice(percentEntry.indexOf('[[') + 2, percentEntry.indexOf(']]') - 1);
+                    percentValues.push(percentValue);
+
+                    // Replace marking for percent values so we don't display them
+                    measure[j + 2] = measure[j + 2].replace(']]', '');
+                    measure[j + 2] = measure[j + 2].replace('[[', '');
+                } else {
+                    percentValues.push(0);
+                }
+
 
                 // Append data to table if there is any to add and if we got the right data already
                 if ((inputText === (tableName2.replaceAll('_', ' ')))) {
                     let dataBuilder = [];
+                    var columnCount = measure.length - 2;
 
-                    if (sumCalc === 'self') {
-                        count = 0;
-                    } else {
-                        count = -1;
-                    }
-
-                    console.log(columns);
+                    var count = 1;
 
                     // Cycle through data for measure and take column breaks into account, 
-                    // TODO: needs to be fixed
                     for (k = j + 1; k < columns.length; k += columnCount) {
-                        // Remove everything from data that isn't a number or decimal point
                         let cellData;
 
                         // We only need the second part of the data for the table
@@ -285,13 +295,10 @@ selM.onclick = function () {
                             cellData = 'n.v.';
                         } else {
                             cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
-                            console.log(cellData);
                         }
 
                         // Just add a zero if we don't have the data, comparison is weird, maybe there is an easier way
-                        if (count != Number((columns[k - 1].split(':')[1] / 10000).toFixed(0)) && (columns[k - 1].split(':')[1].length >= 5) || (filling.includes(count))) {
-                            console.log('no data');
-
+                        if (count != columns[k - 1].split(':')[1].slice(-2) && (columns[k - 1].split(':')[1].length >= 5) || (filling.includes(count))) {
                             cellData = 'n.v.';
                             filling.push(count);
                             k -= columnCount;
@@ -304,21 +311,20 @@ selM.onclick = function () {
                             cellData = 0;
                         }
 
-                        // Don't add user summed values to the graph
-                        if (!(sumCalc === 'self' && k === j + 1) && !yearlyMeasure) {
-                            dataBuilder.push(cellData);
-                        } else if (yearlyMeasure) {
-                            dataBuilder.push(cellData);
+                        // Add to yearly sum here, push new entry if it doesn't exist yet
+                        if (typeof sumArray[j] === 'undefined') {
+                            sumArray.push(parseFloat(cellData));
+                        } else {
+                            sumArray[j] = sumArray[j] + parseFloat(cellData);
                         }
-                    }
 
+
+                        dataBuilder.push(cellData);
+
+                    }
                     dataGraph.push(dataBuilder);
                 }
-            }
-
-            // Precaution so we don't leave the array length later on, only enter if the 
-            // table head is already done and we are ready to write data into the table
-            if (insertedHead && (j < measure.length - 3)) {
+            } else if (insertedHead && (j < measure.length - 3)) {
                 // Prepare new table rows for data
                 let row = table.insertRow(j + 1);
 

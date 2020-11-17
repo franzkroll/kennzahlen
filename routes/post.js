@@ -160,6 +160,10 @@ const visualPostHelper = async (request, response) => {
     let found = false;
     let indexSave = -1;
 
+    if (request.month === undefined) {
+        // TODO: do something if it's a daily measure and the user has entered no month
+    }
+
     for (i = 0; i < roleList.length && !found; i++) {
         // If measure is found, check if saved role equals current role and admin/user
         if (request.body.measure === roleList[i][0]) {

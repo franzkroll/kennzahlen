@@ -179,9 +179,6 @@ function getMeasureFromDB(tableName, month) {
 
     // Check which query we have to build, 
     if (month.length > 1) {
-        console.log('found daily measure: ' + month);
-        console.log(monthNumbers.indexOf(month));
-
         let monthNumber = monthNumbers.indexOf(month) + 1;
         // Have to add a zero to match naming scheme in sql
         if (monthNumber <= 9) {
@@ -198,7 +195,6 @@ function getMeasureFromDB(tableName, month) {
             if (err) {
                 return reject(err);
             } else {
-                console.log(res);
                 resolve(res);
             }
         });
