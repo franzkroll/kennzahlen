@@ -149,16 +149,26 @@ selM.onclick = function () {
                 if (!dailyMeasure) {
                     document.getElementById('month').style.visibility = 'hidden';
                 } else {
-                    selMonth.style.visibility = 'visible';
-                    for (l = 2; l < months.length; l++) {
-                        if (selMonth.length < 13 && !monthsAdded) {
-                            let opt = document.createElement('option');
-                            opt.value = months[l];
-                            opt.appendChild(document.createTextNode(months[l]));
-                            selMonth.appendChild(opt);
+                    if (!monthsAdded) {
+                        selMonth.style.visibility = 'visible';
+                        let opt = document.createElement('option');
+                        opt.value = 'Bitte Monat wählen ...';
+                        opt.appendChild(document.createTextNode('Bitte Monat wählen ...'));
+                        selMonth.appendChild(opt);
+                        for (l = 2; l < months.length; l++) {
+                            if (selMonth.length < 13) {
+                                let opt = document.createElement('option');
+                                opt.value = months[l];
+                                opt.appendChild(document.createTextNode(months[l]));
+                                selMonth.appendChild(opt);
+
+                                if (months[l] === selectedMonth) {
+                                    selMonth.value = selectedMonth;
+                                }
+                            }
                         }
                     }
-                    monthsAdded  =true;
+                    monthsAdded = true;
                 }
 
                 // Returns true if quarterly or monthly or daily measure, fills year select menu with values

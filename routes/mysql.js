@@ -176,21 +176,28 @@ const monthNumbers = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Jul
  */
 function getMeasureFromDB(tableName, month) {
     let query;
+    let abort = false;
 
     // Check which query we have to build, 
-    if (month.length > 1) {
+    if (!(month === 'Bitte Monat wählen ...')) {
         let monthNumber = monthNumbers.indexOf(month) + 1;
         // Have to add a zero to match naming scheme in sql
         if (monthNumber <= 9) {
             monthNumber = '0' + monthNumber;
         }
-
         query = 'SELECT * FROM `' + tableName + '` where Tag like \'2020' + monthNumber + '%\';';
+    } else if ((month === 'Bitte Monat wählen ...') && tableName.includes('daily')) {
+        abort = true;
     } else {
         query = 'SELECT * FROM `' + tableName + '`;';
     } 
 
+
     return new Promise(function (resolve, reject) {
+        if (abort) {
+            console.log('Error: no month selected for daily measure!');
+            return reject();
+        }
         connectionData.query(query, function (err, res) {
             if (err) {
                 return reject(err);
