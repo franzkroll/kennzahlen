@@ -9,6 +9,8 @@ ACHTUNG: DEVELOPMENT BRANCH, ENTHÄLT HÄUFIGE ÄNDERUNGEN
 * Protokollierung gescheiterter Login-Versuche unter [logs](logs/)
 * Automatische Auswahl der letzten Kennzahl und Jahr bei Visualisierung
 * Bugfix bei farbiger Markierung bereits eingetragener Werte
+* Kennzahlen können täglich erfasst werden
+* Mehrere kleinere Bugfixes
 
 ## Features
 
@@ -24,10 +26,15 @@ Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in 
 git clone https://github.com/franzkroll/kennzahlen.git
 cd kennzahlen
 npm install
+# Kopieren und anpassen der .env Datei, danach:
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [.env](/.env) angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden, müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. Weitere Hilfsdateien zur Speicherung von Kennzahleninformationen werden automatisch erstellt. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) 
+Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [.env](/misc_files/.env) angepasst werden. Dazu muss die Datei in das Hauptverzeichnis kopiert und anschließend angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden, müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern strengstens empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) Weitere Hilfsdateien zur Speicherung von Kennzahleninformationen werden automatisch erstellt. 
+
+### Zertifikate 
+
+Standardmäßig verwendet die Anwendung https. Für einen erfolgreichen Start muss ein Paar aus Zeritifikat und Key erstellt werden und in den Ordner [misc_files](cert/) kopiert werden. Dieser sollte standardmäßig zuvor im Hauptverzeichnis erstellt werden.
 
 ### Datenfelder in Konfigurationsdatei
 
@@ -35,7 +42,7 @@ Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu 
 SERVER_IP='127.0.0.1'
 SERVER_PORT=8080
 
-BASEURL='/kpi'
+BASEURL=''
 
 DB_HOST='localhost'
 DB_LOGIN_USER='user'
@@ -46,7 +53,7 @@ DB_MEASURE_USER='user'
 DB_MEASURE_PASSWORD='passwort'
 DB_MEASURE_DATABASE='measures'
 ```
-Die Anwendung ist nun über [localhost:8080](https://localhost:8080/) erreichbar. Beim Starten über node lässt sich ebenso ein anderer Port spezifizieren:
+Die Anwendung ist standardmäßig über [localhost:8080](https://localhost:8080/) erreichbar. Beim Starten mit Hilfe von node lässt sich ebenso ein anderer Port spezifizieren:
 
 ```sh
 PORT:4444 node kennzahlen.js
