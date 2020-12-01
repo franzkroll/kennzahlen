@@ -188,7 +188,7 @@ function getMeasureFromDB(tableName, month) {
         query = 'SELECT * FROM `' + tableName + '` where Tag like \'2020' + monthNumber + '%\';';
     } else {
         query = 'SELECT * FROM `' + tableName + '`;';
-    } // TODO: error case, user selects no month with daily measure
+    } 
 
     return new Promise(function (resolve, reject) {
         connectionData.query(query, function (err, res) {

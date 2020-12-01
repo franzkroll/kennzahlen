@@ -56,7 +56,6 @@ const authHelper = function (request, response) {
                 });
                 console.log("User '" + request.session.username + "' logged in.");
             } else {
-                // TODO: log failed login attempt here, write failed login attempt in separate log
                 logger.info("Failed login attempt by user " + username + "! Username is known by the system.");
 
                 response.render('pages/errors/loginFailed');
@@ -159,10 +158,6 @@ const visualPostHelper = async (request, response) => {
 
     let found = false;
     let indexSave = -1;
-
-    if (request.month === undefined) {
-        // TODO: do something if it's a daily measure and the user has entered no month
-    }
 
     for (i = 0; i < roleList.length && !found; i++) {
         // If measure is found, check if saved role equals current role and admin/user
@@ -325,7 +320,6 @@ const submitDataHelper = async (request, response) => {
                         query += parseInt((quarters.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
                     }
                 } else if (daily) {
-                    console.log('need to daily stuff and format the query');
                     query += '_' + year + '` () values (';
 
                     query += mysql.escape(date.replaceAll('-', '')) + ',';
@@ -352,8 +346,6 @@ const submitDataHelper = async (request, response) => {
 
                 // Finish query for sql
                 query = query.slice(0, query.length - 1) + ');';
-
-                console.log(query);
 
                 // Month for automatic reselection
                 if (!daily) {
@@ -397,7 +389,6 @@ const submitDataHelper = async (request, response) => {
                 // Push completely new entry if the measure wasn't present before
                 if (found) {
                     // If not slice out the comma and add the new number to it, also check before to make sure we don't have a duplicate entry
-                    // TODO: could be formatted better
                     if (quarterly) {
                         if (!entry.includes(quarterNumber + year) && !entry.includes(quarterNumber + year + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
@@ -595,13 +586,12 @@ const createMeasureHelper = async (request, response) => {
         // Format name correctly for mysql and add the year, backticks handle sql injection escape
         let tableName = request.body.id.replace('.', '$') + '_' + request.body.name.trim().replaceAll(' ', '_');
 
-        // TODO: better format for code in if
         // Build string here with correct attributes
         if (quarterly) {
             // Create table and data for measures that are measured quarterly, they are still stored in the default format
             table.push(request.body.year);
             table.push(request.body.cycle);
-            desc.push('dummy'); // TODO: check why this is here
+            desc.push('dummy');
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
         } else if (monthly) {
             table.push(request.body.year);
@@ -627,7 +617,6 @@ const createMeasureHelper = async (request, response) => {
         }
 
         // Make month the primary key 
-        // TODO: is this needed? change for daily measures?
         if (!daily) {
             sql += ' constraint pk_1 primary key(Monat));';
         } else {
@@ -825,7 +814,6 @@ const deleteHelper = async (request, response) => {
 /**
  * Receives post requests from changeMeasure page, collects all the necessary info and passes it to 
  * the database as request. If everything goes well the column is added to the correct table in the database.
- * // TODO: needs to be updated for daily measures?
  * @param {Request from the user page, contains all the data needed for creation of new column.} request 
  * @param {Sends back new page with success/error text.} response 
  */

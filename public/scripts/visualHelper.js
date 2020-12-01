@@ -753,7 +753,6 @@ Storage.prototype.getObject = function (key) {
 }
 
 // Automatically reselect last item that was entered, this in turn loads the table already
-// TODO: Something is wrong with the for-loop
 for (let i, j = 0; i = selM.options[j]; j++) {
     if (i.value === lastSelected.slice(0, lastSelected.length - 1)) {
         selM.selectedIndex = j;
