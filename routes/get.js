@@ -47,7 +47,8 @@ const visualHelper = function (request, response) {
                 text: '',
                 lastSelected: '',
                 lastYear: '',
-                measureListData: measureList
+                measureListData: measureList,
+                selectedMonth: ''
             });
             // Catch errors while loading from disk
         }).catch(function (error) {

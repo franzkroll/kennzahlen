@@ -15,18 +15,18 @@ require('winston-daily-rotate-file');
 
 
 // Automatic log file saving for failed login attempts
-const failedLoginAttempts = new(winston.transports.DailyRotateFile)({
-	filename: './logs/login-%DATE%.log',
-	datePattern: 'DD-MM-YYYY',
-	zippedArchive: true,
-	maxSize: '20m',
-	maxFiles: '30d'
+const failedLoginAttempts = new (winston.transports.DailyRotateFile)({
+    filename: './logs/login-%DATE%.log',
+    datePattern: 'DD-MM-YYYY',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '30d'
 });
 
 const logger = winston.createLogger({
-	transports: [
-		failedLoginAttempts
-	]
+    transports: [
+        failedLoginAttempts
+    ]
 });
 
 
@@ -56,8 +56,7 @@ const authHelper = function (request, response) {
                 });
                 console.log("User '" + request.session.username + "' logged in.");
             } else {
-                // TODO: log failed login attempt here, write failed login attempt in separate log
-                logger.info("Failed login attempt by user " + username + "! Username is known by the system." );
+                logger.info("Failed login attempt by user " + username + "! Username is known by the system.");
 
                 response.render('pages/errors/loginFailed');
             }
@@ -66,7 +65,7 @@ const authHelper = function (request, response) {
     }).catch(function (error) {
         // Log error in console, write failed login attempt in separate log
         if (error) console.log(error);
-        logger.warn("Failed login attempt by user " + username + "! Username is not known by the system." );
+        logger.warn("Failed login attempt by user " + username + "! Username is not known by the system.");
 
         response.render('pages/errors/loginFailed');
     });
@@ -176,7 +175,7 @@ const visualPostHelper = async (request, response) => {
 
             // Only access when user has correct role and mandate
             if (result && resultMandate) {
-                loadNameFromSQL(request.body.measure, request.body.year).then(function (result) {
+                loadNameFromSQL(request.body.measure, request.body.year, request.body.month).then(function (result) {
                     // Render page with newly acquired data
                     response.render('pages/visual', {
                         user: request.session.username,
@@ -185,7 +184,8 @@ const visualPostHelper = async (request, response) => {
                         text: 'Daten erfolgreich geladen!',
                         lastSelected: request.body.measure,
                         lastYear: request.body.year,
-                        measureListData: measureList
+                        measureListData: measureList,
+                        selectedMonth: request.body.month
                     });
                     // Show error if data query failed
                 }).catch(function (error) {
@@ -197,7 +197,8 @@ const visualPostHelper = async (request, response) => {
                         lastSelected: '',
                         lastYear: '',
                         text: 'Datensatz nicht vorhanden!',
-                        measureListData: measureList
+                        measureListData: measureList,
+                        selectedMonth: ''
                     });
                 });
                 // Show error if user has wrong rights
@@ -210,7 +211,8 @@ const visualPostHelper = async (request, response) => {
                     lastSelected: '',
                     lastYear: '',
                     text: 'Dafür besitzen Se nicht die nötigen Rechte!',
-                    measureListData: measureList
+                    measureListData: measureList,
+                    selectedMonth: ''
                 });
             }
         }
@@ -242,7 +244,7 @@ const submitDataHelper = async (request, response) => {
         console.log(error);
     }
 
-    // Save index, because for keeps running while reading from disk
+    // Save index, because for-loop keeps running while reading from disk
     let indexSave = -1;
     let found = false;
 
@@ -252,6 +254,7 @@ const submitDataHelper = async (request, response) => {
             indexSave = i;
             let quarterly = false;
             let yearly = false;
+            let daily = false;
             found = true;
 
             // If measure is found, check if saved role equals current role and admin/user
@@ -279,11 +282,21 @@ const submitDataHelper = async (request, response) => {
                 let indexCut = tableName.indexOf('~');
                 tableName = tableName.slice(0, indexCut);
 
-                // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
-                const date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
+                let year;
+                let date;
 
-                // Get just the year
-                const year = date.slice(date.length - 4, date.length);
+                if (tableName.includes('_daily')) {
+                    date = request.body.dailyDate;
+                    year = date.slice(0, 4);
+
+                    daily = true;
+                } else {
+                    // Escaping year for sql injection and slicing out the year, only quarter or month left afterwards
+                    date = mysql.escape(request.body.date).slice(1, request.body.date.length + 1);
+
+                    // Get just the year
+                    year = date.slice(date.length - 4, date.length);
+                }
 
                 // Build sql string
                 let query = 'REPLACE INTO `' + tableName;
@@ -306,10 +319,13 @@ const submitDataHelper = async (request, response) => {
                     } else {
                         query += parseInt((quarters.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
                     }
+                } else if (daily) {
+                    query += '_' + year + '` () values (';
+
+                    query += mysql.escape(date.replaceAll('-', '')) + ',';
                 } else {
                     // Add year to tablename
                     query += '_' + year + '` () values (';
-
 
                     // First case handles the year entry, second case entries with months
                     if (date.length === 4) {
@@ -318,6 +334,7 @@ const submitDataHelper = async (request, response) => {
                         query += parseInt((months.indexOf(date.slice(0, date.length - 4)) + 1 + year), 10) + ',';
                     }
                 }
+
 
                 // Get attributes, they are already in the right order
                 for (let key in request.body) {
@@ -331,7 +348,11 @@ const submitDataHelper = async (request, response) => {
                 query = query.slice(0, query.length - 1) + ');';
 
                 // Month for automatic reselection
-                month = date.slice(0, date.length - 4);
+                if (!daily) {
+                    month = date.slice(0, date.length - 4);
+                } else {
+                    month = 0;
+                }
 
                 // Contain month or quarter number if it exists, else it is -1
                 let quarterNumber = -1;
@@ -340,6 +361,8 @@ const submitDataHelper = async (request, response) => {
                 // Get indexes of month or quarters
                 if (quarterly) {
                     quarterNumber = quarters.indexOf(month);
+                } else if (daily) {
+                    //monthNumber = date.slice();
                 } else {
                     monthNumber = months.indexOf(month);
                 }
@@ -375,6 +398,12 @@ const submitDataHelper = async (request, response) => {
                         if (!entry.includes(year) && !entry.includes(year + ';')) {
                             entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
                             entry.push(year + ';');
+                        }
+                    } else if (daily) {
+                        let dateNumber = date.replaceAll('-', '');
+                        if (!entry.includes(dateNumber) && !entry.includes(dateNumber + ';')) {
+                            entry[entry.length - 1] = entry[entry.length - 1].slice(0, entry[entry.length - 1].length - 1);
+                            entry.push(dateNumber + ';');
                         }
                     } else {
                         if (!entry.includes(monthNumber + year) && !entry.includes(monthNumber + year + ';')) {
@@ -439,6 +468,7 @@ const submitDataHelper = async (request, response) => {
  * Called when user tries to create a new measure. Has to check if table already exists, the new year already exists.
  * If one of the above is true, then only the lists on disk are modified. If they don't exist already a new measure 
  * is also created in the mysql database.
+ * // TODO: remove id from gui, assign it automatically
  * @param {Request received from the user, hopefully contains all the necessary data to save the measure in the system.} request 
  * @param {Response page sent back to the user, contains message about success or error while creating the measure.} response 
  */
@@ -449,7 +479,7 @@ const createMeasureHelper = async (request, response) => {
     try {
         measureDescriptions = await IO.loadTextFile('desc');
         measureList = await IO.loadTextFile('tables');
-        roleList = await IO.loadTextFile('roles');  
+        roleList = await IO.loadTextFile('roles');
         entryList = await IO.loadTextFile('entries');
         mandateList = await IO.loadTextFile('mandates');
     } catch (error) {
@@ -466,6 +496,7 @@ const createMeasureHelper = async (request, response) => {
     let addYear = false;
     let monthly = false;
     let quarterly = false;
+    let daily = false;
     let error = false;
 
     // Determine which kind of measure was entered by the user
@@ -473,6 +504,8 @@ const createMeasureHelper = async (request, response) => {
         quarterly = true;
     } else if (request.body.cycle === 'monthly' && request.body.year) {
         monthly = true;
+    } else if (request.body.cycle === 'daily' && request.body.year) {
+        daily = true;
     } else if (request.body.cycle !== 'yearly') {
         // Something went wrong
         error = true;
@@ -504,7 +537,7 @@ const createMeasureHelper = async (request, response) => {
                 measureExists = true;
                 for (j = 0; j < years.length; j++) {
                     // Show error if year already exists, which means the measure already exists in the system
-                    if ((quarterly || monthly) && years[j] == request.body.year) {
+                    if ((quarterly || monthly || daily) && years[j] == request.body.year) {
                         yearExists = true;
                         response.render('pages/createMeasure', {
                             text: "Fehler! Kennzahl existiert bereits!",
@@ -515,7 +548,7 @@ const createMeasureHelper = async (request, response) => {
                     }
                 }
                 // Add year if it doesn't exist
-                if ((quarterly || monthly) && !yearExists && measureExists) {
+                if ((quarterly || monthly || daily) && !yearExists && measureExists) {
                     addYear = true;
                     measureList[i][1] += ':' + request.body.year;
                 }
@@ -563,10 +596,14 @@ const createMeasureHelper = async (request, response) => {
         } else if (monthly) {
             table.push(request.body.year);
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Monat INTEGER, ';
-        } else {
+        } else if (daily) {
+            tableName += '_daily';
+            table.push(request.body.year);
+            sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Tag INTEGER, ';
+        } /* else {
             table.push(request.body.cycle);
             sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
-        }
+        }*/
 
         // Add attribute names and descriptions, should always be same number of items
         for (let key in request.body) {
@@ -578,12 +615,21 @@ const createMeasureHelper = async (request, response) => {
             }
         }
 
-        // Make month the primary key
-        sql += ' constraint pk_1 primary key(Monat));';
+        // Make month the primary key 
+        if (!daily) {
+            sql += ' constraint pk_1 primary key(Monat));';
+        } else {
+            sql += ' constraint pk_1 primary key(Tag));';
+        }
 
         // Add semicolon, later needed for identification
-        tableName += '~' + request.body.sumCalc + ';';
+        if (daily) {
+            tableName += '~' + request.body.sumCalc + ';';
+        } else {
+            tableName += '~' + request.body.sumCalc + ';';
+        }
         table.push(tableName);
+
         desc[desc.length - 1] = desc[desc.length - 1] + ';';
 
         // Push table and description data into loaded table
@@ -878,6 +924,7 @@ const addAttributeHelper = async (request, response) => {
 
 /**
  * Changes the specified attribute of the measure. Reloads the page again.
+ * TODO: check if it needs updates for daily measures? 
  * @param {Request from the user. Contains the attribute to be changed.} request 
  * @param {Response with success/failure text. Also sends new page to the user.} response 
  */
@@ -1181,7 +1228,7 @@ const changePasswordHelper = function (request, response) {
  * @param {Name of the measure that we want the data of.} name 
  * @param {Year of the measure that we want the data of.} year 
  */
-function loadNameFromSQL(name, year) {
+function loadNameFromSQL(name, year, month) {
     return new Promise(function (resolve, reject) {
         // Load file with table names for checking
         IO.loadTextFile('tables').then(function (measureList) {
@@ -1201,7 +1248,7 @@ function loadNameFromSQL(name, year) {
             // If user has entered a year we can add it and query the database
             if (year) {
                 tableName = tableName + "_" + year.trim();
-                SQL.getMeasureFromDB(tableName).then(function (result) {
+                SQL.getMeasureFromDB(tableName, month).then(function (result) {
                     resolve([tableName, result]);
                 }).catch(function (error) {
                     reject(error);

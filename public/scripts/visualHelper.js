@@ -13,17 +13,21 @@
 // Split data that was received into an array
 const measureArray = measureListData.split(';');
 
+
 // Get needed elements from html page
 const table = document.getElementById("dataTable");
 const selGraph = document.getElementById('graph');
 const selM = document.getElementById('measure');
 const selYear = document.getElementById('year');
+const selMonth = document.getElementById('month');
 const button = document.getElementById('button');
 
 
 // Used for creating table headers with months and quarters
+const monthsIndex = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const months = ['Eigenschaft der Kennzahl', 'Jahr', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const quarters = ['Eigenschaft der Kennzahl', 'Jahr', '1.Quartal', '2.Quartal', '3.Quartal', '4.Quartal'];
+const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 // Saves values in double brackets from measure attributes => the percent lines to be displayed in the graph
 let percentValues = [];
@@ -39,6 +43,9 @@ let dataGraph = [];
 
 // Saves attributes of the current measure
 let measureAttr = [];
+
+//
+let monthsAdded = false;
 
 // Replace all because js doesn't have it
 String.prototype.replaceAll = function (search, replacement) {
@@ -63,6 +70,16 @@ selM.onchange = function () {
     nameField.innerHTML = '';
 }
 
+function SelectHasValue(select, value) {
+    obj = document.getElementById(select);
+
+    if (obj !== null) {
+        return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
+    } else {
+        return false;
+    }
+}
+
 // Handle filling of table and graph data when new measure is selected 
 selM.onclick = function () {
     // Get parsed name of table
@@ -74,6 +91,9 @@ selM.onclick = function () {
     // For checking if table head was already inserted
     let insertedHead = false;
 
+    // 
+    let dailyPrepared = false;
+
     // Stores which type the table is
     let yearHead = false;
 
@@ -82,6 +102,7 @@ selM.onclick = function () {
     let sumCalc;
 
     let yearlyMeasure = false;
+    let dailyMeasure = false;
 
     // Save spots we filled for later rows
     let filling = [];
@@ -96,6 +117,10 @@ selM.onclick = function () {
             if (measure[j] === inputText) {
                 // Get tablename of the received data
                 let tableName = measure[measure.length - 1];
+
+                if (tableName.includes('_daily')) {
+                    dailyMeasure = true;
+                }
 
                 // Slice out info how the yearly sum is collected
                 let index = tableName.indexOf('~');
@@ -117,19 +142,43 @@ selM.onclick = function () {
                 // Split years here for year table, only if it isn't yearly or quarterly measure
                 years = measure[j + 1].trim().split(':');
 
-                // Returns true if quarterly or monthly measure
-                if (/^\d+$/.test(years[0])) {
-                    years = years.sort();
+                // Sort the years, makes the output look nicer
+                years = years.sort();
 
-                    // Put years into the select menu for tables
+                // Only show month menu if it's a daily measure
+                if (!dailyMeasure) {
+                    document.getElementById('month').style.visibility = 'hidden';
+                } else {
+                    if (!monthsAdded) {
+                        selMonth.style.visibility = 'visible';
+                        let opt = document.createElement('option');
+                        opt.value = 'Bitte Monat wählen ...';
+                        opt.appendChild(document.createTextNode('Bitte Monat wählen ...'));
+                        selMonth.appendChild(opt);
+                        for (l = 2; l < months.length; l++) {
+                            if (selMonth.length < 13) {
+                                let opt = document.createElement('option');
+                                opt.value = months[l];
+                                opt.appendChild(document.createTextNode(months[l]));
+                                selMonth.appendChild(opt);
+
+                                if (months[l] === selectedMonth) {
+                                    selMonth.value = selectedMonth;
+                                }
+                            }
+                        }
+                    }
+                    monthsAdded = true;
+                }
+
+                // Returns true if quarterly or monthly or daily measure, fills year select menu with values
+                if (dailyMeasure || (/^\d+$/.test(years[0]))) {
                     for (k = 0; k < years.length; k++) {
                         let opt = document.createElement('option');
                         opt.value = years[k];
                         opt.appendChild(document.createTextNode(years[k]));
                         selYear.appendChild(opt);
                     }
-
-              
                 } else if (years[0] === 'yearly') {
                     yearHead = true;
                     // Add first row of years here
@@ -143,7 +192,6 @@ selM.onclick = function () {
                 for (let i = 0; i < selYear.options.length; i++) {
                     if (selYear.options[i].value === lastYear) {
                         selYear.selectedIndex = i;
-                                        
                         break;
                     }
                 }
@@ -188,6 +236,17 @@ selM.onclick = function () {
                     insertedHead = true;
 
                     // Then quarterly measures
+                } else if (measureData && dailyMeasure) {
+                    // Find out the correct month
+                    const monthIndex = monthsIndex.indexOf(selectedMonth);
+
+                    // Correctly format labels for graph, fill it with the right number of days for the corresponding month
+                    for (p = 1; p <= daysInMonth[monthIndex]; p++) {
+                        labels.push(p);
+                    }
+
+                    dailyPrepared = true;
+                    insertedHead = true;
                 } else if (measureData && !insertedHead && measure[2] === 'quarterly') {
                     labels = quarters.slice(2, months.length);
 
@@ -212,9 +271,74 @@ selM.onclick = function () {
                 }
             }
 
-            // Precaution so we don't leave the array length later on, only enter if the 
-            // table head is already done and we are ready to write data into the table
-            if (insertedHead && (j < measure.length - 3)) {
+            if (dailyPrepared && measureData && (j < measure.length - 3)) {
+                document.getElementById('name').style.visibility = "hidden";
+
+                measureAttr.push(measure[j + 2]);
+
+                // Look for percent entry syntax
+                if (measure[j + 2].includes('[[')) {
+                    // And slice out the percent value
+                    const percentEntry = measure[j + 2];
+
+                    // Add graph data for complete graph at percent value
+                    const percentValue = percentEntry.slice(percentEntry.indexOf('[[') + 2, percentEntry.indexOf(']]') - 1);
+                    percentValues.push(percentValue);
+
+                    // Replace marking for percent values so we don't display them
+                    measure[j + 2] = measure[j + 2].replace(']]', '');
+                    measure[j + 2] = measure[j + 2].replace('[[', '');
+                } else {
+                    percentValues.push(0);
+                }
+
+
+                // Append data to table if there is any to add and if we got the right data already
+                if ((inputText === (tableName2.replaceAll('_', ' ')))) {
+                    let dataBuilder = [];
+                    var columnCount = measure.length - 2;
+
+                    var count = 1;
+
+                    // Cycle through data for measure and take column breaks into account, 
+                    for (k = j + 1; k < columns.length; k += columnCount) {
+                        let cellData;
+
+                        // We only need the second part of the data for the table
+                        if (columns[k].split(':')[1].slice(0, 2) === '-1') {
+                            cellData = 'n.v.';
+                        } else {
+                            cellData = columns[k].split(':')[1].replace(/[^0-9.]/g, '');
+                        }
+
+                        // Just add a zero if we don't have the data, comparison is weird, maybe there is an easier way
+                        if (count != columns[k - 1].split(':')[1].slice(-2) && (columns[k - 1].split(':')[1].length >= 5) || (filling.includes(count))) {
+                            cellData = 'n.v.';
+                            filling.push(count);
+                            k -= columnCount;
+                        }
+
+                        count++
+
+                        // Substitute again for graphs
+                        if (cellData === 'n.v.') {
+                            cellData = 0;
+                        }
+
+                        // Add to yearly sum here, push new entry if it doesn't exist yet
+                        if (typeof sumArray[j] === 'undefined') {
+                            sumArray.push(parseFloat(cellData));
+                        } else {
+                            sumArray[j] = sumArray[j] + parseFloat(cellData);
+                        }
+
+
+                        dataBuilder.push(cellData);
+
+                    }
+                    dataGraph.push(dataBuilder);
+                }
+            } else if (insertedHead && (j < measure.length - 3)) {
                 // Prepare new table rows for data
                 let row = table.insertRow(j + 1);
 
@@ -643,7 +767,6 @@ Storage.prototype.getObject = function (key) {
 }
 
 // Automatically reselect last item that was entered, this in turn loads the table already
-// TODO: Something is wrong with the for-loop
 for (let i, j = 0; i = selM.options[j]; j++) {
     if (i.value === lastSelected.slice(0, lastSelected.length - 1)) {
         selM.selectedIndex = j;
@@ -656,9 +779,6 @@ for (let i, j = 0; i = selM.options[j]; j++) {
         break;
     }
 }
-
-console.log(lastYear);
-
 
 
 /**
@@ -701,6 +821,7 @@ document.getElementById('report').onclick = function () {
 
 /**
  * Creates new pdf document from all previously stored measure in the session storage
+ * TODO: jspdf is broken
  */
 document.getElementById('download').onclick = function () {
     // Create new document

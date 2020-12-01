@@ -165,15 +165,40 @@ function checkMandatePermissions(mandate, request) {
     });
 }
 
+// Need it to match the month string with it's corresponding number
+const monthNumbers = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
 /**
  * Queries database for a complete measure, no sql injection prevention needed because tableName is taken from predefined list.
  * @param {Tablename that is to be queried from the database.} tableName 
+ * @param {Month of the measure that we want the data of.} month
  * @param {Returns error if query fails.} callback 
  */
-function getMeasureFromDB(tableName) {
+function getMeasureFromDB(tableName, month) {
+    let query;
+    let abort = false;
+
+    // Check which query we have to build, 
+    if (!(month === 'Bitte Monat wählen ...')) {
+        let monthNumber = monthNumbers.indexOf(month) + 1;
+        // Have to add a zero to match naming scheme in sql
+        if (monthNumber <= 9) {
+            monthNumber = '0' + monthNumber;
+        }
+        query = 'SELECT * FROM `' + tableName + '` where Tag like \'2020' + monthNumber + '%\';';
+    } else if ((month === 'Bitte Monat wählen ...') && tableName.includes('daily')) {
+        abort = true;
+    } else {
+        query = 'SELECT * FROM `' + tableName + '`;';
+    } 
+
+
     return new Promise(function (resolve, reject) {
-        connectionData.query('SELECT * FROM `' + tableName + '`;', function (err, res) {
+        if (abort) {
+            console.log('Error: no month selected for daily measure!');
+            return reject();
+        }
+        connectionData.query(query, function (err, res) {
             if (err) {
                 return reject(err);
             } else {

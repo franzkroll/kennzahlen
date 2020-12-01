@@ -9,8 +9,6 @@
         <% include ../partials/header %>
     </header>
 
-    <!--TODO: Maybe add option for daily measures. -->
-
     <main>
         <span style="display:block; height: 10px;"></span>
         <div class="misc-text" style="text-align:center;margin-bottom: 10px;margin-right: 10px">
@@ -75,6 +73,7 @@
                     Erfassungzyklus:
                     <select style="text-align:left; width:50%;" id="cycle" name="cycle" id="cycle" class="dropdownS"
                         required>
+                        <option value="daily">täglich</option>
                         <option value="monthly">monatlich</option>
                         <option value="quarterly">quartalsweise</option>
                         <option value="yearly">jährlich</option>
