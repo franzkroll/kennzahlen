@@ -2,8 +2,6 @@
 
 System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, Chart.js und jspdf.)
 
-ACHTUNG: DEVELOPMENT BRANCH, ENTHÄLT HÄUFIGE ÄNDERUNGEN
-
 ## NEUE FEATURES GEGENÜBER AKTUELLER VERSION
 
 * Protokollierung gescheiterter Login-Versuche unter [logs](logs/)
