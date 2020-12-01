@@ -26,7 +26,7 @@ Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in 
 git clone https://github.com/franzkroll/kennzahlen.git
 cd kennzahlen
 npm install
-// Kopieren und anpassen der .env Datei
+# Kopieren und anpassen der .env Datei, danach:
 node server.js
 ```
 
