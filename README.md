@@ -9,6 +9,8 @@ ACHTUNG: DEVELOPMENT BRANCH, ENTHÄLT HÄUFIGE ÄNDERUNGEN
 * Protokollierung gescheiterter Login-Versuche unter [logs](logs/)
 * Automatische Auswahl der letzten Kennzahl und Jahr bei Visualisierung
 * Bugfix bei farbiger Markierung bereits eingetragener Werte
+* Kennzahlen können täglich erfasst werden
+* Mehrere kleinere Bugfixes
 
 ## Features
 
