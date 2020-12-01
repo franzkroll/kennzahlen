@@ -600,11 +600,10 @@ const createMeasureHelper = async (request, response) => {
             tableName += '_daily';
             table.push(request.body.year);
             sql = 'create table ' + '`' + tableName + '_' + request.body.year + '` (Tag INTEGER, ';
-        } else {
-            console.log('landed in else case');
+        } /* else {
             table.push(request.body.cycle);
             sql = 'create table ' + '`' + tableName + '_' + request.body.cycle + '` (Monat INTEGER, ';
-        }
+        }*/
 
         // Add attribute names and descriptions, should always be same number of items
         for (let key in request.body) {

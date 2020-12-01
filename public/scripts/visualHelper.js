@@ -44,6 +44,9 @@ let dataGraph = [];
 // Saves attributes of the current measure
 let measureAttr = [];
 
+//
+let monthsAdded = false;
+
 // Replace all because js doesn't have it
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
@@ -148,13 +151,14 @@ selM.onclick = function () {
                 } else {
                     selMonth.style.visibility = 'visible';
                     for (l = 2; l < months.length; l++) {
-                        if (selMonth.length < 13) {
+                        if (selMonth.length < 13 && !monthsAdded) {
                             let opt = document.createElement('option');
                             opt.value = months[l];
                             opt.appendChild(document.createTextNode(months[l]));
                             selMonth.appendChild(opt);
                         }
                     }
+                    monthsAdded  =true;
                 }
 
                 // Returns true if quarterly or monthly or daily measure, fills year select menu with values
