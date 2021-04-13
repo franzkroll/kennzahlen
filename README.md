@@ -2,13 +2,15 @@
 
 System der Leitstelle Lausitz zur Verwaltung und Visualisierung von Kennzahlen. (Gebaut mit NodeJS, HTML, javascript, express, mysql, Chart.js und jspdf.)
 
+ACHTUNG: DEVELOPMENT BRANCH, ENTHÄLT HÄUFIGE ÄNDERUNGEN
+
 ## NEUE FEATURES GEGENÜBER AKTUELLER VERSION
 
-* Protokollierung gescheiterter Login-Versuche unter [logs](logs/)
-* Automatische Auswahl der letzten Kennzahl und Jahr bei Visualisierung
-* Bugfix bei farbiger Markierung bereits eingetragener Werte
-* Kennzahlen können täglich erfasst werden
-* Mehrere kleinere Bugfixes
+- Protokollierung gescheiterter Login-Versuche unter [logs](logs/)
+- Automatische Auswahl der letzten Kennzahl und Jahr bei Visualisierung
+- Bugfix bei farbiger Markierung bereits eingetragener Werte
+- Kennzahlen können täglich erfasst werden
+- Mehrere kleinere Bugfixes
 
 ## Features
 
@@ -16,7 +18,7 @@ Verschiedene Nutzer haben die Möglichkeit, Kennzahlen einzusehen, einzutragen, 
 
 ## Installation und Start einer eigenen Instanz des Servers
 
-Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt. 
+Zur Ausführung des Servers wird eine aktuelle Installation von NodeJS, MySQL und npm benötigt. Die Datenbanken müssen zur Ausführung ein entsprechendes Format einhalten. Dieses ist weiter unten dargestellt und erklärt.
 
 Zur Installation muss zuerst das repository gecloned werden. Nach Navigation in das Verzeichnis müssen die benötigten npm-packages installiert werden. Danach lässt sich die Anwendung mit Hilfe von Node starten.
 
@@ -28,9 +30,9 @@ npm install
 node server.js
 ```
 
-Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [.env](/misc_files/.env) angepasst werden. Dazu muss die Datei in das Hauptverzeichnis kopiert und anschließend angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden, müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern strengstens empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) Weitere Hilfsdateien zur Speicherung von Kennzahleninformationen werden automatisch erstellt. 
+Ebenso ist eine lokale Installation von MySQL erforderlich. Die Zugangsdaten zu dieser müssen in der Konfigurationsdatei [.env](/misc_files/.env) angepasst werden. Dazu muss die Datei in das Hauptverzeichnis kopiert und anschließend angepasst werden. Soll der Server andere Namen für die Datenbanken verwenden, müssen diese ebenfalls angepasst werden. Ebenso wird die Verwendung von anderen Passwörtern strengstens empfohlen. Weiterhin können in der Konfigurationsdatei IP und Port des Servers angepasst werden. Die Benutzerdatenbank muss zur Anmeldung wenigstens einen Benutzer enthalten. (Zur leichteren Einrichtung enthält der Ordner [misc_files](misc_files/) eine SQL-Datenbank mit einem Benutzer admin (Passwort: Admin123!), es wird allerdings empfohlen nach dem ersten Einloggen einen neuen Benutzer zu erstellen oder das Passwort zu wechseln.) Weitere Hilfsdateien zur Speicherung von Kennzahleninformationen werden automatisch erstellt.
 
-### Zertifikate 
+### Zertifikate
 
 Standardmäßig verwendet die Anwendung https. Für einen erfolgreichen Start muss ein Paar aus Zeritifikat und Key erstellt werden und in den Ordner [misc_files](cert/) kopiert werden. Dieser sollte standardmäßig zuvor im Hauptverzeichnis erstellt werden.
 
@@ -51,11 +53,13 @@ DB_MEASURE_USER='user'
 DB_MEASURE_PASSWORD='passwort'
 DB_MEASURE_DATABASE='measures'
 ```
+
 Die Anwendung ist standardmäßig über [localhost:8080](https://localhost:8080/) erreichbar. Beim Starten mit Hilfe von node lässt sich ebenso ein anderer Port spezifizieren:
 
 ```sh
 PORT:4444 node kennzahlen.js
 ```
+
 (Beispiel mit Port 4444)
 
 Ebenso ist ein Start über eine feste IP-Adresse möglich. Dies ist über die Startoptionen oder über eine Anpassung von SERVER_IP in [.env](/.env) möglich. (Standardmäßig startet der Server über localhost.)
@@ -63,6 +67,7 @@ Ebenso ist ein Start über eine feste IP-Adresse möglich. Dies ist über die St
 ```sh
 IP:192.168.2.1 node kennzahlen.js
 ```
+
 (Beispiel mit IP 192.168.2.1)
 
 Zum Start wird aber die Benutzung von forever (https://www.npmjs.com/package/forever) empfohlen. Diese sorgt für einen automatischen Neustart beim Absturz der App. Installation, Starten, Stoppen bzw. Neustarten erfolgt dann mit folgenden befehlen:
@@ -81,7 +86,7 @@ forever list
 forever logs
 ```
 
-Ein log über alle Ereignisse wird ebenso automatisch im Ordner [logs](logs/) erstellt. Möchte man ein eigenes SSL-Zertifikat  verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
+Ein log über alle Ereignisse wird ebenso automatisch im Ordner [logs](logs/) erstellt. Möchte man ein eigenes SSL-Zertifikat verwenden, können diese im Ordner [cert](cert/) hinterlegt werden.
 
 ## Aufbau der Datenbanken
 
@@ -89,19 +94,18 @@ Zur einfacheren und sicheren Verwaltung sind die Daten der Anwendung in zwei Dat
 
 ### Benutzerdatenbank
 
-Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzers gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Will man mehrere Rollen festlegen, müssen diese durch einen Unterstrich getrennt werden. Ebenso besitzen Benutzer Mandate. Diese signalisieren die Zugehörigkeit zu einer bestimmten Rettungsstelle. Benutzer mit dem Mandat '*' besitzen Zugriff auf alle Mandate. Möchte man mehrere Rollen oder Mandate für einen Benutzer festlegen, sollten diese durch einen Unterstrich getrennt werden.
+Die Benutzerdatenbank heißt 'nodelogin' und enthält die Tabelle 'accounts' mit allen Benutzern. Es werden Benutzername, Passwort als Hash (erstellt mit bcrypt), E-Mail, sowie die Rolle des Benutzers gespeichert. 'admin' und 'user' sind die zwei Basisrollen. Es können ebenso weitere Rollen erstellt und der Zugriff auf die Kennzahlen für diese Rollen festgelegt werden. Will man mehrere Rollen festlegen, müssen diese durch einen Unterstrich getrennt werden. Ebenso besitzen Benutzer Mandate. Diese signalisieren die Zugehörigkeit zu einer bestimmten Rettungsstelle. Benutzer mit dem Mandat '\*' besitzen Zugriff auf alle Mandate. Möchte man mehrere Rollen oder Mandate für einen Benutzer festlegen, sollten diese durch einen Unterstrich getrennt werden.
 Passwörter werden gehasht mit bcrypt gespeichert und in der Datenbank hinterlegt. Bei einem Login wird das vom Benutzer eingetragene Passwort gehashed und mit dem gespeicherten Hash verglichen.
 Möchte man Benutzer neu erstellen, muss man auf ein sicheres Passwort achten. Es müssen zwischen 8 und 100 Zeichen lang sein, Groß- und Kleinbuchstaben enthalten, sowie mindestens eine Zahl und keine Leerzeichen. Sehr offentsichtliche Passwörter sind ebenfalls gesperrt.
 
 #### Beispiel
 
-| id | username | passwort | email         | role  | mandate |
-| -- | -------- | -------- | ------------- | ----- | ------- |
-| 1  | admin    | Admin123!| test@test.com | admin | cottbus |
-
+| id  | username | passwort  | email         | role  | mandate |
+| --- | -------- | --------- | ------------- | ----- | ------- |
+| 1   | admin    | Admin123! | test@test.com | admin | cottbus |
 
 Standardmäßig hat ein Benutzer mit der Rolle 'admin' Zugriff auf alle Bereiche, 'user' und allen weiteren Rollen fehlt der Zugriff auf den Adminbereich. Ein Benutzer mit der Rolle 'user' darf ebenso Kennzahlen erstellen und bearbeiten. Weitere Rollen können ebenso verwendet werden um den Zugriff auf die verschiedenen Kennzahlen festzulegen. Diese müssen bei der Erstellung der Kennzahl spezifiziert werden. IDs werden automatisch fortlaufend vergeben und müssen nicht bei der Erstellung festgelegt werden.
-Benutzer mit dem Mandat '*' haben Zugriff auf alle Mandate.
+Benutzer mit dem Mandat '\*' haben Zugriff auf alle Mandate.
 
 ### Kennzahlendatenbank
 
@@ -111,20 +115,20 @@ Standardmäßig werden die MySQL Tabellen nach den Namen der Kennzahlen benannt.
 
 #### Beispiel
 
-|                  | Eigenschaft 1.1.1 | Eigenschaft 1.1.2 | Eigenschaft 1.1.3 | 
-| ---------------- | ----------------- | ----------------- | ----------------- | 
-| Januar 2019      | 0                 | 4                 | 5                 | 
-| Februar 2019     | 3                 | 1                 | 2                 | 
-| März 2019        | 0                 | 4                 | 5                 | 
-| April 2019       | 3                 | 1                 | 2                 |  
+|              | Eigenschaft 1.1.1 | Eigenschaft 1.1.2 | Eigenschaft 1.1.3 |
+| ------------ | ----------------- | ----------------- | ----------------- |
+| Januar 2019  | 0                 | 4                 | 5                 |
+| Februar 2019 | 3                 | 1                 | 2                 |
+| März 2019    | 0                 | 4                 | 5                 |
+| April 2019   | 3                 | 1                 | 2                 |
 
 #### Beispiel für Tabellenname
 
 Kennzahl: 1.1, Anzahl der Alarmierungen, Jahr 2018
 
-Tabellenname in Datenbank: 1$1_Anzahl_der_Alarmierungen_2018
+Tabellenname in Datenbank: 1\$1_Anzahl_der_Alarmierungen_2018
 
-Punkte in der ID werden durch $-Zeichen ersetzt, Leerzeichen durch Unterstriche.
+Punkte in der ID werden durch \$-Zeichen ersetzt, Leerzeichen durch Unterstriche.
 
 ## Benutzung des Web-Interfaces
 
@@ -149,7 +153,7 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 ![](misc_files/screenshots/imgSubmit.png?raw=true "Eingabeformular")
 
-### Erstellungsformular 
+### Erstellungsformular
 
 ![](misc_files/screenshots/imgCreate.png?raw=true "Erstellungsformular")
 
@@ -163,12 +167,12 @@ Folgende Bilder zeigen beispielhaft einige Ausschnitte der Website.
 
 ## Bisher noch fehlende Funktionen
 
-* Funktion zum Wechseln von Benutzerrollen
-* Wiederherstellung von vergessenen Passwörtern (eventuell über E-Mail)
-* Vergleich von Kennzahlen über mehrere Jahre
-* Täglich erfasste Kennzahlen
-* Automatische Erstellung von Reports für ein gesamtes Mandat
-* Spätere Änderung der Summenberechnung
+- Funktion zum Wechseln von Benutzerrollen
+- Wiederherstellung von vergessenen Passwörtern (eventuell über E-Mail)
+- Vergleich von Kennzahlen über mehrere Jahre
+- Täglich erfasste Kennzahlen
+- Automatische Erstellung von Reports für ein gesamtes Mandat
+- Spätere Änderung der Summenberechnung
 
 ## Kontakt
 
@@ -179,6 +183,6 @@ franz.kroll@b-tu.de
 
 Sourcecode lizensiert unter MIT (http://opensource.org/licenses/mit-license.php).
 
-## Disclaimer 
+## Disclaimer
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
