@@ -190,7 +190,12 @@ selM.onchange = function () {
     }
 }
 
-selM.selectedIndex = -1;
+//selM.selectedIndex = 0;
+try {
+    selM.onchange();
+} catch (e) {
+    console.log('No measures exist!')
+}
 
 // Automatically reselect last item that was entered
 for (let i, j = 0; i = selM.options[j]; j++) {

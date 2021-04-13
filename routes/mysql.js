@@ -166,7 +166,7 @@ function checkMandatePermissions(mandate, request) {
 }
 
 // Need it to match the month string with it's corresponding number
-const monthNumbers = ['Januar', 'Februar', 'M√§rz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const monthNumbers = ['Januar', 'Februar', 'M‰rz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
 /**
  * Queries database for a complete measure, no sql injection prevention needed because tableName is taken from predefined list.
@@ -179,18 +179,18 @@ function getMeasureFromDB(tableName, month) {
     let abort = false;
 
     // Check which query we have to build, 
-    if (!(month === 'Bitte Monat w√§hlen ...')) {
+    if (tableName.includes('daily')) {
         let monthNumber = monthNumbers.indexOf(month) + 1;
         // Have to add a zero to match naming scheme in sql
         if (monthNumber <= 9) {
             monthNumber = '0' + monthNumber;
         }
         query = 'SELECT * FROM `' + tableName + '` where Tag like \'2020' + monthNumber + '%\';';
-    } else if ((month === 'Bitte Monat w√§hlen ...') && tableName.includes('daily')) {
+    } else if ((month === 'Bitte Monat w‰hlen ...') && tableName.includes('daily')) {
         abort = true;
     } else {
         query = 'SELECT * FROM `' + tableName + '`;';
-    } 
+    }
 
 
     return new Promise(function (resolve, reject) {

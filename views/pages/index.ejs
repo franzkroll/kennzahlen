@@ -7,7 +7,7 @@ Has header and footer for navigation and info.
 	<% include ../partials/head %>
 </head>
 
-<body class="container">
+<body class="container"> 
 	<!-- Load header, every page hast this. -->
 	<header>
 		<% include ../partials/header %>
@@ -17,26 +17,25 @@ Has header and footer for navigation and info.
 		<!-- Buttons for the different sections of the system. -->
 		<div style="text-align:center;">
 			<div>
-				<a href="<%= process.env.BASEURL %>/visual"><button title="√ñffnet √úbersicht zum Abrufen und Darstellen von Kennzahle."
-						class="button">Visualisierung bestehender Kennzahlen</button></a>
+				<a href="<%= process.env.BASEURL %>/visual"><button title="÷ffnet ‹bersicht zum Abrufen und Darstellen von Kennzahlen."
+						class="button">Abrufen von Kennzahlen</button></a>
 			</div>
 			<div>
-				<a href="<%= process.env.BASEURL %>/submit"><button title="√ñffnet √úbersicht zur Eingabe von Kennzahlendaten."
-						class="button">Eingabeformular f√ºr Kennzahlen</button></a>
+				<a href="<%= process.env.BASEURL %>/submit"><button title="÷ffnet ‹bersicht zur Eingabe von Kennzahlendaten."
+						class="button">Eingabeformular</button></a>
 			</div>
 			<div>
-				<a href="<%= process.env.BASEURL %>/createMeasure"><button title="√ñffnet Men√º zur Erstellung neuer Kennzahlen."
-						class="button">Neue
-						Kennzahl anlegen</button></a>
+				<a href="<%= process.env.BASEURL %>/createMeasure"><button title="÷ffnet Men¸ zur Erstellung neuer Kennzahlen."
+						class="button">Neue Kennzahl</button></a>
 			</div>
 			<div>
 				<a href="<%= process.env.BASEURL %>/changeMeasure"><button
-						title="√ñffnet Men√º zur Bearbeitung von bereits existierenden Kennzahlen."
-						class="button">Bestehende Kennzahl bearbeiten</button></a>
+						title="÷ffnet Men¸ zur Bearbeitung von bereits existierenden Kennzahlen."
+						class="button">Kennzahl-Eigenschaften bearbeiten</button></a>
 			</div>
 			<div>
 				<a href="<%= process.env.BASEURL %>/measureHelp"><button title="Zeigt Beschreibung zu allen Kennzahlen im System."
-						class="button">Beschreibungen der Kennzahlen anzeigen</button></a>
+						class="button">Beschreibungen der Kennzahlen</button></a>
 			</div>
 		</div>
 	</main>
