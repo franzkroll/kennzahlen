@@ -178,6 +178,9 @@ function getMeasureFromDB(tableName, month) {
     let query;
     let abort = false;
 
+    splitName = tableName.split('_');
+    year = splitName[splitName.length - 1];
+
     // Check which query we have to build, 
     if (tableName.includes('daily')) {
         let monthNumber = monthNumbers.indexOf(month) + 1;
@@ -185,13 +188,12 @@ function getMeasureFromDB(tableName, month) {
         if (monthNumber <= 9) {
             monthNumber = '0' + monthNumber;
         }
-        query = 'SELECT * FROM `' + tableName + '` where Tag like \'2020' + monthNumber + '%\';';
+        query = 'SELECT * FROM `' + tableName + '` where Tag like \'' + year + '' + monthNumber + '%\';';
     } else if ((month === 'Bitte Monat wählen ...') && tableName.includes('daily')) {
         abort = true;
     } else {
         query = 'SELECT * FROM `' + tableName + '`;';
     }
-
 
     return new Promise(function (resolve, reject) {
         if (abort) {
