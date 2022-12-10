@@ -21,7 +21,7 @@
     "ddos": "0.2.1",
     "dotenv": "8.0.0",
     "ejs": "^2.6.1",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-server-status": "^1.0.3",
     "express-session": "^1.17.1",
     "fs-extra": "8.0.1",
